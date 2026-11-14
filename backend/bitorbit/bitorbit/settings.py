@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'core.apps.CoreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -132,3 +133,14 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+# Machine-to-machine ingestion, independent of Django session login.
+SIM_INGEST_TOKEN = os.environ.get('SIM_INGEST_TOKEN', '')
+INGEST_MAX_BATCH_SIZE = 1000
+INGEST_MAX_BODY_BYTES = 4 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = INGEST_MAX_BODY_BYTES
+
+
+# Local Bronze lakehouse storage, shared by the backend and exporter containers.
+BRONZE_ROOT = Path(os.environ.get('BRONZE_ROOT', str(BASE_DIR / 'data' / 'bronze')))

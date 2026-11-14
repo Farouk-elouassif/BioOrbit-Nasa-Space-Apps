@@ -76,7 +76,7 @@ Local JSONL is an atomic **full snapshot** exported from the journal; re-export 
 
 ## HTTP delivery to Django
 
-A receiver is not implemented. Configure the eventual endpoint explicitly:
+The matching Django receiver is now implemented at `POST /api/v1/ingest/events`. For host-run simulator commands, configure its URL and the shared token from the root `.env` explicitly:
 
 ```bash
 export SIM_INGEST_URL=http://localhost:8000/api/v1/ingest/events
@@ -206,7 +206,7 @@ Simulator options are in the repository's `.env` and documented in `.env.example
 - Initial mission settings: `SIM_MISSION_ID`, `SIM_HABITAT_ID`, `SIM_RUN_ID`, `SIM_ASTRONAUTS`, `SIM_ENVIRONMENT`, `SIM_SEED`, `SIM_START`, `SIM_DURATION_DAYS`, `SIM_PREFLIGHT_DAYS`, `SIM_SPEED`. These apply **only when state is first initialized**. Existing state retains saved profiles, environment, and speed; use live controls below for those supported changes.
 - Startup history target: `SIM_HISTORY_DAYS` (default 30, set 0 for no initial history), `SIM_HISTORY_INTERVAL` (default 300 simulated seconds). Raising the target backfills further only if the current mission clock is still below it. Lowering it never rewinds the clock.
 - Live delivery/pacing: `SIM_EMIT_INTERVAL` (default 5 real seconds), `SIM_BATCH_SIZE` (500), `SIM_HTTP_TIMEOUT` (10), `SIM_HTTP_RETRIES` (3).
-- `SIM_INGEST_URL` and `SIM_INGEST_TOKEN`: **empty by default**, because Django has no ingestion endpoint yet. Events remain safely in the simulator volume. Startup backfill is local; once live starts, configured HTTP delivery sends the pending history and new records. When the endpoint is implemented, use `SIM_INGEST_URL=http://backend:8000/api/v1/ingest/events`, not `localhost`, and recreate the simulator service. The backend's allowed hosts include `backend` for this connection.
+- `SIM_INGEST_URL` and `SIM_INGEST_TOKEN`: the root `.env` configures `http://backend:8000/api/v1/ingest/events` and a shared bearer token for the implemented Django receiver. Use `backend`, not `localhost`, inside Compose. Startup backfill is local; once live starts, HTTP delivery sends the pending history and new records. Clear `SIM_INGEST_URL` for local-only operation. Recreate the service after changing environment configuration. See [backend ingestion documentation](../backend/README.md#simulator-ingestion-api).
 
 Commands to run yourself from the repository root:
 
@@ -233,3 +233,6 @@ docker compose up --build simulator
 ```
 
 `docker compose down` preserves state volumes. Do not delete volumes to apply ordinary configuration changes. CLI commands inside this image automatically use `SIM_STATE_PATH=/data/simulation.sqlite3`; host commands still default to `data/simulation.sqlite3`. Do not launch a second live generator against the same volume. The entry command can also be tested outside Docker with `SIM_STATE_PATH` pointing at a local file and `SIM_LIVE_TICKS` set to a finite count; this is used by the automated lifecycle tests.
+
+
+The backend also accepts the equivalent workbook metric identifiers listed in [its mapping table](../backend/README.md#workbook-metric-identifier-compatibility). The simulator continues to emit its existing canonical identifiers; both forms resolve to the same database metrics. No simulator state reset or migration is required for this compatibility change.

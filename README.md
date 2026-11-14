@@ -6,6 +6,10 @@
 > **Project status:** Architecture and implementation plan. This README describes the system we intend to build, **not** a finished or deployed application.  
 > **Safety notice:** This is a hackathon prototype using simulated data. It is **not a medical device**, and the thresholds, alerts, scoring adaptations, and guidance must not be treated as operational medical advice for astronauts.
 
+**Implemented components:** [durable Bronze JSON export](backend/README.md#bronze-raw-json-export), the [Django operational models and ingestion API](backend/README.md#simulator-ingestion-api) and the standalone [Python astronaut and cabin simulator](simulator/README.md) supports preflight profiles, historical backfill, live streaming, solar storms, durable checkpoints, and configurable HTTP delivery. See its README for commands and contracts.
+
+**Connected frontend:** the [React console](frontend/README.md) reads actual ingested crew/cabin values and recorded trends through [Django operational read APIs](backend/README.md#connected-frontend-read-apis). Telemetry is still synthetic simulator output; clinical alerts, forecasts, persistent UI check-ins, and Gold analytics remain pending.
+
 ## 1. Mission and vision
 
 Build an **offline-first, astronaut-facing health monitoring application** that helps a crew member:
@@ -40,7 +44,7 @@ Space missions expose crews to radiation, isolation, delayed communication with 
 | Backend ingestion | Django + Django REST Framework | Validate incoming event envelopes, authenticate sources, persist and route events |
 | Operational store | PostgreSQL | Users, astronauts, missions, sessions, current/recent readings, alerts, check-ins, tasks, reliable event outbox |
 | Alert/rules service | Django service/worker | Evaluate new data promptly against contextual rules; create/update alerts |
-| Historical storage | Parquet files on local disk | Bronze, Silver, and Gold datasets |
+| Historical storage | Immutable JSON files for Bronze; planned Parquet for Silver/Gold | Raw events and future analytical datasets |
 | Data transformations | Python + DuckDB | Clean, normalize, enrich, aggregate, and query lakehouse data |
 | API serving | Django REST Framework | Fetch **live state from PostgreSQL** and **historical analytics from Gold using DuckDB** |
 | Frontend | React | Tablet-friendly dashboards, human body map, charts, monitoring, check-ins |

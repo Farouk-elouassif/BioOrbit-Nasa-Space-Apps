@@ -171,9 +171,9 @@
       "scenario": "normal"
     }
   },
-  {
-    "schema_version": "1.0",
-    "kind": "measurement",
+  { 
+
+  
     "event_id": "ec54d24c-36fc-5923-91ae-8a0905910a16",
     "run_id": "demo-001",
     "mission_id": "MARS_001",
