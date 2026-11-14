@@ -1,0 +1,243 @@
+[
+  {
+    "schema_version": "1.0",
+    "kind": "preflight_profile",
+    "event_id": "c3d384d1-e0c5-550e-91f8-d120a3c37f97",
+    "run_id": "demo-001",
+    "mission_id": "MARS_001",
+    "habitat_id": "HAB_001",
+    "zone_id": "CABIN_MAIN",
+    "astronaut_id": "AST_001",
+    "domain": "astronaut",
+    "phase": "preflight",
+    "measured_at": "2026-11-13T23:59:59Z",
+    "emitted_at": "2026-11-14T16:35:08.106589Z",
+    "source": "bioorbit-simulator",
+    "simulated": true,
+    "environment": "transit_spacecraft",
+    "context": {
+      "activity": "resting"
+    },
+    "profile": {
+      "baseline_statistics": {
+        "heart_rate": {
+          "mean": 59.34115,
+          "stddev": 1.5349084842426264,
+          "min": 56.4117,
+          "max": 61.0811,
+          "count": 14,
+          "unit": "bpm"
+        },
+        "systolic_blood_pressure": {
+          "mean": 114.89107142857142,
+          "stddev": 3.3153235281106386,
+          "min": 107.6325,
+          "max": 120.0223,
+          "count": 14,
+          "unit": "mmHg"
+        },
+        "diastolic_blood_pressure": {
+          "mean": 75.15534285714286,
+          "stddev": 2.323456440708139,
+          "min": 72.1306,
+          "max": 78.509,
+          "count": 14,
+          "unit": "mmHg"
+        },
+        "blood_glucose": {
+          "mean": 86.4905,
+          "stddev": 2.2738136595731717,
+          "min": 82.7468,
+          "max": 89.6587,
+          "count": 14,
+          "unit": "mg/dL"
+        },
+        "body_temperature": {
+          "mean": 37.00026428571429,
+          "stddev": 0.06389681112956691,
+          "min": 36.8915,
+          "max": 37.118,
+          "count": 14,
+          "unit": "°C"
+        },
+        "respiratory_rate": {
+          "mean": 13.945907142857143,
+          "stddev": 0.7028569517052807,
+          "min": 13.0861,
+          "max": 15.4186,
+          "count": 14,
+          "unit": "breaths/min"
+        },
+        "spo2": {
+          "mean": 98.5283,
+          "stddev": 0.21639836484523733,
+          "min": 98.157,
+          "max": 98.9628,
+          "count": 14,
+          "unit": "%"
+        },
+        "sleep_duration": {
+          "mean": 7.3168500000000005,
+          "stddev": 0.4124707425521699,
+          "min": 6.4708,
+          "max": 8.057,
+          "count": 14,
+          "unit": "hours"
+        },
+        "mood": {
+          "mean": 7.925592857142857,
+          "stddev": 0.49083548624813145,
+          "min": 6.9662,
+          "max": 9.0527,
+          "count": 14,
+          "unit": "0–10"
+        },
+        "body_mass": {
+          "mean": 62.562335714285716,
+          "stddev": 0.2671420814909113,
+          "min": 62.2035,
+          "max": 63.2239,
+          "count": 14,
+          "unit": "kg"
+        },
+        "preflight_radiation_level": {
+          "mean": 1.6259928571428572,
+          "stddev": 0.0375819200452254,
+          "min": 1.5526,
+          "max": 1.6798,
+          "count": 14,
+          "unit": "mSv/year"
+        },
+        "preflight_career_radiation_dose": {
+          "mean": 41.233,
+          "stddev": 0.0,
+          "min": 41.233,
+          "max": 41.233,
+          "count": 14,
+          "unit": "mSv"
+        }
+      },
+      "preflight_radiation_level": 1.6238377755504563,
+      "preflight_radiation_unit": "mSv/year",
+      "career_radiation_dose": 41.23297217014771,
+      "career_radiation_unit": "mSv",
+      "window_start": "2026-10-31T00:00:00Z",
+      "window_end": "2026-11-13T00:00:00Z"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "kind": "measurement",
+    "event_id": "da8952f4-2cb8-5d8f-a3eb-0122f12ec00d",
+    "run_id": "demo-001",
+    "mission_id": "MARS_001",
+    "habitat_id": "HAB_001",
+    "zone_id": "CABIN_MAIN",
+    "astronaut_id": null,
+    "domain": "cabin",
+    "phase": "inflight",
+    "metric": "co2_partial_pressure",
+    "value": 2.1,
+    "unit": "mmHg",
+    "measured_at": "2026-11-14T00:00:00Z",
+    "emitted_at": "2026-11-14T16:35:08.106738Z",
+    "source": "bioorbit-simulator",
+    "simulated": true,
+    "environment": "transit_spacecraft",
+    "context": {
+      "scenario": "normal"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "kind": "measurement",
+    "event_id": "495eff05-eede-5393-8bbc-538d8cd2b28a",
+    "run_id": "demo-001",
+    "mission_id": "MARS_001",
+    "habitat_id": "HAB_001",
+    "zone_id": "CABIN_MAIN",
+    "astronaut_id": null,
+    "domain": "cabin",
+    "phase": "inflight",
+    "metric": "o2_partial_pressure",
+    "value": 149.0,
+    "unit": "mmHg",
+    "measured_at": "2026-11-14T00:00:00Z",
+    "emitted_at": "2026-11-14T16:35:08.106763Z",
+    "source": "bioorbit-simulator",
+    "simulated": true,
+    "environment": "transit_spacecraft",
+    "context": {
+      "scenario": "normal"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "kind": "measurement",
+    "event_id": "ec54d24c-36fc-5923-91ae-8a0905910a16",
+    "run_id": "demo-001",
+    "mission_id": "MARS_001",
+    "habitat_id": "HAB_001",
+    "zone_id": "CABIN_MAIN",
+    "astronaut_id": null,
+    "domain": "cabin",
+    "phase": "inflight",
+    "metric": "total_cabin_pressure",
+    "value": 101.2,
+    "unit": "kPa",
+    "measured_at": "2026-11-14T00:00:00Z",
+    "emitted_at": "2026-11-14T16:35:08.106785Z",
+    "source": "bioorbit-simulator",
+    "simulated": true,
+    "environment": "transit_spacecraft",
+    "context": {
+      "scenario": "normal"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "kind": "measurement",
+    "event_id": "804a151a-027b-5874-9a8a-9cf4707dff62",
+    "run_id": "demo-001",
+    "mission_id": "MARS_001",
+    "habitat_id": "HAB_001",
+    "zone_id": "CABIN_MAIN",
+    "astronaut_id": null,
+    "domain": "cabin",
+    "phase": "inflight",
+    "metric": "cabin_temperature",
+    "value": 22.0,
+    "unit": "°C",
+    "measured_at": "2026-11-14T00:00:00Z",
+    "emitted_at": "2026-11-14T16:35:08.106806Z",
+    "source": "bioorbit-simulator",
+    "simulated": true,
+    "environment": "transit_spacecraft",
+    "context": {
+      "scenario": "normal"
+    }
+  },
+  {
+    "schema_version": "1.0",
+    "kind": "measurement",
+    "event_id": "2ecf5697-16e2-5b9b-8242-8acfdb48a5f2",
+    "run_id": "demo-001",
+    "mission_id": "MARS_001",
+    "habitat_id": "HAB_001",
+    "zone_id": "CABIN_MAIN",
+    "astronaut_id": null,
+    "domain": "cabin",
+    "phase": "inflight",
+    "metric": "relative_humidity",
+    "value": 43.0,
+    "unit": "%",
+    "measured_at": "2026-11-14T00:00:00Z",
+    "emitted_at": "2026-11-14T16:35:08.106830Z",
+    "source": "bioorbit-simulator",
+    "simulated": true,
+    "environment": "transit_spacecraft",
+    "context": {
+      "scenario": "normal"
+    }
+  }
+]

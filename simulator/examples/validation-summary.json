@@ -1,0 +1,13 @@
+{
+  "output_directory": "/tmp/bioorbit-simulator-ce25pgy6",
+  "events": 244071,
+  "mission_days": 30.166666666666668,
+  "peak_cabin_mSv_per_day": 11.96192072,
+  "storm_samples": 1,
+  "mission_doses_mSv": {
+    "AST_001": 51.58536394,
+    "AST_002": 46.59822595,
+    "AST_003": 50.91562662
+  },
+  "elapsed_seconds": 39.58
+}

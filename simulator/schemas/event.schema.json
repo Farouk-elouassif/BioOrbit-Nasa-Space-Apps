@@ -1,0 +1,1527 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bioorbit.local/schemas/event-1.0.json",
+  "title": "BioOrbit simulator event",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "kind",
+    "event_id",
+    "run_id",
+    "mission_id",
+    "habitat_id",
+    "zone_id",
+    "astronaut_id",
+    "domain",
+    "phase",
+    "environment",
+    "measured_at",
+    "emitted_at",
+    "source",
+    "simulated",
+    "context"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mission_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "habitat_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "zone_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "kind": {
+      "enum": [
+        "measurement",
+        "preflight_profile"
+      ]
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "astronaut_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "domain": {
+      "enum": [
+        "astronaut",
+        "cabin"
+      ]
+    },
+    "phase": {
+      "enum": [
+        "preflight",
+        "inflight"
+      ]
+    },
+    "environment": {
+      "enum": [
+        "transit_spacecraft",
+        "space_station",
+        "rover",
+        "surface_base"
+      ]
+    },
+    "measured_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(Z|\\+00:00)$"
+    },
+    "emitted_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(Z|\\+00:00)$"
+    },
+    "simulated": {
+      "const": true
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "enum": [
+            "resting",
+            "sleeping",
+            "working",
+            "exercising",
+            "eva"
+          ]
+        },
+        "meal_context": {
+          "enum": [
+            "fasting",
+            "after_meal"
+          ]
+        },
+        "scenario": {
+          "enum": [
+            "normal",
+            "solar_storm"
+          ]
+        },
+        "window": {
+          "type": "string"
+        }
+      }
+    },
+    "metric": {
+      "enum": [
+        "heart_rate",
+        "systolic_blood_pressure",
+        "diastolic_blood_pressure",
+        "blood_glucose",
+        "body_temperature",
+        "respiratory_rate",
+        "spo2",
+        "sleep_duration",
+        "mood",
+        "stress_level",
+        "fluid_intake",
+        "body_mass",
+        "preflight_radiation_level",
+        "preflight_career_radiation_dose",
+        "personal_radiation_dose_rate",
+        "mission_cumulative_radiation_dose",
+        "total_career_radiation_dose",
+        "co2_partial_pressure",
+        "o2_partial_pressure",
+        "total_cabin_pressure",
+        "cabin_temperature",
+        "relative_humidity",
+        "noise_level",
+        "dust_concentration",
+        "radiation_level",
+        "is_solar_storm"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "value": {
+      "type": [
+        "number",
+        "boolean"
+      ]
+    },
+    "profile": {
+      "type": "object",
+      "required": [
+        "baseline_statistics",
+        "preflight_radiation_level",
+        "preflight_radiation_unit",
+        "career_radiation_dose",
+        "career_radiation_unit",
+        "window_start",
+        "window_end"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "baseline_statistics": {
+          "type": "object",
+          "required": [
+            "heart_rate",
+            "systolic_blood_pressure",
+            "diastolic_blood_pressure",
+            "blood_glucose",
+            "body_temperature",
+            "respiratory_rate",
+            "spo2",
+            "sleep_duration",
+            "mood",
+            "body_mass",
+            "preflight_radiation_level",
+            "preflight_career_radiation_dose"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "heart_rate": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "bpm"
+                    }
+                  }
+                }
+              ]
+            },
+            "systolic_blood_pressure": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "mmHg"
+                    }
+                  }
+                }
+              ]
+            },
+            "diastolic_blood_pressure": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "mmHg"
+                    }
+                  }
+                }
+              ]
+            },
+            "blood_glucose": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "mg/dL"
+                    }
+                  }
+                }
+              ]
+            },
+            "body_temperature": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "°C"
+                    }
+                  }
+                }
+              ]
+            },
+            "respiratory_rate": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "breaths/min"
+                    }
+                  }
+                }
+              ]
+            },
+            "spo2": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "%"
+                    }
+                  }
+                }
+              ]
+            },
+            "sleep_duration": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "hours"
+                    }
+                  }
+                }
+              ]
+            },
+            "mood": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "0–10"
+                    }
+                  }
+                }
+              ]
+            },
+            "body_mass": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "kg"
+                    }
+                  }
+                }
+              ]
+            },
+            "preflight_radiation_level": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "mSv/year"
+                    }
+                  }
+                }
+              ]
+            },
+            "preflight_career_radiation_dose": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "mean",
+                    "stddev",
+                    "min",
+                    "max",
+                    "count",
+                    "unit"
+                  ],
+                  "properties": {
+                    "mean": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "stddev": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "min": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "max": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 2
+                    },
+                    "unit": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "mSv"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "preflight_radiation_level": {
+          "type": "number",
+          "minimum": 0
+        },
+        "preflight_radiation_unit": {
+          "const": "mSv/year"
+        },
+        "career_radiation_dose": {
+          "type": "number",
+          "minimum": 0
+        },
+        "career_radiation_unit": {
+          "const": "mSv"
+        },
+        "window_start": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(Z|\\+00:00)$"
+        },
+        "window_end": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(Z|\\+00:00)$"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "domain": {
+            "const": "astronaut"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "astronaut_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "context": {
+            "required": [
+              "activity"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "astronaut_id": {
+            "type": "null"
+          },
+          "phase": {
+            "const": "inflight"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "metric": {
+            "const": "blood_glucose"
+          }
+        },
+        "required": [
+          "metric"
+        ]
+      },
+      "then": {
+        "properties": {
+          "context": {
+            "required": [
+              "meal_context"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "oneOf": [
+    {
+      "required": [
+        "metric",
+        "unit",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "measurement"
+        }
+      },
+      "not": {
+        "required": [
+          "profile"
+        ]
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "heart_rate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "bpm"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "systolic_blood_pressure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmHg"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "diastolic_blood_pressure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmHg"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "blood_glucose"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mg/dL"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "body_temperature"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "°C"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "respiratory_rate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "breaths/min"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "spo2"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "%"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "sleep_duration"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "hours"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "mood"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "0–10"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "stress_level"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "0–10"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "fluid_intake"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "L"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "body_mass"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "kg"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "preflight_radiation_level"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mSv/year"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "preflight_career_radiation_dose"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mSv"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "personal_radiation_dose_rate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mSv/day"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "mission_cumulative_radiation_dose"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mSv"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "total_career_radiation_dose"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mSv"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "co2_partial_pressure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmHg"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "o2_partial_pressure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmHg"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "total_cabin_pressure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "kPa"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "cabin_temperature"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "°C"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "relative_humidity"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "%"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "noise_level"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "dBA"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "dust_concentration"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mg/m³"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "radiation_level"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mSv/day"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "is_solar_storm"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "boolean"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "required": [
+        "profile"
+      ],
+      "properties": {
+        "kind": {
+          "const": "preflight_profile"
+        },
+        "phase": {
+          "const": "preflight"
+        },
+        "domain": {
+          "const": "astronaut"
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "metric"
+            ]
+          },
+          {
+            "required": [
+              "unit"
+            ]
+          },
+          {
+            "required": [
+              "value"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
