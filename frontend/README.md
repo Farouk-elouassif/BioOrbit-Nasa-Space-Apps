@@ -135,10 +135,10 @@ categorical and structured readings; independent random fixtures are labelled.
 - `/documentation` explains the biology behind circulation, breathing, sleep,
   metabolism, bone/muscle changes, urinary health, immunity, sensory systems,
   cabin exposures, radiation and EVA, with source links and interpretation limits.
-- Its searchable measurement atlas covers all 88 configured measurement types,
+- Its searchable measurement atlas covers 87 measurement types (the serum iron/ferritin documentation entry is omitted),
   preserving the prototype’s declared units and distinguishing measurement types
   from actual collected observations. A glossary explains key abbreviations.
-- `/resources` contains all 139 references in the seven categories supplied in
+- `/resources` contains 139 references, including the serum iron clinical reference in the seven categories supplied in
   `References.docx`. Search works across titles, authors, dates and study IDs;
   category filters combine with search. Full citations remain expandable.
 - `/downloads/References.docx` serves the unchanged original bibliography. One

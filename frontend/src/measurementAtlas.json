@@ -328,14 +328,6 @@
     "biology": "25-hydroxyvitamin D provides context for vitamin D status. It is not a direct measurement of bone density."
   },
   {
-    "code": "ferritin",
-    "chapter": "blood-immunity",
-    "label": "Ferritin / serum iron",
-    "unit": "ng/mL",
-    "domain": "astronaut",
-    "biology": "Ferritin provides information about iron storage and can be influenced by other biological processes. It is not interchangeable with serum iron."
-  },
-  {
     "code": "creatinine",
     "chapter": "kidneys",
     "label": "Creatinine",

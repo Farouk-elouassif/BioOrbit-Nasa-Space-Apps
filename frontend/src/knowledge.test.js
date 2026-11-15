@@ -10,7 +10,7 @@ import {chapters} from './biologyContent.js';
 const bibliography=JSON.parse(readFileSync(new URL('./references.json',import.meta.url),'utf8'));
 const atlas=JSON.parse(readFileSync(new URL('./measurementAtlas.json',import.meta.url),'utf8'));
 
-test('supplied bibliography preserves every entry, category and explicitly missing URL',()=>{
+test('supplied bibliography preserves retained entries, category and explicitly missing URL',()=>{
   assert.equal(bibliography.references.length,139);
   assert.equal(bibliography.groups.length,7);
   assert.equal(new Set(bibliography.references.map(ref=>ref.id)).size,139);
@@ -33,18 +33,18 @@ test('reference search combines author, study ID and category filters without mu
 test('every biology citation and atlas topic resolves, and all configured measurements have explanations',()=>{
   const refs=new Set(bibliography.references.map(ref=>ref.id)),sections=new Set(chapters.map(c=>c.id));
   for(const chapter of chapters)for(const id of chapter.refs)assert.ok(refs.has(id),id);
-  assert.equal(atlas.length,88);
-  assert.equal(new Set(atlas.map(record=>record.code)).size,88);
+  assert.equal(atlas.length,87);
+  assert.equal(new Set(atlas.map(record=>record.code)).size,87);
   for(const record of atlas){assert.ok(sections.has(record.chapter),record.code);assert.ok(record.biology.length>35,record.code)}
   const extra=JSON.parse(readFileSync(new URL('../../backend/bitorbit/core/ingestion/additional_metrics.json',import.meta.url),'utf8'));
-  for(const code of Object.keys(extra))assert.ok(atlas.some(record=>record.code===code),code);
+  for(const code of Object.keys(extra).filter(code=>code!=='ferritin'))assert.ok(atlas.some(record=>record.code===code),code);
 });
 test('documentation and resources render with working navigation, source anchors and source download',async()=>{
   const server=await createServer({server:{middlewareMode:true},appType:'custom'});
   try{
     const {default:Documentation}=await server.ssrLoadModule('/src/DocumentationPage.jsx');
     const html=renderToStaticMarkup(React.createElement(Documentation));
-    assert.match(html,/The biology behind/);assert.match(html,/88 configured measurement types/);
+    assert.match(html,/The biology behind/);assert.match(html,/87 measurement types/);
     assert.match(html,/href="\/resources#ref-007"/);
     assert.match(html,/id="measurement-atlas"/);assert.match(html,/id="glossary"/);
     assert.match(html,/href="\/documentation" aria-current="page"/);

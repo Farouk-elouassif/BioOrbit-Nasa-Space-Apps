@@ -190,7 +190,7 @@
   },
   {
     "metric": "ferritin",
-    "label": "Ferritin / serum iron",
+    "label": "Ferritin",
     "category": "body",
     "group": "Blood, urine and saliva",
     "domain": "astronaut",

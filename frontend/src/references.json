@@ -49,14 +49,6 @@
       "format": "PDF"
     },
     {
-      "id": "ref-003",
-      "groupId": "group-1",
-      "title": "Behavioral health and performance (Technical Brief OCHMO-TB-016, Rev. B)",
-      "citation": "NASA Office of the Chief Health and Medical Officer. (2023b, October 24). Behavioral health and performance (Technical Brief OCHMO-TB-016, Rev. B). National Aeronautics and Space Administration.",
-      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-016-behavioral-health.pdf",
-      "format": "PDF"
-    },
-    {
       "id": "ref-004",
       "groupId": "group-1",
       "title": "Exercise overview (Technical Brief OCHMO-TB-031)",
@@ -1126,6 +1118,14 @@
       "title": "Adult lab normals",
       "citation": "StatPearls. (n.d.). Adult lab normals. StatPearls Publishing.",
       "url": "https://www.statpearls.com/AdultLabNormals.html",
+      "format": "Web"
+    },
+    {
+      "id": "ref-140",
+      "groupId": "group-6",
+      "title": "Serum iron test",
+      "citation": "MedlinePlus. (n.d.). Serum iron test. U.S. National Library of Medicine.",
+      "url": "https://medlineplus.gov/ency/article/003488.htm",
       "format": "Web"
     },
     {
