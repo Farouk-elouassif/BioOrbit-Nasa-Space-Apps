@@ -4,20 +4,20 @@
 
 We built BioOrbit to bring astronaut health measurements, personal baselines, and cabin conditions into one place. Our goal is to make changes easier to understand in the context of a mission: who the observation belongs to, what they were doing, when it was recorded, and what was happening around them.
 
-BioOrbit is a working research prototype with a Python simulator, a Django API, PostgreSQL storage, and a React interface. Synthetic observations flow through ingestion, alert evaluation, current readings, and historical charts. Crew members can also sign in and save check-ins that feed the same measurement and alert workflow.
+BioOrbit is an astronaut health-monitoring prototype with a Python simulator, a Django API, PostgreSQL storage, and a React interface. Synthetic observations flow through ingestion, alert evaluation, current readings, and historical charts. Crew members can also sign in and save check-ins that feed the same measurement and alert workflow.
 
 All simulator telemetry is synthetic. Our rules and guidance are prototype interpretations of the supplied measurement workbook and reference material. BioOrbit is not a medical device and is not affiliated with or endorsed by NASA.
 
 ## What we have built
 
 - A mission dashboard with crew readings, personal preflight references, habitat conditions, and recorded alerts.
-- An interactive Three.js astronaut with twelve selectable body regions, measurement details, and shared cabin markers.
+- An interactive Three.js astronaut with twelve defined body regions shown according to available core readings and alerts, measurement details, and shared cabin markers.
 - Body, Mind, Sleep, and Habitat measurement categories, covering the 88 configured wire metrics.
-- Historical charts with 24-hour, seven-day, and thirty-day windows where applicable, exact aggregate values, and visible gaps when observations are missing.
+- Historical charts with 24-hour, seven-day, and thirty-day windows where applicable, aggregate values displayed to two decimal places, and visible gaps when observations are missing.
 - Four alert tiers: Advisory, Caution, Warning, and Emergency, with recorded evidence, guidance, recheck times, and acknowledgment.
 - Authenticated crew check-ins for manual measurements, symptoms, findings, and notes.
 - A resumable simulator with personal profiles, preflight observations, historical backfill, live generation, and configurable abnormal scenarios.
-- A research landing page, biology documentation, a searchable measurement atlas, and a reference library containing 139 entries across seven categories.
+- An astronaut-focused project introduction, 13 biology chapters, an atlas of 87 measurement types, a library of 139 references across seven categories, and an About us page.
 - Light and dark themes shared across the public pages and console.
 
 ## Architecture
@@ -36,7 +36,7 @@ flowchart LR
 
 | Component | Technology | Role |
 |---|---|---|
-| Frontend | React, Vite, Three.js, Lucide | Research pages, crew console, interactive body view, charts, and check-ins |
+| Frontend | React, Vite, Three.js, Lucide | Project and biology pages, crew console, interactive body view, charts, and check-ins |
 | Backend | Django | Event validation, ingestion, sessions, check-ins, alert rules, and read APIs |
 | Application database | PostgreSQL | Accepted events, original payloads, baselines, current state, reports, and alerts |
 | Simulator | Python standard library | Seeded synthetic observations, mission time, scenarios, and HTTP delivery |
@@ -75,6 +75,8 @@ Our alert engine runs during ingestion and when a crew report is saved. It uses 
 
 Escalation occurs when a rule's conditions and persistence requirements are met. Recovery generally requires three distinct later qualifying normal observations to lower one tier. Repeated polling, duplicate delivery, missing inputs, and stale observations do not count as recovery. Acknowledgment records that an alert was reviewed; it does not resolve the condition.
 
+NEWS2 evidence displays component scores, not the raw vital readings. A component score of zero contributes no points; missing values remain unknown. An earlier higher tier can be retained even when the latest total indicates a lower tier, until qualifying normal observations meet recovery requirements. The frontend explains this distinction.
+
 We retain the evidence, source references, observation times, and guidance behind alerts. The interface distinguishes alert severity from overdue collection tasks and telemetry connection status. Guidance and recipient information are reference material; we do not dispatch treatments or external notifications.
 
 Crew check-ins require a Django session, CSRF protection, and the `core.add_crewcheckin` permission. Reports retain their author and mission time. Manual readings enter the measurement journal and charts; symptoms and findings feed supported rules without manufacturing sensor samples. Notes alone do not become clinical rule inputs. Repeating the same report ID and body returns the existing report without duplicate effects.
@@ -85,10 +87,11 @@ The numerical scoring and spaceflight adaptations remain prototype rules. We do 
 
 | Route | Purpose |
 |---|---|
-| `/` | Research introduction, project approach, and source links |
+| `/` | Astronaut-focused project overview, mission context, and source links |
 | `/dashboard` | Crew and habitat console, body view, history, alerts, and check-ins |
 | `/documentation` | Biology explanations, searchable measurement atlas, and glossary |
 | `/resources` | Searchable bibliography with category filters and expandable citations |
+| `/about` | Team roles, biographies, email and professional profile links |
 
 The public pages work independently of the measurement API. The dashboard loads its code and starts polling when opened. The Three.js view loads on demand and pauses animation while the page is hidden.
 
@@ -107,7 +110,10 @@ We show missing values as unknown and leave missing chart buckets as gaps. When 
 | GET / POST / DELETE | `/api/v1/session` | Session status, sign-in, and sign-out |
 | GET / POST | `/api/v1/check-ins` | Authorized report history and new crew reports |
 
-The browser uses relative `/api/v1/` requests. The simulator's ingestion token stays outside browser code. Full request contracts and query parameters are in the [backend documentation](backend/README.md).
+The browser uses relative `/api/v1/` requests. Vite development and preview proxy
+them to `https://requests-curriculum-organisation-ace.trycloudflare.com` by default.
+Set `BIOORBIT_BACKEND_URL=http://127.0.0.1:8000` when starting Vite to use the
+local backend. Static deployments need their own `/api/` proxy and SPA route fallback. The simulator's ingestion token stays outside browser code. Full request contracts and query parameters are in the [backend documentation](backend/README.md).
 
 ## Storage model
 
@@ -178,4 +184,4 @@ We have an end-to-end simulated measurement and reporting workflow, but we have 
 
 Forecasting, browser offline caching, and an offline check-in queue are not implemented. Live readings and shared alert evaluation require the backend. There is no independent watchdog producing new clinical alerts when ingestion stops; the interface reports telemetry inactivity and retains the last known state.
 
-Our documentation and bibliography provide research context. Bibliography entries are preserved as supplied, rather than represented as independently verified datasets connected to the console. We keep source-derived limits, workbook conditions, and our own prototype assumptions distinguishable so the evidence and uncertainty remain visible.
+Our documentation and bibliography provide research context. The bibliography retains source IDs; REF 003 was removed and a serum iron clinical reference was added as REF 140. The downloadable bibliography reflects those edits. Listed sources are background material, not datasets connected to the console. We keep source-derived limits, workbook conditions, and our own prototype assumptions distinguishable so the evidence and uncertainty remain visible.

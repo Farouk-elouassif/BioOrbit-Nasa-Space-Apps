@@ -1,5 +1,7 @@
 # Alert handling recheck — 15 November 2026
 
+> Historical review snapshot. Later fixes and the expanded simulator supersede parts of this report. For current behavior, see the [project README](../README.md), [backend README](../backend/README.md) and [expanded simulation notes](expanded-workbook-simulation.md). Test counts below describe the review when it was run.
+
 Assessment: improved, but one confirmed alert-loss case prevents a clean pass. No application changes made during this review.
 
 ## Confirmed issue: Emergency can disappear inside an ingestion batch

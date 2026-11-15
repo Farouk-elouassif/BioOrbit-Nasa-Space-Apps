@@ -366,3 +366,18 @@ workbook indicators or tracking against a 250 mSv event limit.
 ## Expanded workbook measurement storage
 
 Migration `0007_typed_workbook_measurements` adds typed JSON storage for categorical/structured readings and allows longer workbook unit descriptions. All 83 workbook indicators are represented, retaining existing internal fields. Original numeric/boolean storage, IDs and raw payloads remain intact. New independent random fixtures are stored and exposed via dashboard measurements, but do not override validated alert context or calculated scores. See [expanded generator definitions](../docs/expanded-workbook-simulation.md).
+
+
+## NEWS2 evidence and retained severity
+
+`evidence.components` contains numerical component scores, not measurement values.
+A zero score is valid when an available reading contributes no points. Missing or
+invalid components remain unknown; they are not filled with zero. Full assessments
+and partial lower bounds are distinguished in the evidence.
+
+For example, a latest total of 2 yields an Advisory candidate. If the alert already
+holds Emergency, `candidate_tier` can be Advisory while `tier` remains Emergency
+and `held_until_three_normal_readings` is true. Recovery requires three distinct
+later qualifying normal observations per tier. A later observation still triggering
+an alert resets the normal counter, even when its candidate tier is lower. The
+frontend labels these scores and the retained/calculated tier distinction.
