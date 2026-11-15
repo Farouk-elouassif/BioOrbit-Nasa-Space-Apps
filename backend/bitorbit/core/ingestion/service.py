@@ -101,8 +101,9 @@ def ingest(items):
             astronaut=astronauts.get(data['astronaut_id']), zone_id=data['zone_id'],
             kind=data['kind'], phase=data['phase'], domain=data['domain'],
             metric=metrics.get(data.get('metric')),
-            numeric_value=value if is_measurement and type(value) is not bool else None,
+            numeric_value=value if is_measurement and type(value) in (int,float) else None,
             boolean_value=value if is_measurement and type(value) is bool else None,
+            json_value=value if is_measurement and isinstance(value,(str,dict)) else None,
             measured_at=item.measured_at, emitted_at=item.emitted_at,
             context=data['context'], raw_payload=item.raw_payload,
         ))
@@ -156,8 +157,9 @@ def ingest(items):
             value = data['value']
             current.habitat = habitat
             current.zone_id = data['zone_id']
-            current.numeric_value = None if type(value) is bool else value
+            current.numeric_value = value if type(value) in (int,float) else None
             current.boolean_value = value if type(value) is bool else None
+            current.json_value = value if isinstance(value,(str,dict)) else None
             current.context = data['context']
             current.measured_at = item.measured_at
             current.source_event_id = item.event_id
@@ -168,7 +170,7 @@ def ingest(items):
         updates = [row for row in changed.values() if row.pk is not None]
         LatestMeasurement.objects.bulk_create(creates)
         if updates:
-            LatestMeasurement.objects.bulk_update(updates, ['habitat', 'zone_id', 'numeric_value', 'boolean_value',
+            LatestMeasurement.objects.bulk_update(updates, ['habitat', 'zone_id', 'numeric_value', 'boolean_value', 'json_value',
                                                             'context', 'measured_at', 'source_event', 'updated_at'])
         # Keep environment and independent facts on the same timeline as values.
         # Already-stored future values are never rewound for a late history batch.

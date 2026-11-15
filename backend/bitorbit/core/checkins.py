@@ -90,7 +90,7 @@ def validate_report(data):
         raise ValueError('Unsupported manual measurement.')
     for code, value in measurements.items():
         lo, hi = RANGES[code]
-        if type(value) not in (int, float) or not math.isfinite(value) or not lo <= value <= hi:
+        if type(value) not in (int, float) or not lo <= value <= hi or not math.isfinite(value):
             raise ValueError(f'{code} must be between {lo} and {hi}.')
     if 'blood_glucose' in measurements and data.get('meal_context') not in ('fasting', 'after_meal'):
         raise ValueError('Glucose requires fasting or after_meal context.')

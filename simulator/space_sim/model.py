@@ -81,9 +81,10 @@ class Engine:
             for code in PERIODIC:
                 state['next_periodic'].setdefault(code, state['seconds'])
             state.setdefault('scenarios', [])
+            state.setdefault('next_extra', state['seconds'])
             return
         self.state = {'seconds': 0., 'sequence': 0, 'storms': [], 'next_periodic': {},
-                      'crew': [], 'cabin': {}, 'rng': None}
+                      'crew': [], 'cabin': {}, 'rng': None, 'next_extra': 0.}
         self._profiles()
         self.state['cabin'] = {'co2_partial_pressure': 2.1, 'o2_partial_pressure': 149.,
                                'total_cabin_pressure': 101.2, 'cabin_temperature': 22.,
@@ -152,7 +153,7 @@ class Engine:
                  'habitat_id': self.config.habitat_id, 'zone_id': 'CABIN_MAIN' if not person else ('EVA' if activity_at(seconds, person['index']) == 'eva' and phase == 'inflight' else 'CABIN_MAIN'),
                  'astronaut_id': person['id'] if person else None,
                  'domain': 'astronaut' if person else 'cabin', 'phase': phase,
-                 'metric': metric, 'value': value if type(value) is bool else round(value, 8),
+                 'metric': metric, 'value': round(value,8) if type(value) in (int,float) else value,
                  'unit': CATALOGUE[metric][0], 'measured_at': self.iso(seconds), 'emitted_at': utcnow(),
                  'source': 'bioorbit-simulator', 'simulated': True, 'environment': self.config.environment,
                  'context': context or {}}
@@ -319,7 +320,12 @@ class Engine:
                 if metric == 'fluid_intake': details['interval_seconds'] = 21600
                 events.append(self.event(metric, value, t, person, context=details))
         from .errors import inject
-        return self.apply_scenarios(inject(self, events))
+        events=self.apply_scenarios(inject(self,events))
+        if t>=self.state['next_extra']-1e-8:
+            from .extra import generate, INTERVAL
+            events.extend(generate(self))
+            self.state['next_extra']=t+INTERVAL
+        return events
 
     def initial_events(self):
         periodic = [k for k, due in self.state['next_periodic'].items() if due == 0]
@@ -336,7 +342,7 @@ class Engine:
             return []
         events = []
         while self.state['seconds'] < end - 1e-8:
-            boundary = min(end, min(self.state['next_periodic'].values()))
+            boundary = min(end, min(self.state['next_periodic'].values()),self.state['next_extra'])
             self._advance(boundary)
             due = [k for k, value in self.state['next_periodic'].items() if value <= boundary + 1e-8]
             frequent = abs(boundary - end) < 1e-8

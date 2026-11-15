@@ -21,6 +21,7 @@ class Point:
 def valid(point):
     if point is None:return False
     c=point.context
+    if c.get('synthetic_random'):return False
     if c.get('sensor_fault') or c.get('motion_artefact') or c.get('perfusion_ok') is False:return False
     if c.get('signal_quality') in ('bad','poor','invalid','fault'):return False
     return not isinstance(point.value,float) or math.isfinite(point.value)
@@ -412,7 +413,8 @@ def evaluate_additional(f):
             alarm=f.point('ecg_alarm',DAY)
             if alarm and alarm.value is True:
                 tier='emergency' if f.flag('chest_pain') or f.flag('collapse') else 'warning' if any(
-                    f.flag(name) for name in ('symptoms_present','breathlessness','breathlessness_at_rest','lightheadedness','fainting','new_confusion')) else 'caution'
+                    f.flag(name) for name in ('symptoms_present','breathlessness','breathlessness_at_rest','lightheadedness','fainting','new_confusion',
+                        'confusion','sweating','shaking','dizziness','nausea','vomiting','vision_change')) else 'caution'
                 triggered.append(('ecg_alarm',tier,alarm))
                 triggered.sort(key=lambda item:{'caution':1,'warning':2,'emergency':3}[item[1]])
         picked=triggered[-1] if triggered else min(present,key=lambda item:item[2].at)

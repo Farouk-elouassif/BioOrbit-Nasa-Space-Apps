@@ -14,3 +14,6 @@ space-sim = "space_sim.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["space_sim*"]
+
+[tool.setuptools.package-data]
+space_sim = ["*.json"]

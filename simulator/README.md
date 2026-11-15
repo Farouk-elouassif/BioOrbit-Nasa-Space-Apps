@@ -367,3 +367,9 @@ symptoms for escalation. Diastolic drift and rapid cabin-pressure loss can now b
 detected from measured history without injected flags; diastolic needs its
 in-flight baseline window. A scenario may tag a planned pressure change with
 `context.planned_pressure_change: true` to suppress the inferred loss rule.
+
+## Full workbook coverage
+
+The simulator now represents all **83 indicators** in `Data.xlsx`, retaining the original 26 context-aware wire measurements and adding 62 independent, plausibly random measurement types (88 wire codes in total). New readings are emitted at startup and hourly in simulated time, including resumed states. See [the generator definitions, types, ranges and upgrade notes](../docs/expanded-workbook-simulation.md).
+
+Deploy the backend migration before rebuilding/restarting the simulator. New fixtures do not change the original clinical alert simulation or participate in `SIM_ERROR_LEVEL` injection.

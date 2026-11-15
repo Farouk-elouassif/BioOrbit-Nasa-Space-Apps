@@ -33,3 +33,12 @@ export function guidanceSteps(value) {
   return [];
 }
 export function humanLabel(value){return value.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());}
+
+export function sleepDayLabel(bucket,missionStartedAt) {
+  const date=new Date(bucket),start=new Date(missionStartedAt);
+  if(!Number.isFinite(date.getTime()))return 'Date unavailable';
+  const calendarDate=date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+  if(!missionStartedAt||!Number.isFinite(start.getTime()))return calendarDate;
+  const day=Math.floor((Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate())-Date.UTC(start.getUTCFullYear(),start.getUTCMonth(),start.getUTCDate()))/86400000)+1;
+  return `Day ${day} · ${calendarDate}`;
+}

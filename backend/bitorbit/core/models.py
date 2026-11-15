@@ -16,6 +16,8 @@ class Domain(models.TextChoices):
 class ValueType(models.TextChoices):
     NUMERIC = 'numeric', 'Numeric'
     BOOLEAN = 'boolean', 'Boolean'
+    CATEGORICAL = 'categorical', 'Categorical'
+    STRUCTURED = 'structured', 'Structured'
 
 
 class AggregationKind(models.TextChoices):
@@ -118,7 +120,7 @@ class CrewCheckIn(models.Model):
 class MetricCatalog(models.Model):
     code = models.CharField(max_length=100, primary_key=True)
     domain = models.CharField(max_length=20, choices=Domain.choices)
-    unit = models.CharField(max_length=30)
+    unit = models.CharField(max_length=128)
     value_type = models.CharField(max_length=20, choices=ValueType.choices)
     aggregation_kind = models.CharField(max_length=30, choices=AggregationKind.choices,
                                         default=AggregationKind.POINT, db_default='point', null=True, blank=True)
@@ -137,8 +139,9 @@ class MetricCatalog(models.Model):
 
 # Explicit IS NULL/IS NOT NULL clauses preserve the XOR checks in PostgreSQL.
 EXACTLY_ONE_VALUE = (
-    Q(numeric_value__isnull=False, boolean_value__isnull=True)
-    | Q(numeric_value__isnull=True, boolean_value__isnull=False)
+    Q(numeric_value__isnull=False, boolean_value__isnull=True, json_value__isnull=True)
+    | Q(numeric_value__isnull=True, boolean_value__isnull=False, json_value__isnull=True)
+    | Q(numeric_value__isnull=True, boolean_value__isnull=True, json_value__isnull=False)
 )
 VALID_SUBJECT = (
     Q(domain=Domain.CABIN, astronaut__isnull=True)
@@ -161,6 +164,7 @@ class MeasurementEvent(models.Model):
                                related_name='measurement_events', null=True, blank=True)
     numeric_value = models.FloatField(null=True, blank=True)
     boolean_value = models.BooleanField(null=True, blank=True)
+    json_value = models.JSONField(null=True, blank=True)
     measured_at = models.DateTimeField()
     emitted_at = models.DateTimeField()
     received_at = models.DateTimeField(default=timezone.now, db_default=Now(), null=True, blank=True)
@@ -176,7 +180,7 @@ class MeasurementEvent(models.Model):
             models.CheckConstraint(
                 condition=(
                     Q(kind=EventKind.PREFLIGHT_PROFILE, phase=Phase.PREFLIGHT, domain=Domain.ASTRONAUT,
-                      astronaut__isnull=False, metric__isnull=True, numeric_value__isnull=True, boolean_value__isnull=True)
+                      astronaut__isnull=False, metric__isnull=True, numeric_value__isnull=True, boolean_value__isnull=True, json_value__isnull=True)
                     | (Q(kind=EventKind.MEASUREMENT, metric__isnull=False) & EXACTLY_ONE_VALUE)
                 ),
                 name='valid_event_value',
@@ -230,6 +234,7 @@ class LatestMeasurement(models.Model):
     metric = models.ForeignKey(MetricCatalog, db_column='metric_code', on_delete=models.PROTECT, related_name='latest_measurements')
     numeric_value = models.FloatField(null=True, blank=True)
     boolean_value = models.BooleanField(null=True, blank=True)
+    json_value = models.JSONField(null=True, blank=True)
     context = models.JSONField(blank=True, default=dict, db_default={})
     measured_at = models.DateTimeField()
     source_event = models.ForeignKey(MeasurementEvent, db_column='source_event_id', on_delete=models.PROTECT,

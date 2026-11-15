@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
 import {postJSON} from './api.js';
+import {createReportId} from './reportId.js';
 
 const fields=[['heart_rate','Heart rate (bpm)',1,300],['respiratory_rate','Breathing rate (/min)',1,100],['spo2','SpO₂ (%)',1,100],['systolic_blood_pressure','Systolic BP (mmHg)',1,300],['diastolic_blood_pressure','Diastolic BP (mmHg)',1,200],['blood_glucose','Glucose (mg/dL)',1,1000],['body_temperature','Temperature (°C)',25,45],['sleep_duration','Sleep (hours)',0,24],['mood','Mood (0–10)',0,10]];
 const symptoms=[['chest_pain','Chest pain'],['collapse','Collapse'],['breathlessness_at_rest','Breathlessness at rest'],['new_confusion','New confusion'],['neurological_signs','New neurological signs'],['sweating','Sweating'],['shaking','Shaking'],['lightheadedness','Lightheadedness'],['fainting','Fainting'],['vision_change','Vision change'],['nausea','Nausea'],['vomiting','Vomiting'],['ecg_alarm','ECG alarm']];
@@ -17,7 +18,7 @@ export default function CheckInForm({run,crew,initialCrew,onSaved}){
    const rule_inputs=Object.fromEntries(Object.entries(findings).filter(([,v])=>v!=='').map(([k,v])=>[k,k==='consciousness'?v:k==='headache'?Number(v):v==='true']));
    const payload={run_id:run.id,astronaut_id:person,measurements,rule_inputs,activity,meal_context:meal,notes};
    const fingerprint=JSON.stringify(payload);
-   const id=attempt?.fingerprint===fingerprint?attempt.id:crypto.randomUUID();
+   const id=attempt?.fingerprint===fingerprint?attempt.id:createReportId();
    setAttempt({fingerprint,id});
    const result=await postJSON('check-ins',{...payload,id});onSaved(result);
   }catch(e){if(e.status===401)setNeedLogin(true);setError(e.message)}finally{setBusy(false)}

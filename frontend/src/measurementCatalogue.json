@@ -1,0 +1,794 @@
+[
+  {
+    "metric": "heart_rate",
+    "label": "Heart rate (resting)",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "bpm",
+    "type": "numeric"
+  },
+  {
+    "metric": "systolic_blood_pressure",
+    "label": "Blood pressure – systolic",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "mmHg",
+    "type": "numeric"
+  },
+  {
+    "metric": "diastolic_blood_pressure",
+    "label": "Blood pressure – diastolic",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "mmHg",
+    "type": "numeric"
+  },
+  {
+    "metric": "respiratory_rate",
+    "label": "Breathing rate",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "breaths/min",
+    "type": "numeric"
+  },
+  {
+    "metric": "spo2",
+    "label": "Oxygen saturation (SpO2)",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "%",
+    "type": "numeric"
+  },
+  {
+    "metric": "body_temperature",
+    "label": "Body temperature (core)",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "°C",
+    "type": "numeric"
+  },
+  {
+    "metric": "consciousness",
+    "label": "Consciousness / alertness",
+    "category": "mind",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "Alert / new confusion / voice / pain / unresponsive",
+    "type": "categorical"
+  },
+  {
+    "metric": "news2",
+    "label": "Acute early-warning score (NEWS2 total)",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "score 0–20",
+    "type": "numeric"
+  },
+  {
+    "metric": "hrv",
+    "label": "Heart-rate variability",
+    "category": "body",
+    "group": "Vital signs",
+    "domain": "astronaut",
+    "unit": "ms (RMSSD)",
+    "type": "numeric"
+  },
+  {
+    "metric": "ecg_flag",
+    "label": "ECG rhythm, ST and QT flags",
+    "category": "body",
+    "group": "Cardiac and respiratory monitor",
+    "domain": "astronaut",
+    "unit": "device flag",
+    "type": "categorical"
+  },
+  {
+    "metric": "etco2",
+    "label": "End-tidal CO2",
+    "category": "body",
+    "group": "Cardiac and respiratory monitor",
+    "domain": "astronaut",
+    "unit": "mmHg",
+    "type": "numeric"
+  },
+  {
+    "metric": "spco",
+    "label": "Carboxyhaemoglobin (SpCO)",
+    "category": "body",
+    "group": "Cardiac and respiratory monitor",
+    "domain": "astronaut",
+    "unit": "%",
+    "type": "numeric"
+  },
+  {
+    "metric": "spmet",
+    "label": "Methaemoglobin (SpMet)",
+    "category": "body",
+    "group": "Cardiac and respiratory monitor",
+    "domain": "astronaut",
+    "unit": "%",
+    "type": "numeric"
+  },
+  {
+    "metric": "perfusion_index",
+    "label": "Perfusion index",
+    "category": "body",
+    "group": "Cardiac and respiratory monitor",
+    "domain": "astronaut",
+    "unit": "%",
+    "type": "numeric"
+  },
+  {
+    "metric": "sphb",
+    "label": "Haemoglobin, non-invasive (SpHb)",
+    "category": "body",
+    "group": "Cardiac and respiratory monitor",
+    "domain": "astronaut",
+    "unit": "g/dL",
+    "type": "numeric"
+  },
+  {
+    "metric": "hemoglobin",
+    "label": "Haemoglobin (lab)",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "g/dL",
+    "type": "numeric"
+  },
+  {
+    "metric": "hematocrit",
+    "label": "Haematocrit",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "%",
+    "type": "numeric"
+  },
+  {
+    "metric": "platelets",
+    "label": "Platelets",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "×10⁹/L",
+    "type": "numeric"
+  },
+  {
+    "metric": "wbc",
+    "label": "White cells and lymphocytes",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "×10⁹/L",
+    "type": "numeric"
+  },
+  {
+    "metric": "serum_calcium",
+    "label": "Serum calcium",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "mmol/L",
+    "type": "numeric"
+  },
+  {
+    "metric": "vitamin_d",
+    "label": "25-OH vitamin D",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "ng/mL",
+    "type": "numeric"
+  },
+  {
+    "metric": "ferritin",
+    "label": "Ferritin / serum iron",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "ng/mL",
+    "type": "numeric"
+  },
+  {
+    "metric": "creatinine",
+    "label": "Creatinine",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "mg/dL",
+    "type": "numeric"
+  },
+  {
+    "metric": "sodium",
+    "label": "Sodium (serum)",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "mmol/L",
+    "type": "numeric"
+  },
+  {
+    "metric": "potassium",
+    "label": "Potassium (serum)",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "mmol/L",
+    "type": "numeric"
+  },
+  {
+    "metric": "blood_glucose",
+    "label": "Blood sugar (glucose)",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "mg/dL",
+    "type": "numeric"
+  },
+  {
+    "metric": "cortisol_dhea",
+    "label": "Cortisol : DHEA ratio (saliva)",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "ratio",
+    "type": "numeric"
+  },
+  {
+    "metric": "herpes_dna",
+    "label": "Herpes virus DNA (saliva/urine)",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "detected / not",
+    "type": "boolean"
+  },
+  {
+    "metric": "urine_sg_ph",
+    "label": "Urine specific gravity and pH",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "SG; pH",
+    "type": "structured"
+  },
+  {
+    "metric": "urinary_calcium",
+    "label": "Urinary calcium",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "mg/24 h",
+    "type": "numeric"
+  },
+  {
+    "metric": "ntx",
+    "label": "Bone resorption markers (NTX)",
+    "category": "body",
+    "group": "Blood, urine and saliva",
+    "domain": "astronaut",
+    "unit": "vs baseline",
+    "type": "numeric"
+  },
+  {
+    "metric": "urine_volume",
+    "label": "Urine volume",
+    "category": "body",
+    "group": "Kidneys and hydration",
+    "domain": "astronaut",
+    "unit": "L/day",
+    "type": "numeric"
+  },
+  {
+    "metric": "urine_colour",
+    "label": "Urine colour",
+    "category": "body",
+    "group": "Kidneys and hydration",
+    "domain": "astronaut",
+    "unit": "pale / yellow / dark",
+    "type": "categorical"
+  },
+  {
+    "metric": "flank_pain",
+    "label": "Flank pain or blood in urine",
+    "category": "body",
+    "group": "Kidneys and hydration",
+    "domain": "astronaut",
+    "unit": "yes / no",
+    "type": "boolean"
+  },
+  {
+    "metric": "urinary_retention",
+    "label": "Cannot pass urine / painful urination",
+    "category": "body",
+    "group": "Kidneys and hydration",
+    "domain": "astronaut",
+    "unit": "yes / no",
+    "type": "boolean"
+  },
+  {
+    "metric": "fluid_intake",
+    "label": "Fluid intake",
+    "category": "body",
+    "group": "Kidneys and hydration",
+    "domain": "astronaut",
+    "unit": "L",
+    "type": "numeric"
+  },
+  {
+    "metric": "bone_density",
+    "label": "Bone density (DXA)",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "% of pre-mission",
+    "type": "numeric"
+  },
+  {
+    "metric": "resistance_ex",
+    "label": "Resistance exercise done vs planned",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "sessions",
+    "type": "numeric"
+  },
+  {
+    "metric": "exercise_min",
+    "label": "Exercise minutes",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "min/week",
+    "type": "numeric"
+  },
+  {
+    "metric": "fitness",
+    "label": "Aerobic capacity (VO2max)",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "% of pre-mission; mL/min/kg",
+    "type": "numeric"
+  },
+  {
+    "metric": "strength",
+    "label": "Muscle strength",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "% of baseline",
+    "type": "numeric"
+  },
+  {
+    "metric": "body_mass",
+    "label": "Body mass",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "kg",
+    "type": "numeric"
+  },
+  {
+    "metric": "energy_intake",
+    "label": "Food energy intake",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "kcal/day",
+    "type": "numeric"
+  },
+  {
+    "metric": "vision_change",
+    "label": "New blur or blind spot (SANS symptom)",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "yes / no",
+    "type": "boolean"
+  },
+  {
+    "metric": "oct_rnfl",
+    "label": "Retinal thickness around optic disc (OCT)",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "µm change",
+    "type": "numeric"
+  },
+  {
+    "metric": "amsler_acuity",
+    "label": "Visual acuity and Amsler grid",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "lines / distortion",
+    "type": "structured"
+  },
+  {
+    "metric": "jugular_flow",
+    "label": "Neck-vein (internal jugular) flow",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "normal / stagnant / reversed / clot",
+    "type": "categorical"
+  },
+  {
+    "metric": "orthostatic",
+    "label": "Standing tolerance (BP/HR on standing)",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "symptoms; BP/HR",
+    "type": "structured"
+  },
+  {
+    "metric": "motion_sickness",
+    "label": "Motion sickness",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "grade 0–3",
+    "type": "numeric"
+  },
+  {
+    "metric": "balance",
+    "label": "Balance / dizziness",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "check-in score",
+    "type": "numeric"
+  },
+  {
+    "metric": "hearing",
+    "label": "Hearing thresholds",
+    "category": "body",
+    "group": "Body systems (slow change)",
+    "domain": "astronaut",
+    "unit": "dB HL",
+    "type": "numeric"
+  },
+  {
+    "metric": "headache",
+    "label": "Headache",
+    "category": "body",
+    "group": "Symptoms and skin",
+    "domain": "astronaut",
+    "unit": "severity 0–3",
+    "type": "numeric"
+  },
+  {
+    "metric": "infection_signs",
+    "label": "Infection signs (rash, cold sores, shingles pain, fever)",
+    "category": "body",
+    "group": "Symptoms and skin",
+    "domain": "astronaut",
+    "unit": "checklist",
+    "type": "structured"
+  },
+  {
+    "metric": "skin",
+    "label": "Skin: rash, dryness, cut, abrasion",
+    "category": "body",
+    "group": "Symptoms and skin",
+    "domain": "astronaut",
+    "unit": "photo + note",
+    "type": "structured"
+  },
+  {
+    "metric": "pain_injury",
+    "label": "Aches and injuries",
+    "category": "body",
+    "group": "Symptoms and skin",
+    "domain": "astronaut",
+    "unit": "0–10, location on body",
+    "type": "structured"
+  },
+  {
+    "metric": "medication_log",
+    "label": "Medication taken and stock",
+    "category": "body",
+    "group": "Symptoms and skin",
+    "domain": "astronaut",
+    "unit": "log",
+    "type": "structured"
+  },
+  {
+    "metric": "sleep_duration",
+    "label": "Sleep duration",
+    "category": "sleep",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "hours",
+    "type": "numeric"
+  },
+  {
+    "metric": "circadian",
+    "label": "Sleep timing / circadian alignment",
+    "category": "sleep",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "sleep midpoint",
+    "type": "numeric"
+  },
+  {
+    "metric": "mood",
+    "label": "Mood",
+    "category": "mind",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "0–10",
+    "type": "numeric"
+  },
+  {
+    "metric": "stress_level",
+    "label": "Stress",
+    "category": "mind",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "0–10",
+    "type": "numeric"
+  },
+  {
+    "metric": "workload",
+    "label": "Workload (Bedford) / effort (Borg CR10)",
+    "category": "mind",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "Bedford 1–10; Borg 0–10",
+    "type": "structured"
+  },
+  {
+    "metric": "reaction_ms",
+    "label": "Reaction time (3-min PVT-B)",
+    "category": "mind",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "ms",
+    "type": "numeric"
+  },
+  {
+    "metric": "cognition",
+    "label": "Cognition battery (10 tests)",
+    "category": "mind",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "score vs baseline",
+    "type": "numeric"
+  },
+  {
+    "metric": "team_cohesion",
+    "label": "Team cohesion / conflict",
+    "category": "mind",
+    "group": "Behaviour, sleep and cognition",
+    "domain": "astronaut",
+    "unit": "survey score",
+    "type": "numeric"
+  },
+  {
+    "metric": "eva_hr",
+    "label": "Heart rate during spacewalk",
+    "category": "body",
+    "group": "Spacewalk (EVA)",
+    "domain": "astronaut",
+    "unit": "% of age-predicted max",
+    "type": "numeric"
+  },
+  {
+    "metric": "eva_core_temp",
+    "label": "Core temperature during spacewalk",
+    "category": "body",
+    "group": "Spacewalk (EVA)",
+    "domain": "astronaut",
+    "unit": "°C",
+    "type": "numeric"
+  },
+  {
+    "metric": "suit_status",
+    "label": "Suit pressure, O2, CO2, metabolic rate",
+    "category": "body",
+    "group": "Spacewalk (EVA)",
+    "domain": "astronaut",
+    "unit": "per suit system",
+    "type": "structured"
+  },
+  {
+    "metric": "dcs",
+    "label": "Decompression sickness symptoms",
+    "category": "body",
+    "group": "Spacewalk (EVA)",
+    "domain": "astronaut",
+    "unit": "symptom check",
+    "type": "structured"
+  },
+  {
+    "metric": "dust_symptoms",
+    "label": "Dust exposure symptoms (eyes, throat, cough)",
+    "category": "body",
+    "group": "Spacewalk (EVA)",
+    "domain": "astronaut",
+    "unit": "yes / no",
+    "type": "boolean"
+  },
+  {
+    "metric": "total_career_radiation_dose",
+    "label": "Cumulative effective dose (personal)",
+    "category": "body",
+    "group": "Radiation",
+    "domain": "astronaut",
+    "unit": "mSv",
+    "type": "numeric"
+  },
+  {
+    "metric": "personal_radiation_dose_rate",
+    "label": "Daily dose rate (cabin and personal)",
+    "category": "body",
+    "group": "Radiation",
+    "domain": "astronaut",
+    "unit": "mSv/day",
+    "type": "numeric"
+  },
+  {
+    "metric": "solar_storm",
+    "label": "Solar particle event (proton flux, NOAA S-scale)",
+    "category": "body",
+    "group": "Radiation",
+    "domain": "astronaut",
+    "unit": "S-level; projected mSv",
+    "type": "structured"
+  },
+  {
+    "metric": "rad_bfo",
+    "label": "Blood-forming organ dose",
+    "category": "body",
+    "group": "Radiation",
+    "domain": "astronaut",
+    "unit": "mGy-Eq",
+    "type": "numeric"
+  },
+  {
+    "metric": "ars_symptoms",
+    "label": "Acute radiation sickness symptoms",
+    "category": "body",
+    "group": "Radiation",
+    "domain": "astronaut",
+    "unit": "symptoms",
+    "type": "structured"
+  },
+  {
+    "metric": "co2_partial_pressure",
+    "label": "Cabin CO2 partial pressure",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "mmHg",
+    "type": "numeric"
+  },
+  {
+    "metric": "o2_partial_pressure",
+    "label": "Inspired O2 partial pressure",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "mmHg",
+    "type": "numeric"
+  },
+  {
+    "metric": "total_cabin_pressure",
+    "label": "Total cabin pressure",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "kPa",
+    "type": "numeric"
+  },
+  {
+    "metric": "cabin_temperature",
+    "label": "Cabin temperature",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "°C",
+    "type": "numeric"
+  },
+  {
+    "metric": "relative_humidity",
+    "label": "Relative humidity",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "%",
+    "type": "numeric"
+  },
+  {
+    "metric": "noise_level",
+    "label": "Noise (work 16 h / sleep 8 h)",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "dBA",
+    "type": "numeric"
+  },
+  {
+    "metric": "dust_concentration",
+    "label": "Cabin dust (surface only)",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "mg/m³",
+    "type": "numeric"
+  },
+  {
+    "metric": "combustion",
+    "label": "Combustion products (CO, HCN, HCl, HF)",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "ppm",
+    "type": "structured"
+  },
+  {
+    "metric": "water_supply",
+    "label": "Drinking water available",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "L/person/day",
+    "type": "numeric"
+  },
+  {
+    "metric": "preflight_radiation_level",
+    "label": "Preflight background radiation",
+    "category": "body",
+    "group": "Preflight reference",
+    "domain": "astronaut",
+    "unit": "mSv/year",
+    "type": "numeric"
+  },
+  {
+    "metric": "preflight_career_radiation_dose",
+    "label": "Previous career radiation dose",
+    "category": "body",
+    "group": "Preflight reference",
+    "domain": "astronaut",
+    "unit": "mSv",
+    "type": "numeric"
+  },
+  {
+    "metric": "mission_cumulative_radiation_dose",
+    "label": "Mission radiation dose",
+    "category": "body",
+    "group": "Radiation",
+    "domain": "astronaut",
+    "unit": "mSv",
+    "type": "numeric"
+  },
+  {
+    "metric": "radiation_level",
+    "label": "Cabin radiation dose rate",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "mSv/day",
+    "type": "numeric"
+  },
+  {
+    "metric": "is_solar_storm",
+    "label": "Solar storm present",
+    "category": "habitat",
+    "group": "Cabin environment",
+    "domain": "cabin",
+    "unit": "boolean",
+    "type": "boolean"
+  }
+]

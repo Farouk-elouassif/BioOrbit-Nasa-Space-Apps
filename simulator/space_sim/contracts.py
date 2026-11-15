@@ -30,6 +30,9 @@ CATALOGUE = {
     'radiation_level': ('mSv/day', 'cabin'),
     'is_solar_storm': ('boolean', 'cabin'),
 }
+from .extra import SPECS, validate_value
+CATALOGUE.update({code:(spec['unit'],spec['domain']) for code,spec in SPECS.items()})
+
 ENVIRONMENTS = ('transit_spacecraft', 'space_station', 'rover', 'surface_base')
 ACTIVITIES = ('resting', 'sleeping', 'working', 'exercising', 'eva')
 
@@ -88,7 +91,9 @@ def validate_event(event):
     if metric not in CATALOGUE or (event['unit'], event['domain']) != CATALOGUE[metric]:
         raise ValueError('Unknown metric, domain, or unit')
     value = event['value']
-    if metric == 'is_solar_storm':
+    if metric in SPECS:
+        validate_value(metric,value)
+    elif metric == 'is_solar_storm':
         if type(value) is not bool:
             raise ValueError('Storm indicator must be boolean')
     elif type(value) not in (int, float) or not math.isfinite(value) or value < 0:

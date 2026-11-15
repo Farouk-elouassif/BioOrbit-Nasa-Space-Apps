@@ -16,12 +16,13 @@ import django
 django.setup()
 
 from core.test_alerts import AlertRuleTests, AlertFixRegressionTests
+from core.test_extended_measurements import ExtendedContractTests
 from core.test_checkins import InferredRuleTests
 from core.test_pdf_scenarios import PdfRuleTests
 from core.tests import OperationalModelDefinitionTests
 from core.test_ingestion import IngestionValidationTests, IngestionRequestTests
 from core.test_reads import ReadSerializationTests, ReadRequestTests
 
-suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromTestCase(cls) for cls in (PdfRuleTests, AlertRuleTests, AlertFixRegressionTests, InferredRuleTests, OperationalModelDefinitionTests, IngestionValidationTests, IngestionRequestTests, ReadSerializationTests, ReadRequestTests))
+suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromTestCase(cls) for cls in (ExtendedContractTests, PdfRuleTests, AlertRuleTests, AlertFixRegressionTests, InferredRuleTests, OperationalModelDefinitionTests, IngestionValidationTests, IngestionRequestTests, ReadSerializationTests, ReadRequestTests))
 result = unittest.TextTestRunner(verbosity=2).run(suite)
 raise SystemExit(0 if result.wasSuccessful() else 1)

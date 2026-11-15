@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import math
 from uuid import UUID
 
+from .extra import SPECS, validate_value
 from .catalogue import ACTIVITIES, CATALOGUE, ENVIRONMENTS, PREFLIGHT_METRICS, canonical_metric, canonical_unit
 
 
@@ -159,7 +160,10 @@ def validate_event(original):
         unit, domain = CATALOGUE[code]
         if data['unit'] != unit or data['domain'] != domain:
             raise IngestionError('Metric domain/unit mismatch')
-        if code == 'is_solar_storm':
+        if code in SPECS:
+            try:validate_value(code,data['value'])
+            except ValueError as exc:raise IngestionError(str(exc)) from None
+        elif code == 'is_solar_storm':
             if type(data['value']) is not bool:
                 raise IngestionError('is_solar_storm requires a JSON boolean')
         else:

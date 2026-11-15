@@ -362,3 +362,7 @@ Caution; associated symptoms raise Warning; chest pain/collapse raises Emergency
 These adaptations are team prototype rules, not clinical validation or an external
 sensor connection. This work does not establish complete collection of all 83
 workbook indicators or tracking against a 250 mSv event limit.
+
+## Expanded workbook measurement storage
+
+Migration `0007_typed_workbook_measurements` adds typed JSON storage for categorical/structured readings and allows longer workbook unit descriptions. All 83 workbook indicators are represented, retaining existing internal fields. Original numeric/boolean storage, IDs and raw payloads remain intact. New independent random fixtures are stored and exposed via dashboard measurements, but do not override validated alert context or calculated scores. See [expanded generator definitions](../docs/expanded-workbook-simulation.md).

@@ -8,6 +8,7 @@ from django.db.models import Min,Max
 from django.core.cache import cache
 
 from core.ingestion.catalogue import CATALOGUE,canonical_metric
+from core.ingestion.extra import SPECS as RANDOM_METRICS
 from core.models import AlertAssessment,LatestMeasurement,MeasurementEvent,MonitoringAlert,PreflightProfile,LatestRuleInput,CrewCheckIn
 from .engine import DAY,Frame,Point,evaluate,patterns,valid,combination,truth,disjunction
 from .spec import COLLECTION_SECONDS,COLORS,PARAMETERS,RANK,REGIONS,TIERS,WORKBOOK
@@ -30,7 +31,7 @@ def extract_inputs(context,at,identity):
     for code,entry in inputs.items():
         if not isinstance(code,str) or not code or len(code)>100 or not isinstance(entry,dict) or 'value' not in entry:continue
         value=entry['value'];observed=at
-        if code in CATALOGUE:continue  # Supplemental facts cannot override validated measurement columns.
+        if code in CATALOGUE and code not in RANDOM_METRICS:continue  # Supplemental facts cannot override validated measurement columns.
         if code in NUMERIC_INPUTS and type(value) not in (int,float):continue
         if code in ENUM_INPUTS and (not isinstance(value,str) or value not in ENUM_INPUTS[code]):continue
         if code not in NUMERIC_INPUTS and code not in ENUM_INPUTS and type(value) is not bool:continue
@@ -82,7 +83,7 @@ class History:
         query=MeasurementEvent.objects.filter(run=self.run,kind='measurement',phase='inflight',measured_at__gte=start,measured_at__lte=end)
         if self.person is not None:query=query.filter(domain='astronaut',astronaut_id=self.person)
         else:query=query.filter(domain='cabin',habitat_id=self.habitat,zone_id=self.zone)
-        direct=code in CATALOGUE
+        direct=code in CATALOGUE and code not in RANDOM_METRICS
         if direct:query=query.filter(metric_id=code)
         else:query=query.filter(context__rule_inputs__has_key=code)
         points=[];seen=set()
@@ -122,6 +123,7 @@ def references(profile,run,person,anchor):
 def frame_from_rows(run,rows,anchor,start,baselines=None,inflight=None,person=None,habitat=None,zone=None):
     latest={}
     for row in sorted(rows,key=lambda r:r.measured_at):
+        if row.metric_id in RANDOM_METRICS or row.context.get('synthetic_random'):continue
         context={**row.context,'_source':row.source_event.raw_payload.get('source')}
         latest[row.metric_id]=Point(row.boolean_value if row.boolean_value is not None else row.numeric_value,row.measured_at,str(row.source_event_id),context)
         for code,point in extract_inputs(context,row.measured_at,row.source_event_id).items():

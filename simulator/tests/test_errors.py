@@ -21,7 +21,7 @@ class ErrorLevelTests(unittest.TestCase):
             for event in events:
                 validate_event(event)
                 if level==0:self.assertNotIn('error_injection',event['context'])
-                else:self.assertTrue(event['context']['error_injection']['selected'])
+                elif not event['context'].get('synthetic_random'):self.assertTrue(event['context']['error_injection']['selected'])
 
     def test_twenty_percent_selection_and_restart_reproducibility(self):
         engine=Engine(Config(error_level=20,astronauts=3))
@@ -30,10 +30,10 @@ class ErrorLevelTests(unittest.TestCase):
         events=[];replayed=[]
         for _ in range(120):
             events.extend(engine.advance(30));replayed.extend(restored.advance(30))
-        selected=[e['context']['error_injection']['selected'] for e in events]
+        selected=[e['context']['error_injection']['selected'] for e in events if 'error_injection' in e['context']]
         self.assertGreater(sum(selected)/len(selected),.17)
         self.assertLess(sum(selected)/len(selected),.23)
-        self.assertEqual(selected,[e['context']['error_injection']['selected'] for e in replayed])
+        self.assertEqual(selected,[e['context']['error_injection']['selected'] for e in replayed if 'error_injection' in e['context']])
         self.assertEqual([e['value'] for e in events],[e['value'] for e in replayed])
 
     def test_compose_setting_updates_saved_run_without_resetting_journal(self):

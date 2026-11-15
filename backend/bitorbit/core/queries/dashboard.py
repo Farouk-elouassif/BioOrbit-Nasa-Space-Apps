@@ -25,7 +25,7 @@ STALE_AFTER = COLLECTION_SECONDS
 def reading(row, anchor):
     age = max(0., (anchor-row.measured_at).total_seconds()) if anchor else None
     raw = row.source_event.raw_payload
-    return {'metric':row.metric_id, 'value':row.boolean_value if row.boolean_value is not None else row.numeric_value,
+    return {'metric':row.metric_id, 'value':row.boolean_value if row.boolean_value is not None else row.numeric_value if row.numeric_value is not None else getattr(row,'json_value',None),
             'unit':row.metric.unit, 'measured_at':row.measured_at, 'emitted_at':row.source_event.emitted_at,
             'received_at':row.source_event.received_at, 'event_id':str(row.source_event_id),
             'context':row.context, 'source':raw.get('source'), 'simulated':raw.get('simulated') is True,
@@ -46,7 +46,9 @@ def choose_run(code=None):
 
 def run_clock(run):
     times=MeasurementEvent.objects.filter(run=run,phase='inflight').aggregate(start=Min('measured_at'),latest=Max('measured_at'))
-    return times['start'],times['latest']
+    report_at=CrewCheckIn.objects.filter(run=run).aggregate(at=Max('observed_at'))['at']
+    latest=max(times['latest'],report_at) if times['latest'] and report_at else times['latest'] or report_at
+    return times['start'],latest
 
 
 def dashboard(params):
@@ -60,8 +62,6 @@ def dashboard(params):
     start,anchor=run_clock(run)
     rows=list(LatestMeasurement.objects.filter(run=run).select_related('metric','source_event','habitat'))
     if rows:anchor=max([r.measured_at for r in rows]+([anchor] if anchor else []))
-    report_at=CrewCheckIn.objects.filter(run=run).aggregate(at=Max('observed_at'))['at']
-    if report_at is not None:anchor=max(anchor,report_at) if anchor else report_at
     result['run']={'id':run.pk,'environment':run.environment,'mission_code':run.mission.mission_code,
                    'mission_name':run.mission.name or run.mission.mission_code,'started_at':start,
                    'observation_time':anchor,
@@ -130,7 +130,7 @@ def trends(params):
     metric=canonical_metric(params.get('metric',''),domain)
     if not isinstance(metric,str) or metric not in CATALOGUE or CATALOGUE[metric][1]!=domain:
         raise ReadError('Unknown metric or domain mismatch')
-    if metric=='is_solar_storm':raise ReadError('Numeric trends are not available for boolean metrics')
+    if metric_spec(metric)['value_type']!='numeric':raise ReadError('Numeric trends require a numeric metric; categorical and structured readings are available in the dashboard')
     window=params.get('window','24h').lower()
     if window not in ('24h','7d','30d'):raise ReadError('window must be 24h, 7d, or 30d')
     _,anchor=run_clock(run)

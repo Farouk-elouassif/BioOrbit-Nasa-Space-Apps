@@ -1,0 +1,338 @@
+{
+  "source": "Data.xlsx / Parameters",
+  "source_sha256": "8fb53ac25be1f5cbee3ff2c226138a8111388a3273d6503e0c19355005cac486",
+  "indicators": [
+    {
+      "id": "heart_rate",
+      "metric": "heart_rate"
+    },
+    {
+      "id": "bp_systolic",
+      "metric": "systolic_blood_pressure"
+    },
+    {
+      "id": "bp_diastolic",
+      "metric": "diastolic_blood_pressure"
+    },
+    {
+      "id": "resp_rate",
+      "metric": "respiratory_rate"
+    },
+    {
+      "id": "spo2",
+      "metric": "spo2"
+    },
+    {
+      "id": "core_temp",
+      "metric": "body_temperature"
+    },
+    {
+      "id": "consciousness",
+      "metric": "consciousness"
+    },
+    {
+      "id": "news2",
+      "metric": "news2"
+    },
+    {
+      "id": "hrv",
+      "metric": "hrv"
+    },
+    {
+      "id": "ecg_flag",
+      "metric": "ecg_flag"
+    },
+    {
+      "id": "etco2",
+      "metric": "etco2"
+    },
+    {
+      "id": "spco",
+      "metric": "spco"
+    },
+    {
+      "id": "spmet",
+      "metric": "spmet"
+    },
+    {
+      "id": "perfusion_index",
+      "metric": "perfusion_index"
+    },
+    {
+      "id": "sphb",
+      "metric": "sphb"
+    },
+    {
+      "id": "hemoglobin",
+      "metric": "hemoglobin"
+    },
+    {
+      "id": "hematocrit",
+      "metric": "hematocrit"
+    },
+    {
+      "id": "platelets",
+      "metric": "platelets"
+    },
+    {
+      "id": "wbc",
+      "metric": "wbc"
+    },
+    {
+      "id": "serum_calcium",
+      "metric": "serum_calcium"
+    },
+    {
+      "id": "vitamin_d",
+      "metric": "vitamin_d"
+    },
+    {
+      "id": "ferritin",
+      "metric": "ferritin"
+    },
+    {
+      "id": "creatinine",
+      "metric": "creatinine"
+    },
+    {
+      "id": "sodium",
+      "metric": "sodium"
+    },
+    {
+      "id": "potassium",
+      "metric": "potassium"
+    },
+    {
+      "id": "glucose",
+      "metric": "blood_glucose"
+    },
+    {
+      "id": "cortisol_dhea",
+      "metric": "cortisol_dhea"
+    },
+    {
+      "id": "herpes_dna",
+      "metric": "herpes_dna"
+    },
+    {
+      "id": "urine_sg_ph",
+      "metric": "urine_sg_ph"
+    },
+    {
+      "id": "urinary_calcium",
+      "metric": "urinary_calcium"
+    },
+    {
+      "id": "ntx",
+      "metric": "ntx"
+    },
+    {
+      "id": "urine_volume",
+      "metric": "urine_volume"
+    },
+    {
+      "id": "urine_colour",
+      "metric": "urine_colour"
+    },
+    {
+      "id": "flank_pain",
+      "metric": "flank_pain"
+    },
+    {
+      "id": "urinary_retention",
+      "metric": "urinary_retention"
+    },
+    {
+      "id": "fluid_intake",
+      "metric": "fluid_intake"
+    },
+    {
+      "id": "bone_density",
+      "metric": "bone_density"
+    },
+    {
+      "id": "resistance_ex",
+      "metric": "resistance_ex"
+    },
+    {
+      "id": "exercise_min",
+      "metric": "exercise_min"
+    },
+    {
+      "id": "fitness",
+      "metric": "fitness"
+    },
+    {
+      "id": "strength",
+      "metric": "strength"
+    },
+    {
+      "id": "body_mass",
+      "metric": "body_mass"
+    },
+    {
+      "id": "energy_intake",
+      "metric": "energy_intake"
+    },
+    {
+      "id": "vision_change",
+      "metric": "vision_change"
+    },
+    {
+      "id": "oct_rnfl",
+      "metric": "oct_rnfl"
+    },
+    {
+      "id": "amsler_acuity",
+      "metric": "amsler_acuity"
+    },
+    {
+      "id": "jugular_flow",
+      "metric": "jugular_flow"
+    },
+    {
+      "id": "orthostatic",
+      "metric": "orthostatic"
+    },
+    {
+      "id": "motion_sickness",
+      "metric": "motion_sickness"
+    },
+    {
+      "id": "balance",
+      "metric": "balance"
+    },
+    {
+      "id": "hearing",
+      "metric": "hearing"
+    },
+    {
+      "id": "headache",
+      "metric": "headache"
+    },
+    {
+      "id": "infection_signs",
+      "metric": "infection_signs"
+    },
+    {
+      "id": "skin",
+      "metric": "skin"
+    },
+    {
+      "id": "pain_injury",
+      "metric": "pain_injury"
+    },
+    {
+      "id": "medication_log",
+      "metric": "medication_log"
+    },
+    {
+      "id": "sleep_hours",
+      "metric": "sleep_duration"
+    },
+    {
+      "id": "circadian",
+      "metric": "circadian"
+    },
+    {
+      "id": "mood",
+      "metric": "mood"
+    },
+    {
+      "id": "stress",
+      "metric": "stress_level"
+    },
+    {
+      "id": "workload",
+      "metric": "workload"
+    },
+    {
+      "id": "reaction_ms",
+      "metric": "reaction_ms"
+    },
+    {
+      "id": "cognition",
+      "metric": "cognition"
+    },
+    {
+      "id": "team_cohesion",
+      "metric": "team_cohesion"
+    },
+    {
+      "id": "eva_hr",
+      "metric": "eva_hr"
+    },
+    {
+      "id": "eva_core_temp",
+      "metric": "eva_core_temp"
+    },
+    {
+      "id": "suit_status",
+      "metric": "suit_status"
+    },
+    {
+      "id": "dcs",
+      "metric": "dcs"
+    },
+    {
+      "id": "dust_symptoms",
+      "metric": "dust_symptoms"
+    },
+    {
+      "id": "rad_cumulative",
+      "metric": "total_career_radiation_dose"
+    },
+    {
+      "id": "rad_rate",
+      "metric": "personal_radiation_dose_rate"
+    },
+    {
+      "id": "solar_storm",
+      "metric": "solar_storm"
+    },
+    {
+      "id": "rad_bfo",
+      "metric": "rad_bfo"
+    },
+    {
+      "id": "ars_symptoms",
+      "metric": "ars_symptoms"
+    },
+    {
+      "id": "cabin_co2",
+      "metric": "co2_partial_pressure"
+    },
+    {
+      "id": "cabin_o2",
+      "metric": "o2_partial_pressure"
+    },
+    {
+      "id": "cabin_pressure",
+      "metric": "total_cabin_pressure"
+    },
+    {
+      "id": "cabin_temp",
+      "metric": "cabin_temperature"
+    },
+    {
+      "id": "cabin_humidity",
+      "metric": "relative_humidity"
+    },
+    {
+      "id": "noise",
+      "metric": "noise_level"
+    },
+    {
+      "id": "dust",
+      "metric": "dust_concentration"
+    },
+    {
+      "id": "combustion",
+      "metric": "combustion"
+    },
+    {
+      "id": "water_supply",
+      "metric": "water_supply"
+    }
+  ]
+}

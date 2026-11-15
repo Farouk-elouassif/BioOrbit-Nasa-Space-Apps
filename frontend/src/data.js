@@ -4,10 +4,10 @@ export const KEY_METRICS = {
   fluid: 'fluid_intake', dose: 'mission_cumulative_radiation_dose', radiation: 'personal_radiation_dose_rate',
 };
 export const FIELD_META = {
-  hr: ['Heart rate','bpm',0], bp: ['Blood pressure','mmHg',0], glucose:['Blood glucose','mg/dL',1],
-  temp:['Temperature','°C',2],sleep:['Sleep','hours',1],mood:['Mood','/10',1],rr:['Breathing rate','breaths/min',1],
-  spo2:['Oxygen saturation','%',1],stress:['Stress','/10',1],fluid:['Fluid intake','L',2],
-  dose:['Mission dose','mSv',3],radiation:['Personal radiation','mSv/day',3],
+  hr: ['Heart rate','bpm',2], bp: ['Blood pressure','mmHg',2], glucose:['Blood glucose','mg/dL',2],
+  temp:['Temperature','°C',2],sleep:['Sleep','hours',2],mood:['Mood','/10',2],rr:['Breathing rate','breaths/min',2],
+  spo2:['Oxygen saturation','%',2],stress:['Stress','/10',2],fluid:['Fluid intake','L',2],
+  dose:['Mission dose','mSv',2],radiation:['Personal radiation','mSv/day',2],
 };
 export const CABIN_META = [
   {metric:'co2_partial_pressure',name:'Carbon dioxide',label:'CO₂',unit:'mmHg'},
@@ -19,9 +19,14 @@ export const CABIN_META = [
   {metric:'dust_concentration',name:'Dust',label:'DUST',unit:'mg/m³'},
   {metric:'radiation_level',name:'Cabin radiation',label:'RADIATION',unit:'mSv/day'},
 ];
-export function formatValue(value,digits=1) {
+export function formatValue(value) {
   if (typeof value==='boolean') return value?'Yes':'No';
-  return typeof value==='number'&&Number.isFinite(value)?value.toFixed(digits).replace(/\.0+$/,''):'—';
+  return typeof value==='number'&&Number.isFinite(value)?value.toFixed(2):'—';
+}
+// Alert explanations arrive as prose; format decimal readings without changing
+// identifiers, dates, or the underlying evidence.
+export function formatNumericText(text) {
+  return typeof text==='string'?text.replace(/(?<![\w.])[+-]?\d+\.\d+(?![\w.])/g,number=>formatValue(Number(number))):text;
 }
 export function timeLabel(value) {
   if(!value)return 'No observation';
@@ -31,23 +36,22 @@ export function timeLabel(value) {
 export function baselineText(member,key) {
   const one=member.baselines?.[KEY_METRICS[key]];
   if(!one)return 'No preflight baseline available';
-  const digits=FIELD_META[key]?.[2]??1;
   if(key==='bp'){
     const diastolic=member.baselines?.diastolic_blood_pressure;
-    return `Preflight ${formatValue(one.mean,0)} / ${diastolic?formatValue(diastolic.mean,0):'—'} mmHg · mean`;
+    return `Preflight ${formatValue(one.mean)} / ${diastolic?formatValue(diastolic.mean):'—'} mmHg · mean`;
   }
-  return `Preflight ${formatValue(one.min,digits)}–${formatValue(one.max,digits)} ${FIELD_META[key]?.[1]||''}`;
+  return `Preflight ${formatValue(one.min)}–${formatValue(one.max)} ${FIELD_META[key]?.[1]||''}`;
 }
 export function adaptCrew(person,run) {
   const readings=person.measurements||{};
   const values=Object.fromEntries(Object.entries(KEY_METRICS).map(([key,metric])=>[key,readings[metric]?.value??null]));
   const systolic=readings.systolic_blood_pressure?.value,diastolic=readings.diastolic_blood_pressure?.value;
-  values.bp=systolic!=null||diastolic!=null?`${formatValue(systolic,0)}/${formatValue(diastolic,0)}`:null;
+  values.bp=systolic!=null||diastolic!=null?`${formatValue(systolic)}/${formatValue(diastolic)}`:null;
   const colors=['#eaa586','#a4c6aa','#b9b0d7','#8db5ce'];
   const number=(person.id.match(/\d+$/)||[])[0];
   const overdue=Object.values(readings).filter(r=>r.freshness==='overdue').length;
   const alerts=person.alerts||[];const top=highestAlert(alerts);
-  return {...person,...values,topAlert:top,alerts,runId:run.id,observedAt:run.observation_time,
+  return {...person,...values,topAlert:top,alerts,runId:run.id,observedAt:run.observation_time,missionStartedAt:run.started_at,
     initials:number?number.slice(-2).padStart(2,'0'):person.name.split(' ').map(p=>p[0]).join('').slice(0,2),
     color:colors[[...person.id].reduce((sum,c)=>sum+c.charCodeAt(0),0)%colors.length],
     role:'CREW MEMBER',location:[person.habitat_id,person.zone_id].filter(Boolean).join(' / ')||'Location unavailable',
@@ -66,3 +70,11 @@ export const ALERT_RANK={advisory:1,caution:2,warning:3,emergency:4};
 export const ALERT_COLORS={advisory:'#4278ca',caution:'#b98320',warning:'#d57127',emergency:'#ce4257'};
 export function highestAlert(alerts=[]){return [...alerts].sort((a,b)=>(ALERT_RANK[b.tier]||0)-(ALERT_RANK[a.tier]||0))[0]||null;}
 export function tierLabel(tier){return tier?tier[0].toUpperCase()+tier.slice(1):'No active alert';}
+
+export function hasMeasurement(member,key) {
+  const metrics=key==='bp'?['systolic_blood_pressure','diastolic_blood_pressure']:[KEY_METRICS[key]];
+  return metrics.some(metric=>{
+    const value=member?.measurements?.[metric]?.value;
+    return typeof value==='number'&&Number.isFinite(value);
+  });
+}

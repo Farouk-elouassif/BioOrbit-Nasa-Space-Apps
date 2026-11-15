@@ -35,7 +35,7 @@ class InferredRuleTests(SimpleTestCase):
         self.assertEqual(evaluate(f)['bp_diastolic']['tier'],'advisory')
 
     def test_ecg_uses_associated_findings(self):
-        for symptom,tier in [(None,'caution'),('lightheadedness','warning'),('chest_pain','emergency')]:
+        for symptom,tier in [(None,'caution'),('lightheadedness','warning'),('nausea','warning'),('chest_pain','emergency')]:
             points={'ecg_alarm':Point(True,NOW,'ecg')}
             if symptom:points[symptom]=Point(True,NOW,'symptom')
             f=Frame(NOW,points,lambda *args:[])
@@ -63,6 +63,9 @@ class CrewCheckInTests(TestCase):
         response=self.post(self.report())
         self.assertEqual(response.status_code,201,response.content)
         self.assertEqual(MeasurementEvent.objects.count(),before)
+        dashboard=self.client.get('/api/v1/dashboard',{'run_id':'demo-001'}).json()
+        self.assertEqual(dashboard['run']['observation_time'],response.json()['observed_at'])
+        self.assertEqual(dashboard['crew'][0]['measurements']['heart_rate']['value'],68)
         self.assertEqual(CrewCheckIn.objects.get().recorded_by,self.user)
         self.assertEqual(MonitoringAlert.objects.get(rule_code='acute_symptoms').tier,'emergency')
         reports=self.client.get('/api/v1/check-ins',{'run_id':'demo-001'}).json()['checkins']

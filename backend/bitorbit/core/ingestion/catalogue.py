@@ -27,6 +27,9 @@ CATALOGUE = {
     'radiation_level': ('mSv/day', 'cabin'),
     'is_solar_storm': ('boolean', 'cabin'),
 }
+from .extra import SPECS
+CATALOGUE.update({code:(spec['unit'],spec['domain']) for code,spec in SPECS.items()})
+
 ENVIRONMENTS = ('transit_spacecraft', 'space_station', 'rover', 'surface_base')
 ACTIVITIES = ('resting', 'sleeping', 'working', 'exercising', 'eva')
 
@@ -42,9 +45,10 @@ INTERVAL_TOTAL = {'sleep_duration', 'fluid_intake'}
 
 def metric_spec(code):
     unit, domain = CATALOGUE[code]
-    boolean = code == 'is_solar_storm'
+    value_type = SPECS[code]['type'] if code in SPECS else 'boolean' if code=='is_solar_storm' else 'numeric'
+    boolean = value_type=='boolean'
     return {'unit': unit, 'domain': domain,
-            'value_type': 'boolean' if boolean else 'numeric',
+            'value_type': value_type,
             'aggregation_kind': 'boolean' if boolean else 'cumulative' if code in CUMULATIVE else 'interval_total' if code in INTERVAL_TOTAL else 'point'}
 
 # Data.xlsx identifiers are accepted at the wire boundary. Existing database codes

@@ -94,3 +94,38 @@ Habitat metric cards use the same interactive history panels as crew indicators:
 recorded-value tables and gaps for missing buckets. Each panel queries the selected
 run, habitat and cabin zone. Personal preflight reference labels apply only to crew
 charts; habitat charts show recorded environmental measurements.
+
+Sleep history uses daily observations with seven-day or thirty-day views. Axes,
+point inspection and value tables label each UTC calendar day relative to the
+mission's first observation (Day 1), alongside its date. Sleep duration stays in
+hours on the value axis. Missing days remain gaps.
+
+## Landing page and dashboard
+
+The frontend opens to the research landing page at `/`. Its “Visit dashboard”
+links open the existing console at `/dashboard`; the console wordmark returns
+home. The dashboard code and API polling load only when the console is opened.
+Both pages share the saved light/dark theme preference and orbit favicon.
+
+The landing page introduces the research audience, explains how measurements,
+mission time and environmental context are read together, and links directly to
+NASA’s Human Research Program, spaceflight hazards and evidence reports. Its
+interactive vector illustration is a conceptual diagram, not measured data.
+The page identifies the simulator data and the project’s independent status.
+
+Vite development and preview serve both routes. When deploying the production
+build behind another web server, configure SPA fallback to `index.html` for
+`/dashboard` while forwarding `/api/` requests to Django.
+
+## Measurements beside the 3D astronaut
+
+The crew snapshot uses Body, Mind, Sleep, and Habitat tabs. Body includes physical
+measurements and exposure; Mind includes mood, stress and cognition; Sleep includes
+sleep duration and circadian timing; Habitat shows shared readings for the selected
+crew member's habitat, with its zone labelled. The 3D canvas remains mounted when
+switching tabs. Arrow keys, Home and End navigate the categories.
+
+All 88 current wire metrics have an explicit category in
+`src/measurementCatalogue.json`. Values retain their backend units, timestamps,
+missing/overdue states and alert links. Categories support numeric, boolean,
+categorical and structured readings; independent random fixtures are labelled.

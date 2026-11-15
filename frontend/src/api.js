@@ -64,8 +64,23 @@ export async function postJSON(resource,payload){
   if(!document.cookie.split(';').some(v=>v.trim().startsWith('csrftoken=')))await readJSON(apiUrl('session'));
   const cookie=document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith('csrftoken='));
   const csrf=cookie?decodeURIComponent(cookie.slice('csrftoken='.length)):'';
-  const response=await fetch(apiUrl(resource),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRFToken':csrf},body:JSON.stringify(payload)});
-  let data;try{data=await response.json()}catch{throw new Error('The server could not save the report. Retry the same report.');}
-  if(!response.ok){const error=new Error(data.message||`Save failed (${response.status}).`);error.status=response.status;throw error;}
-  return data;
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),10000);
+  try{
+    const response=await fetch(apiUrl(resource),{method:'POST',credentials:'same-origin',signal:controller.signal,headers:{'Content-Type':'application/json','X-CSRFToken':csrf},body:JSON.stringify(payload)});
+    let data;
+    try{data=await response.json()}catch{
+      const message=response.status===404
+        ?'The API endpoint is unavailable (404). Update and restart the backend, then retry.'
+        :response.status===403
+          ?'The server rejected this request (403). Refresh the page to renew your session, then retry.'
+          :`The server returned an unexpected response (HTTP ${response.status}). Retry the same report.`;
+      const error=new Error(message);error.status=response.status;throw error;
+    }
+    if(!response.ok){const error=new Error(data.message||`Save failed (${response.status}).`);error.status=response.status;throw error;}
+    return data;
+  }catch(error){
+    if(error.name==='AbortError')throw new Error('Saving timed out. Retry the same report; duplicate observations will not be created.');
+    throw error;
+  }finally{clearTimeout(timer)}
 }

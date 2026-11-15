@@ -150,7 +150,69 @@
         "noise_level",
         "dust_concentration",
         "radiation_level",
-        "is_solar_storm"
+        "is_solar_storm",
+        "consciousness",
+        "news2",
+        "hrv",
+        "ecg_flag",
+        "etco2",
+        "spco",
+        "spmet",
+        "perfusion_index",
+        "sphb",
+        "hemoglobin",
+        "hematocrit",
+        "platelets",
+        "wbc",
+        "serum_calcium",
+        "vitamin_d",
+        "ferritin",
+        "creatinine",
+        "sodium",
+        "potassium",
+        "cortisol_dhea",
+        "herpes_dna",
+        "urine_sg_ph",
+        "urinary_calcium",
+        "ntx",
+        "urine_volume",
+        "urine_colour",
+        "flank_pain",
+        "urinary_retention",
+        "bone_density",
+        "resistance_ex",
+        "exercise_min",
+        "fitness",
+        "strength",
+        "energy_intake",
+        "vision_change",
+        "oct_rnfl",
+        "amsler_acuity",
+        "jugular_flow",
+        "orthostatic",
+        "motion_sickness",
+        "balance",
+        "hearing",
+        "headache",
+        "infection_signs",
+        "skin",
+        "pain_injury",
+        "medication_log",
+        "circadian",
+        "workload",
+        "reaction_ms",
+        "cognition",
+        "team_cohesion",
+        "eva_hr",
+        "eva_core_temp",
+        "suit_status",
+        "dcs",
+        "dust_symptoms",
+        "solar_storm",
+        "rad_bfo",
+        "ars_symptoms",
+        "combustion",
+        "water_supply"
       ]
     },
     "unit": {
@@ -160,7 +222,9 @@
     "value": {
       "type": [
         "number",
-        "boolean"
+        "boolean",
+        "string",
+        "object"
       ]
     },
     "profile": {
@@ -1531,6 +1595,1680 @@
               },
               "value": {
                 "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "consciousness"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "Alert / new confusion / voice / pain / unresponsive"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "enum": [
+                  "alert",
+                  "new_confusion",
+                  "voice",
+                  "pain",
+                  "unresponsive"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "news2"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "score 0–20"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "hrv"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "ms (RMSSD)"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "ecg_flag"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "device flag"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "enum": [
+                  "none",
+                  "sinus_rhythm",
+                  "irregular_rhythm"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "etco2"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmHg"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "spco"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "%"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "spmet"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "%"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "perfusion_index"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "%"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "sphb"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "g/dL"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "hemoglobin"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "g/dL"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "hematocrit"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "%"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "platelets"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "×10⁹/L"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "wbc"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "×10⁹/L"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "serum_calcium"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmol/L"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "vitamin_d"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "ng/mL"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "ferritin"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "ng/mL"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "creatinine"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mg/dL"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "sodium"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmol/L"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "potassium"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mmol/L"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "cortisol_dhea"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "ratio"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "herpes_dna"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "detected / not"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "urine_sg_ph"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "SG; pH"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "specific_gravity": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "ph": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "specific_gravity",
+                  "ph"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "urinary_calcium"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mg/24 h"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "ntx"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "vs baseline"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "urine_volume"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "L/day"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "urine_colour"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "pale / yellow / dark"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "enum": [
+                  "pale",
+                  "yellow",
+                  "dark"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "flank_pain"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "yes / no"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "urinary_retention"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "yes / no"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "bone_density"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "% of pre-mission"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "resistance_ex"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "sessions"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "exercise_min"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "min/week"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "fitness"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "% of pre-mission; mL/min/kg"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "strength"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "% of baseline"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "energy_intake"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "kcal/day"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "vision_change"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "yes / no"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "oct_rnfl"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "µm change"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "amsler_acuity"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "lines / distortion"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "acuity_lines": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "distortion": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "acuity_lines",
+                  "distortion"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "jugular_flow"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "normal / stagnant / reversed / clot"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "enum": [
+                  "normal",
+                  "stagnant",
+                  "reversed",
+                  "clot"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "orthostatic"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "symptoms; BP/HR"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "symptoms": {
+                    "type": "boolean"
+                  },
+                  "systolic_mmhg": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "diastolic_mmhg": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "heart_rate_bpm": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "symptoms",
+                  "systolic_mmhg",
+                  "diastolic_mmhg",
+                  "heart_rate_bpm"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "motion_sickness"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "grade 0–3"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "balance"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "check-in score"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "hearing"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "dB HL"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "headache"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "severity 0–3"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "infection_signs"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "checklist"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "rash": {
+                    "type": "boolean"
+                  },
+                  "cold_sores": {
+                    "type": "boolean"
+                  },
+                  "fever": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "rash",
+                  "cold_sores",
+                  "fever"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "skin"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "photo + note"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "condition": {
+                    "enum": [
+                      "normal",
+                      "dry",
+                      "minor_abrasion",
+                      "mild_rash"
+                    ]
+                  },
+                  "note": {
+                    "enum": [
+                      "Synthetic skin observation; no real photograph collected."
+                    ]
+                  },
+                  "photo_available": {
+                    "enum": [
+                      false
+                    ]
+                  }
+                },
+                "required": [
+                  "condition",
+                  "note",
+                  "photo_available"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "pain_injury"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "0–10, location on body"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "severity": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "location": {
+                    "enum": [
+                      "none",
+                      "back",
+                      "shoulder",
+                      "knee",
+                      "hand"
+                    ]
+                  }
+                },
+                "required": [
+                  "severity",
+                  "location"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "medication_log"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "log"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "taken": {
+                    "type": "boolean"
+                  },
+                  "item": {
+                    "enum": [
+                      "none",
+                      "synthetic_medication_A"
+                    ]
+                  },
+                  "stock_remaining": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "taken",
+                  "item",
+                  "stock_remaining"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "circadian"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "sleep midpoint"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "workload"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "Bedford 1–10; Borg 0–10"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "bedford": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "borg_cr10": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "bedford",
+                  "borg_cr10"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "reaction_ms"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "ms"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "cognition"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "score vs baseline"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "team_cohesion"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "survey score"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "eva_hr"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "% of age-predicted max"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "eva_core_temp"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "°C"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "suit_status"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "per suit system"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "pressure_kpa": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "o2_partial_pressure_mmhg": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "co2_partial_pressure_mmhg": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "metabolic_rate_watts": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "pressure_kpa",
+                  "o2_partial_pressure_mmhg",
+                  "co2_partial_pressure_mmhg",
+                  "metabolic_rate_watts"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "dcs"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "symptom check"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "joint_pain": {
+                    "type": "boolean"
+                  },
+                  "tingling": {
+                    "type": "boolean"
+                  },
+                  "weakness": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "joint_pain",
+                  "tingling",
+                  "weakness"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "dust_symptoms"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "yes / no"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "solar_storm"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "S-level; projected mSv"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "noaa_s_level": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "projected_event_dose_msv": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "noaa_s_level",
+                  "projected_event_dose_msv"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "rad_bfo"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "mGy-Eq"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "ars_symptoms"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "symptoms"
+              },
+              "domain": {
+                "const": "astronaut"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "nausea": {
+                    "type": "boolean"
+                  },
+                  "vomiting": {
+                    "type": "boolean"
+                  },
+                  "loss_of_appetite": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "nausea",
+                  "vomiting",
+                  "loss_of_appetite"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "combustion"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "ppm"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "co_ppm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "hcn_ppm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "hcl_ppm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "hf_ppm": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "co_ppm",
+                  "hcn_ppm",
+                  "hcl_ppm",
+                  "hf_ppm"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "water_supply"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "L/person/day"
+              },
+              "domain": {
+                "const": "cabin"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0
               }
             }
           }
