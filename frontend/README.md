@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-If Vite was already running before the integration, stop it with Ctrl+C and restart it so `vite.config.js` loads. Its `/api` proxy forwards requests to `http://127.0.0.1:8000`, keeping browser requests same-origin. For a different backend host port:
+If Vite was already running before the integration, stop it with Ctrl+C and restart it so `vite.config.js` loads. Its `/api` proxy forwards requests to `https://requests-curriculum-organisation-ace.trycloudflare.com`, keeping browser requests same-origin for sessions and CSRF. This applies to both development and preview. Restart Vite after changing the target. To override the backend (for example, to use a local server):
 
 ```bash
 BIOORBIT_BACKEND_URL=http://127.0.0.1:8080 npm run dev

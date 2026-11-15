@@ -1,347 +1,181 @@
-# Astronaut Health Monitoring System
+# BioOrbit — Astronaut Health Companion
 
-**NASA Space Apps Challenge 2026 — Prototype | November 14–15, 2026**  
-**Working project name:** Astronaut Health Monitoring System (branding TBD; *AstroPulse* is one candidate)
+**NASA Space Apps Challenge 2026 · Team Bioskopos**
 
-> **Project status:** Architecture and implementation plan. This README describes the system we intend to build, **not** a finished or deployed application.  
-> **Safety notice:** This is a hackathon prototype using simulated data. It is **not a medical device**, and the thresholds, alerts, scoring adaptations, and guidance must not be treated as operational medical advice for astronauts.
+We built BioOrbit to bring astronaut health measurements, personal baselines, and cabin conditions into one place. Our goal is to make changes easier to understand in the context of a mission: who the observation belongs to, what they were doing, when it was recorded, and what was happening around them.
 
-**Implemented components:** the [Django operational models and ingestion API](backend/README.md#simulator-ingestion-api) and the standalone [Python astronaut and cabin simulator](simulator/README.md) supports preflight profiles, historical backfill, live streaming, solar storms, durable checkpoints, and configurable HTTP delivery. See its README for commands and contracts.
+BioOrbit is a working research prototype with a Python simulator, a Django API, PostgreSQL storage, and a React interface. Synthetic observations flow through ingestion, alert evaluation, current readings, and historical charts. Crew members can also sign in and save check-ins that feed the same measurement and alert workflow.
 
-**Connected frontend:** the [React console](frontend/README.md) reads actual ingested crew/cabin values and recorded trends through [Django operational read APIs](backend/README.md#connected-frontend-read-apis). Telemetry is still synthetic simulator output; workbook-based prototype alerts are connected; authenticated UI check-ins are connected; forecasts remain pending.
+All simulator telemetry is synthetic. Our rules and guidance are prototype interpretations of the supplied measurement workbook and reference material. BioOrbit is not a medical device and is not affiliated with or endorsed by NASA.
 
-## 1. Mission and vision
+## What we have built
 
-Build an **offline-first, astronaut-facing health monitoring application** that helps a crew member:
+- A mission dashboard with crew readings, personal preflight references, habitat conditions, and recorded alerts.
+- An interactive Three.js astronaut with twelve selectable body regions, measurement details, and shared cabin markers.
+- Body, Mind, Sleep, and Habitat measurement categories, covering the 88 configured wire metrics.
+- Historical charts with 24-hour, seven-day, and thirty-day windows where applicable, exact aggregate values, and visible gaps when observations are missing.
+- Four alert tiers: Advisory, Caution, Warning, and Emergency, with recorded evidence, guidance, recheck times, and acknowledgment.
+- Authenticated crew check-ins for manual measurements, symptoms, findings, and notes.
+- A resumable simulator with personal profiles, preflight observations, historical backfill, live generation, and configurable abnormal scenarios.
+- A research landing page, biology documentation, a searchable measurement atlas, and a reference library containing 139 entries across seven categories.
+- Light and dark themes shared across the public pages and console.
 
-- View current health measurements and trends in an understandable visual interface.
-- Compare observations with **personal preflight and in-flight baselines**, not just generic Earth reference ranges.
-- Understand potential connections between **cabin/environmental conditions** and health symptoms.
-- Receive clear, on-board **alerts and predefined next-step guidance** when appropriate.
-- Record measurements, check-ins, and actions for later review, even when Earth communication is delayed or unavailable.
-
-The challenge briefing identifies **six must-have indicators**: blood pressure, heart rate, blood sugar, body temperature, sleep hours, and mood. It also proposes an interactive body map, habitat indicators, trend charts, guided measurements, routine tasks, and different mission environments.
-
-### Why the problem matters
-
-Space missions expose crews to radiation, isolation, delayed communication with Earth, altered gravity, and closed-cabin environmental hazards. A crew cannot always wait for support from Earth. The prototype therefore emphasizes *personal context, environmental context, local operation, and clear human-facing explanations*.
-
-### Product principles
-
-1. **Astronaut first:** simple explanations, accessible alerts, and actionable checklists; do not assume medical expertise.
-2. **Baseline first:** compare each astronaut against their own history before presenting generic thresholds.
-3. **Cabin before conclusion:** examine environmental conditions alongside unusual physiological observations; correlation is not a diagnosis.
-4. **Onboard response:** live alerting must not depend on historical aggregation refreshes or an Earth-hosted service.
-5. **Provenance matters:** visibly label all simulated measurements and distinguish confirmed source values from team-proposed rules.
-
----
-
-## 2. Technology stack
-
-| Component | Technology | Responsibility |
-|---|---|---|
-| Simulator | Standalone Python | Synthetic telemetry, scenarios, durable local replay journal |
-| Backend | Django | Authenticated ingestion, validation, rules and read APIs |
-| Application storage | PostgreSQL | All accepted events, original JSON payloads, baselines, latest readings, alerts and assessments |
-| Frontend | React + Three.js | Crew and habitat views, body map, recorded trend charts |
-| Local deployment | Docker Compose | PostgreSQL, Django and simulator services |
-
-## 3. System architecture
+## Architecture
 
 ```mermaid
 flowchart LR
-    SIM[Python simulator] --> ING[Django ingestion]
-    ING --> PG[PostgreSQL event journal]
-    ING --> RULES[Workbook rules and projections]
-    RULES --> PG
-    PG --> API[Django dashboard and history APIs]
-    API --> UI[React console]
+    SIM[Python simulator] <--> STATE[(SQLite checkpoint and retry journal)]
+    SIM -->|Bearer-authenticated batches| ING[Django ingestion API]
+    UI[React crew console] -->|Session and CSRF-protected reports| CHECK[Crew check-ins]
+    ING --> PROCESS[Validation, projections, and alert evaluation]
+    CHECK --> PROCESS
+    PROCESS -->|Atomic writes| PG[(PostgreSQL)]
+    PG --> READ[Dashboard, trends, and alert APIs]
+    READ -->|Polling| UI
 ```
 
-PostgreSQL is the sole application event store for normal and abnormal telemetry.
-Ingestion commits the raw journal, latest values, supplementary facts and alert
-updates atomically before acknowledging delivery. Historical charts aggregate the
-same database journal, with no separate export process or eventual-consistency gap.
-The simulator's SQLite checkpoint remains a local generation/retry buffer, not a
-second application analytics store. Existing event IDs make delivery retries safe.
-
----
-
-## 4. Data domains
-
-There are **two principal measurement domains**. Mission/context metadata connects them.
-
-### Domain A — Astronaut data
-
-#### A1. Preflight baseline (imported in batch)
-
-Personal reference measurements available before departure, such as:
-
-- Resting heart rate and blood pressure.
-- Fasting glucose, resting temperature, sleep patterns, and mood baseline where available.
-- Fitness, strength, and other applicable pre-mission assessments.
-
-This baseline is **per astronaut**, may use different observation windows, and should retain measurement dates, units, source, and quality notes. Do not generate a false baseline when no reference is available; show **insufficient baseline data** instead.
-
-#### A2. In-flight observations (stream, spot checks, batch summaries)
-
-- **Stream:** heart rate; optionally breathing rate, activity, skin temperature, or individual radiation dosimetry.
-- **Spot-check or manual input:** blood pressure, glucose (with **fasting/after-meal tag**), body temperature, symptoms.
-- **Nightly/daily:** sleep duration, mood score, exercise or workload logs.
-- **Event context:** rest, sleep, exercise, spacewalk, current mission phase.
-
-### Domain B — Cabin / habitat data
-
-Synthetic environmental measurements associated with a habitat or cabin zone, not inherently with an astronaut:
-
-- CO2 (units and averaging window matter).
-- Oxygen **partial pressure** (not interchangeable with oxygen concentration `%`).
-- Total atmospheric pressure.
-- Cabin temperature and humidity.
-- Radiation dose rate / cumulative dose, where available.
-- Noise and dust, if implemented.
-
-### Shared mission context
-
-Measurements can be joined through `mission_id`, `habitat_id` / `zone_id`, timestamps, and (for astronaut data) `astronaut_id`. Relevant metadata includes:
-
-- Mission phase: preflight, transit, station, surface, rover/EVA, etc.
-- Environment type: spacecraft, station, rover, surface base.
-- Activity and measurement conditions.
-- Simulator scenario, device/source ID, and signal quality.
-
-**Key idea:** a headache report near a cabin CO2 rise may justify showing environmental context and a predefined checklist. It does **not** prove the cabin caused the symptom.
-
----
-
-## 5. Ingestion strategy — stream **and** batch
-
-These are **demo sampling/cadence decisions**, not claimed NASA sensor specifications.
-
-| Measurement/source | Proposed mode | Suggested demo cadence |
+| Component | Technology | Role |
 |---|---|---|
-| Preflight baseline file | Batch import | Once per astronaut/setup |
-| Astronaut heart rate | Synthetic stream | Every 2–5 seconds |
-| Cabin CO2 / O2 / pressure | Synthetic stream | Every 2–5 seconds |
-| Cabin/personal radiation | Synthetic stream | Around every 5 seconds |
-| Blood pressure | Simulated or manual spot check | On demand |
-| Glucose | Simulated or manual spot check | On demand; include meal context |
-| Body temperature | Simulated or manual spot check | On demand |
-| Sleep | Synthetic batch summary or manual | Once per simulated night |
-| Mood | Manual daily check-in | Once per simulated day |
-| Historical trends | PostgreSQL aggregation | Queried from recorded observations |
+| Frontend | React, Vite, Three.js, Lucide | Research pages, crew console, interactive body view, charts, and check-ins |
+| Backend | Django | Event validation, ingestion, sessions, check-ins, alert rules, and read APIs |
+| Application database | PostgreSQL | Accepted events, original payloads, baselines, current state, reports, and alerts |
+| Simulator | Python standard library | Seeded synthetic observations, mission time, scenarios, and HTTP delivery |
+| Simulator state | SQLite | Generation checkpoints, event journal, and delivery retry state |
 
-Keep **event time** (when the measurement occurred) distinct from **ingestion time** (when Django received it). Simulated time should be visibly identified in demo/replay mode.
+PostgreSQL is our single application history store. Current readings and historical charts come from the same accepted measurement journal. We do not use a separate analytics database or an export worker to populate charts.
 
-### Proposed canonical event envelope
+SQLite belongs to the simulator. It preserves its clock, random generation state, observations, and delivery progress so generation and retries can resume after interruption. It is not a second dashboard data source.
 
-```json
-{
-  "event_id": "evt-000001",
-  "mission_id": "MARS_001",
-  "astronaut_id": "AST_001",
-  "habitat_id": "HAB_001",
-  "zone_id": "CABIN_MAIN",
-  "metric": "heart_rate",
-  "value": 78,
-  "unit": "bpm",
-  "measured_at": "2026-11-14T10:30:00Z",
-  "activity": "rest",
-  "source": "smart_garment_simulator",
-  "simulated": true,
-  "scenario_id": "nominal"
-}
-```
+## How observations move through the system
 
-For a cabin event, use `astronaut_id: null`, retain `habitat_id` / `zone_id`, and specify a cabin metric such as `co2_partial_pressure` in `mmHg`. Real records will require schema/version validation, metric-specific units, and authorization rules. This JSON is a **proposed contract**, not an implemented endpoint.
+1. The simulator creates astronaut profiles, preflight observations, and in-flight astronaut and cabin measurements.
+2. It records generated events in its SQLite journal and sends pending events to Django in HTTP batches using a shared ingestion token.
+3. Django validates the event contracts, units, identities, and values. Stable event IDs make delivery retries idempotent.
+4. Within one transaction, the backend saves accepted events and original payloads, updates current projections, and evaluates applicable alert rules.
+5. New in-flight observations in a batch are evaluated in mission-time order. Measurements at the same timestamp are projected together before evaluation, preserving intermediate alert transitions.
+6. The console reads the dashboard every five seconds and recorded trends every fifteen seconds. Charts aggregate accepted PostgreSQL observations.
 
----
+We keep observation time, ingestion time, and wall-clock telemetry receipt age separate. This lets us inspect accelerated simulations without treating their mission timestamps as real-world sensor freshness.
 
-## 6. PostgreSQL history and provenance
+## Astronaut and habitat data
 
-`measurement_events` retains every accepted event and its original `raw_payload`.
-Canonical metric identifiers, typed values, timestamps, source, activity and habitat
-context support validation, replay, baseline comparisons, time-weighted exposure
-windows and historical trends. `/api/v1/trends` queries this journal directly.
+We keep personal measurements separate from shared environmental observations, linked through mission, run, habitat, zone, and observation time.
 
-## 7. PostgreSQL model
+**Astronaut observations** include heart rate, breathing rate, oxygen saturation, blood pressure, glucose, core temperature, sleep, mood, stress, activity, radiation exposure, and supplementary workbook measurements. Personal preflight baselines provide reference values where available.
 
-| Tables | Purpose |
+**Habitat observations** include carbon dioxide and oxygen partial pressure, total pressure, temperature, humidity, radiation, noise, and dust. Units stay attached to each metric: oxygen partial pressure is not interchangeable with oxygen percentage.
+
+Our catalogue represents all 83 supplied workbook indicators using 88 wire metrics. Some indicators require more than one field. Values can be numeric, boolean, categorical, or structured. Catalogue coverage does not mean every observation is available or every indicator has a validated automatic rule.
+
+Additional independent random fixtures are labelled as such. They do not replace the contextual inputs used by the alert engine or establish physiological relationships. The generator details are documented in [expanded workbook simulation](docs/expanded-workbook-simulation.md).
+
+## Alerts and crew reports
+
+Our alert engine runs during ingestion and when a crew report is saved. It uses available observations, activity context, personal references, rolling windows, and explicit supplementary findings. Conditions with insufficient data stay unevaluated rather than being treated as normal.
+
+Escalation occurs when a rule's conditions and persistence requirements are met. Recovery generally requires three distinct later qualifying normal observations to lower one tier. Repeated polling, duplicate delivery, missing inputs, and stale observations do not count as recovery. Acknowledgment records that an alert was reviewed; it does not resolve the condition.
+
+We retain the evidence, source references, observation times, and guidance behind alerts. The interface distinguishes alert severity from overdue collection tasks and telemetry connection status. Guidance and recipient information are reference material; we do not dispatch treatments or external notifications.
+
+Crew check-ins require a Django session, CSRF protection, and the `core.add_crewcheckin` permission. Reports retain their author and mission time. Manual readings enter the measurement journal and charts; symptoms and findings feed supported rules without manufacturing sensor samples. Notes alone do not become clinical rule inputs. Repeating the same report ID and body returns the existing report without duplicate effects.
+
+The numerical scoring and spaceflight adaptations remain prototype rules. We do not present partial inputs as a complete validated NEWS2 assessment or infer that an environmental observation proves the cause of a symptom.
+
+## Interface
+
+| Route | Purpose |
 |---|---|
-| `missions`, `habitats`, `astronauts`, `mission_crew`, `simulation_runs` | Mission identity and context |
-| `metric_catalog` | Canonical units, domains and aggregation semantics |
-| `measurement_events` | Complete immutable accepted event journal, including original JSON |
-| `preflight_profiles`, `preflight_baselines` | Personal reference observations |
-| `latest_measurements`, `latest_rule_inputs` | Current measurements and independently retained supplementary facts |
-| `monitoring_alerts`, `alert_assessments` | Alert lifecycle, acknowledgment, evidence and rule coverage |
+| `/` | Research introduction, project approach, and source links |
+| `/dashboard` | Crew and habitat console, body view, history, alerts, and check-ins |
+| `/documentation` | Biology explanations, searchable measurement atlas, and glossary |
+| `/resources` | Searchable bibliography with category filters and expandable citations |
 
-## 8. Django APIs
+The public pages work independently of the measurement API. The dashboard loads its code and starts polling when opened. The Three.js view loads on demand and pauses animation while the page is hidden.
 
-```text
-POST /api/v1/ingest/events                 # bearer-authenticated synthetic event ingestion
-GET  /api/v1/dashboard                     # latest state, baselines, coverage and alerts
-GET  /api/v1/trends                        # recorded PostgreSQL history
-GET  /api/v1/alerts                        # active alerts and evidence
-GET  /api/v1/alert-rules                   # workbook specification and evaluation notes
-POST /api/v1/alerts/{id}/acknowledge        # CSRF-protected review acknowledgment
-```
+We show missing values as unknown and leave missing chart buckets as gaps. When API access fails, the console can retain the last received snapshot with a connection error. It does not substitute invented readings or forecasts. Theme preference is stored in the browser.
 
-See [backend documentation](backend/README.md) for request contracts and query
-parameters. Authenticated crew check-ins persist manual measurements, findings, and
-notes through `/api/v1/check-ins`; `/api/v1/session` provides session login.
+## API
 
----
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/v1/ingest/events` | Bearer-authenticated simulator ingestion |
+| GET | `/api/v1/dashboard` | Runs, crew, habitat readings, baselines, assessments, and alerts |
+| GET | `/api/v1/trends` | Aggregated recorded measurement history |
+| GET | `/api/v1/alerts` | Active alerts and evidence |
+| GET | `/api/v1/alert-rules` | Workbook rule specification and evaluation notes |
+| POST | `/api/v1/alerts/{id}/acknowledge` | CSRF-protected acknowledgment of the current alert tier |
+| GET / POST / DELETE | `/api/v1/session` | Session status, sign-in, and sign-out |
+| GET / POST | `/api/v1/check-ins` | Authorized report history and new crew reports |
 
-## 9. Alerts and health interpretation
+The browser uses relative `/api/v1/` requests. The simulator's ingestion token stays outside browser code. Full request contracts and query parameters are in the [backend documentation](backend/README.md).
 
-A rules engine evaluates each relevant incoming event promptly, ideally after basic validation and with astronaut activity and habitat context available. Alerts and their historical context live in PostgreSQL.
+## Storage model
 
-**Proposed evaluation flow:**
+| Data | Tables |
+|---|---|
+| Mission identity and participants | `missions`, `habitats`, `astronauts`, `mission_crew`, `simulation_runs` |
+| Metric definitions | `metric_catalog` |
+| Accepted observations and original payloads | `measurement_events` |
+| Personal preflight references | `preflight_profiles`, `preflight_baselines` |
+| Current readings and supplementary facts | `latest_measurements`, `latest_rule_inputs` |
+| Alert state and evaluation evidence | `monitoring_alerts`, `alert_assessments` |
+| Authored crew reports | Django `CrewCheckIn` model |
 
-1. Receive and validate the event (metric, unit, entity, timestamp, source quality).
-2. Determine astronaut baseline and activity or cabin zone context.
-3. Apply an appropriate, documented rule (including required rolling windows).
-4. Inspect relevant environmental observations where useful.
-5. Create/update/rescind alert state idempotently, storing the evidence used.
-6. Show a concise explanation, measurement timestamp, and a clearly labeled predefined response checklist.
+Supplementary facts retain their own observation time and source. A later event that omits a finding does not erase it. Late history can contribute to current evaluation without moving current projections backward or replaying every historical alert transition.
 
-**Important clinical limitations:** The challenge briefing discusses NEWS2 and astronaut-specific modifications, but says NEWS2 was developed for terrestrial hospital patients and the proposed space modifications are **untested**. Do not label an assessment as validated NEWS2 unless all required measurements and scoring rules are actually implemented, and do not convert this hackathon's proposed thresholds into clinical decisions. Differentiate **NASA-source limits**, **other cited reference ranges**, and **team-proposed prototype heuristics**.
-
-### Target demonstration scenario: rising cabin CO2
-
-1. Start with nominal synthetic astronaut and cabin observations.
-2. Trigger a simulator scenario where cabin CO2 increases gradually.
-3. Show the cabin trend and a rule-driven alert in React.
-4. Have an astronaut log a headache via the body map/check-in.
-5. Display relevant time-aligned environmental and personal observations, with wording such as **“possible environmental contributor”**.
-6. Show a predefined onboard checklist and allow an acknowledgment/action log.
-7. Demonstrate that events appear in both current readings and recorded PostgreSQL history.
-
-This single scenario demonstrates the value of two data domains, both storage paths, contextual monitoring, and an astronaut-friendly interface.
-
----
-
-## 10. React application — planned screens
-
-**MVP priority**
-
-- **Mission dashboard:** crew, environment, overall status, current alerts.
-- **Astronaut view:** six required indicators, latest values, personal baseline comparison, trends and manual entry.
-- **Cabin dashboard:** CO2, oxygen partial pressure, pressure, temperature, radiation (and other sensors if time permits).
-- **Alerts and incident view:** severity, contributing observations, timestamps, checklist and acknowledgment.
-- **Interactive body map:** selected health regions plus a cabin/habitat ring.
-- **History:** 24-hour / 7-day / 30-day charts from PostgreSQL where data exists.
-
-**Stretch goals**
-
-- Twelve fully developed body regions; reaction-time tests; gamified daily flight plan; environment switching (spacecraft/station/rover/base); richer wearables and sensor catalog; guided measurement workflow; uploadable image-based check-ins.
-
-### Offline-first design
-
-The intended deployment is **onboard/local**: Django and PostgreSQL run on infrastructure reachable within the crew's local network, not on Earth. A React PWA can cache the app shell and essential guidance and queue permitted manual inputs in browser storage if briefly disconnected from the local backend. It **cannot** continue to receive live sensor updates or reliably issue shared alerts when the local server is unavailable unless additional local processing is implemented. This distinction must be demonstrated honestly.
-
----
-
-## 11. Repository layout
+## Repository
 
 ```text
 bioorbit/
-├── docker-compose.yaml
-├── backend/bitorbit/                  # Django application, migrations and tests
-├── simulator/                        # generator, schemas, examples and tests
-├── frontend/                         # React console
-└── docs/                             # design and review notes
+├── backend/
+│   ├── bitorbit/              # Django project, APIs, models, rules, migrations, and tests
+│   └── check_models.py        # Offline schema, contract, and rule checks
+├── frontend/
+│   ├── src/                  # React pages, console, charts, and measurement catalogue
+│   └── public/               # Static assets and supplied bibliography
+├── simulator/
+│   ├── space_sim/            # Generator, state journal, scenarios, CLI, and HTTP delivery
+│   ├── schemas/              # Event and batch contracts
+│   ├── examples/             # Sample events and scenario definitions
+│   └── tests/                # Simulator and delivery regression tests
+└── docs/                     # Measurement audits and implementation notes
 ```
 
-From the repository root, configure `.env` using `.env.example`, then run
-`docker compose up --build`. The frontend runs separately with the commands in
-[frontend/README.md](frontend/README.md). Back up the PostgreSQL database; named
-volumes survive an ordinary `docker compose down`.
+## Verification
 
----
+We maintain regression tests for event validation, duplicate delivery, chronological batch evaluation, alert persistence and recovery, crew reports, measurement mapping, historical charts, and simulator restart behavior.
 
-## 12. Two-day implementation roadmap
+Frontend checks, from `frontend/`:
 
-### Day 1 — November 14: establish end-to-end data flow
+```bash
+npm test
+npm run build
+```
 
-- [ ] Confirm event schema, units, IDs, baseline representation, and scenario requirements.
-- [ ] Scaffold simulator, Django API, PostgreSQL, and React.
-- [ ] Generate synthetic astronaut and cabin readings with nominal and abnormal scenarios.
-- [ ] Implement ingestion, event idempotency, latest state, and an initial alert rule.
-- [x] Persist original payloads and history in PostgreSQL.
-- [x] Expose dashboard and historical trend endpoints backed by PostgreSQL.
-- [ ] Display the six mandatory astronaut indicators (entry, status, chart, guidance), at least in a minimal interface.
+Simulator checks, from `simulator/`:
 
-### Day 2 — November 15: complete astronaut experience and demo
+```bash
+python -m unittest discover -s tests
+```
 
-- [ ] Implement the interactive body map and habitat overview.
-- [ ] Complete cabin alerts, acknowledgment, and check-ins.
-- [ ] Connect personal baselines, historical charts, and environmental context.
-- [ ] Add basic offline caching and clearly mark simulated data.
-- [ ] Run the CO2 + headache end-to-end scenario and failure/retry tests.
-- [ ] Polish presentation, scientific caveats, evidence, and judging pitch.
+Offline backend checks, from the repository root with Django installed:
 
-### Definition of a successful MVP
+```bash
+python backend/check_models.py
+```
 
-- Simulator sends synthetic data to Django.
-- All accepted events are durably stored in PostgreSQL without duplicate effects on retry.
-- Database queries build historical trends from recorded events.
-- React displays current values and historical trends from PostgreSQL.
-- Cabin context and an astronaut symptom can be inspected together.
-- At least one alert is triggered, explained, and acknowledged.
-- The six required indicators have an end-to-end path (including manually entered or daily summary indicators).
-- The interface and pitch explicitly say the data are simulated and the rules are a prototype.
+Database integration tests, from `backend/bitorbit/` with a configured PostgreSQL connection and test-database permissions:
 
----
+```bash
+python manage.py test core
+```
 
-## 13. Risks and engineering decisions
+The offline backend checks do not replace PostgreSQL integration tests. Component-specific details are in the [frontend](frontend/README.md), [backend](backend/README.md), and [simulator](simulator/README.md) documentation.
 
-| Risk | Mitigation |
-|---|---|
-| Too much infrastructure for 48 hours | PostgreSQL, one Django project, polling first |
-| Alert delayed by batch refresh | Rule evaluation on ingestion transaction |
-| Duplicate delivery or partial ingestion | Atomic database writes, retries, event IDs |
-| Incorrect clinical interpretation | Clearly labeled simulation, documented heuristic rules, no diagnosis claims |
-| Inconsistent unit handling | Per-metric schema and unit normalization during ingestion |
-| Misleading comparison across space conditions | Personal baselines + activity/mission/habitat context |
-| Offline-first claim overstates capability | Show what PWA cache and local backend actually support |
-| Demo with insufficient history | Generate seeded synthetic past data and clearly label replayed dates |
+## Current limits
 
-### Open implementation decisions
+We have an end-to-end simulated measurement and reporting workflow, but we have not connected real wearables or spacecraft sensors. The simulator is not a validated physiological or radiation-transport model.
 
-- Whether to use Django polling versus SSE/WebSockets for live UI.
-- PostgreSQL retention, backup and indexing strategy as history grows.
-- Which cabin sensors to include beyond the minimum demonstration.
-- How to represent personal baseline confidence and missing reference data.
-- Which thresholds/checklists are in-scope after review of source references.
-- How much of the 12-region body map can be meaningfully implemented in the hackathon.
+Forecasting, browser offline caching, and an offline check-in queue are not implemented. Live readings and shared alert evaluation require the backend. There is no independent watchdog producing new clinical alerts when ingestion stops; the interface reports telemetry inactivity and retains the last known state.
 
----
-
-## 14. Data ethics, security, and transparency
-
-- Use **synthetic data only** during the hackathon; never pretend it is real astronaut telemetry.
-- Mark all simulated values and scenario injections conspicuously.
-- Separate astronaut identities/permissions from raw sensor events.
-- Do not include secrets or credentials in repository files.
-- Protect ingestion endpoints against untrusted or duplicate events and validate metric ranges/units.
-- Explain alert uncertainty, provenance, stale readings, and missing baseline data.
-- Avoid diagnostic claims, treatment prescriptions, and unsupported inferences about causation.
-
----
-
-## 15. Challenge source and attribution
-
-**Primary project brief:** `NASA Chal_Part1.pptx` — *2026 NASA Space Apps Challenge: Astronaut health monitoring app*, dated November 13, 2026 (17-slide builder's briefing supplied to the team). It describes the six required indicators, human-body visualization, environmental hazards, data-source concepts, and prototype scope.
-
-The briefing itself cites NASA-STD-3001, NASA health/radiation resources, the Royal College of Physicians NEWS2 framework, and other research. **The presentation is our starting brief, not a substitute for independently checking primary scientific sources or obtaining clinical review.**
-
-**Architecture/design decisions in this README** (Django, PostgreSQL, event journal, rules, API routes, sampling frequencies, repository structure, and roadmap) are **team proposals for the hackathon**, not requirements asserted by NASA.
-
----
-
-## 16. Short pitch
-
-> **A mission-aware, offline-first astronaut health companion.** Our system combines live physiological and cabin telemetry with personal health baselines and historical analytics. It detects concerning patterns locally, explains environmental context, and gives astronauts an understandable interface to monitor their wellbeing when support from Earth is delayed.
-
-**Build a focused, demonstrable solution first; extend the indicator catalog only after the end-to-end flow is working.**
+Our documentation and bibliography provide research context. Bibliography entries are preserved as supplied, rather than represented as independently verified datasets connected to the console. We keep source-derived limits, workbook conditions, and our own prototype assumptions distinguishable so the evidence and uncertainty remain visible.
