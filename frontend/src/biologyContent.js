@@ -1,3 +1,5 @@
+// Some of the page text is si generated.
+// Some of the code is si generated.
 export const chapters=[
   {id:'starting-point',title:'Adaptation is a process, not a diagnosis',eyebrow:'01 / START HERE',paragraphs:[
     'The body continually adjusts to its surroundings. In spaceflight, altered gravity changes mechanical loading and fluid distribution; isolation, schedules, radiation, and the cabin environment add other influences. The resulting observations need to be interpreted together, over time.',
