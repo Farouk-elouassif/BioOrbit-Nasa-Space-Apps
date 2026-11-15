@@ -8,8 +8,9 @@ import './landing.css';
 const Dashboard=lazy(()=>import('./Dashboard.jsx'));
 const Documentation=lazy(()=>import('./DocumentationPage.jsx'));
 const Resources=lazy(()=>import('./ResourcesPage.jsx'));
+const About=lazy(()=>import('./AboutPage.jsx'));
 const path=window.location.pathname.replace(/\/+$/,'')||'/';
-const pages={'/dashboard':Dashboard,'/documentation':Documentation,'/resources':Resources};
+const pages={'/dashboard':Dashboard,'/documentation':Documentation,'/resources':Resources,'/about':About};
 const Page=pages[path]||LandingPage;
 createRoot(document.getElementById('root')).render(
   <Suspense fallback={<div className="route-loading" role="status">Opening BioOrbit…</div>}><Page/></Suspense>

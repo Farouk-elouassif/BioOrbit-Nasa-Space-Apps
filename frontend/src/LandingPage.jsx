@@ -3,9 +3,9 @@ import {ArrowDown,ArrowUpRight} from 'lucide-react';
 import PublicLayout from './PublicLayout.jsx';
 
 const systems=[
-  {id:'circulation',number:'01',title:'Circulation',label:'Heart rate · blood pressure',note:'Read cardiovascular observations against a person’s own baseline, with activity and cabin conditions in view.',point:[245,231]},
-  {id:'recovery',number:'02',title:'Rest & recovery',label:'Sleep · mood · workload',note:'Follow daily sleep and mood observations. Look for changes across mission days, rather than treating one reading as the whole story.',point:[238,100]},
-  {id:'environment',number:'03',title:'Shared environment',label:'Atmosphere · radiation · temperature',note:'Place physiological observations alongside cabin conditions. A shared environment provides context; it does not establish a cause.',point:[370,310]},
+  {id:'circulation',number:'01',title:'Circulation',label:'Heart rate · blood pressure',note:'Heart rate and blood pressure are shown with personal reference values, activity, and cabin conditions.',point:[245,231]},
+  {id:'recovery',number:'02',title:'Rest & recovery',label:'Sleep · mood · workload',note:'Sleep, mood, and workload observations provide a record of changes across mission days.',point:[238,100]},
+  {id:'environment',number:'03',title:'Shared environment',label:'Atmosphere · radiation · temperature',note:'Cabin observations provide context for crew readings. Similar symptoms across crew members may warrant a review of the shared environment.',point:[370,310]},
 ];
 
 function ResearchPlate(){
@@ -14,7 +14,7 @@ function ResearchPlate(){
   return <figure className="research-plate">
     <div className="plate-heading"><span>FIG. 01 / HUMAN SYSTEMS</span><span>IN CONTEXT</span></div>
     <div className="plate-illustration">
-      <svg viewBox="0 0 480 505" role="img" aria-label="Human systems study illustration, showing circulation, rest and environmental context">
+      <svg viewBox="0 0 480 505" role="img" aria-label="Astronaut health illustration showing circulation, recovery and cabin conditions">
         <defs><pattern id="plate-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="currentColor" strokeWidth=".5"/></pattern></defs>
         <rect width="480" height="505" fill="url(#plate-grid)" className="plate-grid"/>
         <g className="plate-orbits" fill="none"><circle cx="240" cy="253" r="187"/><circle cx="240" cy="253" r="150" strokeDasharray="2 7"/><ellipse cx="240" cy="253" rx="210" ry="79" transform="rotate(-31 240 253)"/><path d="M240 36V467M29 253H451" strokeDasharray="4 8"/></g>
@@ -43,34 +43,35 @@ export default function LandingPage(){
   return <PublicLayout>
 
       <section className="landing-hero" aria-labelledby="landing-title">
-        <div className="landing-hero-copy"><div className="landing-eyebrow"><span/>HUMAN SPACEFLIGHT / RESEARCH CONSOLE</div>
-          <h1 id="landing-title">Space changes<br/>the human body<span>.</span></h1>
-          <p className="landing-intro">A closer look at what changes.<br/>A clearer view of the conditions around it.</p>
-          <p className="landing-description">BioOrbit is for researchers exploring how the human body responds to spaceflight, informed by NASA’s human research. Observe crew physiology, personal baselines, and the cabin environment in one connected workspace.</p>
-          <div className="landing-hero-actions"><a href="/dashboard" className="landing-primary-cta">Visit dashboard<ArrowUpRight size={19}/></a><a href="#approach" className="landing-text-link">Take a closer look<ArrowDown size={16}/></a></div>
-          <div className="landing-prototype-note"><span className="landing-note-marker"/>Research prototype<span className="landing-note-divider">/</span>Simulated mission data</div>
+        <div className="landing-hero-copy"><div className="landing-eyebrow"><span/>LONG-DURATION MISSIONS / CREW HEALTH CONSOLE</div>
+          <h1 id="landing-title">Health monitoring<br/>for astronauts<span>.</span></h1>
+          <p className="landing-intro">A software prototype for long-duration missions.</p>
+          <p className="landing-description">BioOrbit gathers health indicators and cabin observations for astronauts to review during a mission. It displays personal references, recorded trends, and alerts with supporting evidence, recheck times, and workbook guidance.</p>
+          <div className="landing-hero-actions"><a href="/dashboard" className="landing-primary-cta">Visit dashboard<ArrowUpRight size={19}/></a><a href="#approach" className="landing-text-link">Project overview<ArrowDown size={16}/></a></div>
+          <div className="landing-prototype-note"><span className="landing-note-marker"/>Monitoring prototype<span className="landing-note-divider">/</span>Simulated mission data</div>
           <a className="landing-research-credit" href="https://www.nasa.gov/hrp/" target="_blank" rel="noreferrer">Research context: NASA Human Research Program<ArrowUpRight size={13}/></a>
         </div>
         <ResearchPlate/>
       </section>
-      <div className="landing-index-strip"><span>THE PERSON</span><i/><span>THE MISSION DAY</span><i/><span>THE ENVIRONMENT</span><span className="landing-strip-note">Three perspectives. One research view.</span></div>
+      <div className="landing-index-strip"><span>THE PERSON</span><i/><span>THE MISSION DAY</span><i/><span>THE ENVIRONMENT</span><span className="landing-strip-note">Individual observations / Mission time / Cabin conditions</span></div>
       <section id="approach" className="landing-approach" aria-labelledby="approach-title">
-        <div className="landing-section-intro"><span className="landing-eyebrow">01 / THE APPROACH</span><h2 id="approach-title">A reading needs<br/>a reference.</h2><p>A heart rate is a measurement. Understanding it starts with the person, their activity, and the environment they share.</p><p>BioOrbit keeps those perspectives together, so researchers can move from an observation to its context.</p></div>
+        <div className="landing-section-intro"><span className="landing-eyebrow">01 / PROJECT OVERVIEW</span><h2 id="approach-title">Monitoring health<br/>during a mission.</h2><p>Long-duration missions expose astronauts to radiation, isolation and confinement, altered gravity, and a hostile closed environment. These conditions can affect immunity, bone health, cardiovascular function, and mental wellbeing. Astronauts carry much of the responsibility for noticing changes in themselves.</p><p>The project addresses the challenge of gathering health indicators and enabling astronauts to evaluate and act on their health status. The current prototype combines a body map, personal baselines, trends, cabin readings, alerts, and crew check-ins.</p></div>
         <div className="landing-methods">
-          <article><span className="landing-method-number">01</span><div><h3>Start with the individual.</h3><p>Compare recorded indicators with personal preflight references. Keep differences between crew members visible instead of reducing everyone to the same starting point.</p><span>Personal baselines / Core indicators</span></div></article>
-          <article><span className="landing-method-number">02</span><div><h3>Follow the days, not just the moment.</h3><p>Read observations across mission time. Explore sleep by day, inspect exact recorded values, and see where the history has gaps.</p><span>Mission timeline / Recorded trends</span></div></article>
-          <article><span className="landing-method-number">03</span><div><h3>Keep the cabin in the picture.</h3><p>Review atmospheric pressure, oxygen, carbon dioxide, temperature, and exposure alongside crew measurements. Environmental context belongs in the same conversation.</p><span>Habitat conditions / Shared exposure</span></div></article>
+          <article><span className="landing-method-number">01</span><div><h3>Personal references</h3><p>Core indicators, including heart rate, blood pressure, glucose, temperature, sleep, and mood, are displayed alongside available personal preflight references.</p><span>Personal baselines / Core indicators</span></div></article>
+          <article><span className="landing-method-number">02</span><div><h3>Recorded trends</h3><p>Charts show observations across mission time, with sleep grouped by day. Missing time buckets remain visible as gaps.</p><span>Mission timeline / Recorded trends</span></div></article>
+          <article><span className="landing-method-number">03</span><div><h3>Cabin observations</h3><p>Cabin pressure, oxygen, carbon dioxide, temperature, and radiation are displayed alongside crew observations to provide environmental context.</p><span>Habitat conditions / Shared exposure</span></div></article>
+          <article><span className="landing-method-number">04</span><div><h3>Alerts and check-ins</h3><p>Alerts include their trigger, recorded evidence, workbook guidance, reference recipients, and a recheck deadline. Signed-in crew members can record symptoms and measurements; acknowledgment records that an alert has been reviewed.</p><span>Alert evidence / Guidance / Crew check-ins</span></div></article>
         </div>
       </section>
       <section id="research" className="landing-research" aria-labelledby="research-title">
-        <div className="landing-section-intro"><span className="landing-eyebrow">02 / RESEARCH CONTEXT</span><h2 id="research-title">Built around questions<br/>worth investigating.</h2><p>NASA’s human research examines the effects of spaceflight on health and performance. These open resources provide a starting point for understanding the research behind the questions.</p><p className="landing-source-note">Research references inform the context. Dashboard observations are generated by our mission simulator.</p></div>
+        <div className="landing-section-intro"><span className="landing-eyebrow">02 / RESEARCH BACKGROUND</span><h2 id="research-title">Spaceflight health<br/>and performance.</h2><p>NASA’s human research resources describe the health and performance risks of spaceflight. These sources provide background for the biological topics and environmental conditions represented in BioOrbit.</p><p className="landing-source-note">Research informs the background. This prototype uses simulated mission observations; it does not diagnose conditions or replace approved mission medical procedures.</p></div>
         <div className="landing-sources">
-          <a href="https://www.nasa.gov/hrp/" target="_blank" rel="noreferrer"><div><span>NASA / PROGRAM OVERVIEW</span><h3>Human Research Program</h3><p>Explore the research into how people live and work in space.</p></div><ArrowUpRight size={22}/></a>
+          <a href="https://www.nasa.gov/hrp/" target="_blank" rel="noreferrer"><div><span>NASA / PROGRAM OVERVIEW</span><h3>Human Research Program</h3><p>Research into how people live and work in space.</p></div><ArrowUpRight size={22}/></a>
           <a href="https://www.nasa.gov/hrp/hazards/" target="_blank" rel="noreferrer"><div><span>NASA / ENVIRONMENTAL CONTEXT</span><h3>Five hazards of human spaceflight</h3><p>Radiation, isolation, distance, gravity, and closed environments.</p></div><ArrowUpRight size={22}/></a>
-          <a href="https://humanresearchroadmap.nasa.gov/evidence/" target="_blank" rel="noreferrer"><div><span>NASA / HUMAN RESEARCH ROADMAP</span><h3>The evidence behind the risks</h3><p>Read the evidence reports on human health and performance.</p></div><ArrowUpRight size={22}/></a>
+          <a href="https://humanresearchroadmap.nasa.gov/evidence/" target="_blank" rel="noreferrer"><div><span>NASA / HUMAN RESEARCH ROADMAP</span><h3>The evidence behind the risks</h3><p>Evidence reports on human health and performance.</p></div><ArrowUpRight size={22}/></a>
         </div>
       </section>
-      <section className="landing-entry" aria-labelledby="entry-title"><div><span className="landing-eyebrow">FROM RESEARCH CONTEXT TO OBSERVATION</span><h2 id="entry-title">Meet the crew.<br/>Explore the observations.</h2><p>Open the console for the body map, recorded trends, cabin conditions, and alert evidence.</p></div><a href="/dashboard" className="landing-primary-cta">Visit dashboard<ArrowUpRight size={20}/></a><span className="landing-entry-coordinate" aria-hidden="true">BIOORBIT / HUMAN SYSTEMS</span></section>
+      <section className="landing-entry" aria-labelledby="entry-title"><div><span className="landing-eyebrow">03 / PROTOTYPE CONSOLE</span><h2 id="entry-title">The crew console.</h2><p>The dashboard contains the body map, measurement history, cabin conditions, alert evidence, and crew check-in form.</p></div><a href="/dashboard" className="landing-primary-cta">Visit dashboard<ArrowUpRight size={20}/></a><span className="landing-entry-coordinate" aria-hidden="true">BIOORBIT / HUMAN SYSTEMS</span></section>
 
   </PublicLayout>;
 }

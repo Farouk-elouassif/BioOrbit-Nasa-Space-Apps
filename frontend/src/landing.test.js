@@ -9,8 +9,8 @@ test('landing page provides dashboard entry, research references and honest simu
   try{
     const {default:LandingPage}=await server.ssrLoadModule('/src/LandingPage.jsx');
     const html=renderToStaticMarkup(React.createElement(LandingPage));
-    assert.match(html,/Space changes/);
-    assert.match(html,/for researchers/);
+    assert.match(html,/Health monitoring/);
+    assert.match(html,/for astronauts/);
     assert.match(html,/Simulated mission data/);
     assert.equal((html.match(/href="\/dashboard"/g)||[]).length,3);
     for(const url of ['https://www.nasa.gov/hrp/','https://www.nasa.gov/hrp/hazards/','https://humanresearchroadmap.nasa.gov/evidence/'])assert.ok(html.includes(`href="${url}"`));
