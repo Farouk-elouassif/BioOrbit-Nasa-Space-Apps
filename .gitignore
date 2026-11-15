@@ -13,3 +13,4 @@ simulator/*.egg-info/
 backend/bitorbit/data/
 bronze/
 /lakehouse
+data.txt

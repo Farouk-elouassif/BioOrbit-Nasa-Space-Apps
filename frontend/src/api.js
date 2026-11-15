@@ -46,3 +46,15 @@ export function useSeries({runId,metric,astronautId,habitatId,zoneId,window='7d'
     run_id:runId,metric,astronaut_id:astronautId,habitat_id:habitatId,zone_id:zoneId,window,domain,
   }):null,15000);
 }
+
+export async function acknowledgeAlert(alert){
+  const cookie=document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith('csrftoken='));
+  const csrf=cookie?decodeURIComponent(cookie.slice('csrftoken='.length)):'';
+  const response=await fetch(`/api/v1/alerts/${alert.id}/acknowledge`,{
+    method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRFToken':csrf},
+    body:JSON.stringify({tier:alert.tier}),
+  });
+  let data;try{data=await response.json()}catch{throw new Error('Acknowledgment failed. Refresh the mission data and try again.');}
+  if(!response.ok)throw new Error(data.message||`Acknowledgment failed (${response.status}).`);
+  return data;
+}

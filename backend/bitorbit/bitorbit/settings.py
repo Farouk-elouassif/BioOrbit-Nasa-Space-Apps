@@ -144,3 +144,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = INGEST_MAX_BODY_BYTES
 
 # Local Bronze lakehouse storage, shared by the backend and exporter containers.
 BRONZE_ROOT = Path(os.environ.get('BRONZE_ROOT', str(BASE_DIR / 'data' / 'bronze')))
+
+
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.environ.get(
+    'DJANGO_CSRF_TRUSTED_ORIGINS',
+    'http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173'
+).split(',') if origin.strip()]

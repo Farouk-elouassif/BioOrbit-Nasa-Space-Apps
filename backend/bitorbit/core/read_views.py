@@ -4,6 +4,7 @@ import logging
 from django.db import DatabaseError
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .queries.dashboard import ReadError, dashboard, trends
 
@@ -22,6 +23,7 @@ def respond(service,params):
     return response
 
 
+@ensure_csrf_cookie
 @require_GET
 def dashboard_view(request):
     return respond(dashboard,request.GET)

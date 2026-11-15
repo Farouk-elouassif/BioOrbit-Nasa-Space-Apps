@@ -166,4 +166,7 @@ def ingest(items):
             if run.environment != newest.payload['environment']:
                 run.environment = newest.payload['environment']
                 run.save(update_fields=['environment'])
+    from core.alerts.service import evaluate_run
+    for run in runs.values():
+        evaluate_run(run)
     return {'accepted_event_ids': [str(i.event_id) for i in items], 'created_count': len(new), 'duplicate_count': len(items)-len(new)}

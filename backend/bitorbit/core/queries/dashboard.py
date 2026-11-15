@@ -7,7 +7,9 @@ from django.db.models.functions import RowNumber, TruncDay, TruncHour
 from django.utils import timezone
 
 from core.ingestion.catalogue import CATALOGUE, canonical_metric, metric_spec
-from core.models import Astronaut, Habitat, LatestMeasurement, MeasurementEvent, PreflightProfile, SimulationRun
+from core.models import Astronaut, Habitat, LatestMeasurement, MeasurementEvent, PreflightProfile, SimulationRun, AlertAssessment
+from core.alerts.api import active_alerts
+from core.alerts.spec import COLLECTION_SECONDS,WORKBOOK
 
 
 class ReadError(Exception):
@@ -17,11 +19,7 @@ class ReadError(Exception):
 
 
 # Missing/overdue data is a collection status, never a clinical alert.
-STALE_AFTER = {
-    'systolic_blood_pressure':10800, 'diastolic_blood_pressure':10800,
-    'blood_glucose':43200, 'body_temperature':5400,
-    'sleep_duration':172800, 'mood':172800, 'stress_level':64800, 'fluid_intake':64800,
-}
+STALE_AFTER = COLLECTION_SECONDS
 
 
 def reading(row, anchor):
@@ -57,7 +55,7 @@ def dashboard(params):
     run=choose_run(params.get('run_id'))
     result={'schema_version':'1.0','generated_at':timezone.now(),
             'runs':[{'id':r.pk,'mission_code':r.mission.mission_code,'environment':r.environment,'is_active':r.is_active} for r in runs],
-            'run':None,'crew':[],'habitats':[],'cabin':None,'alerts_available':False}
+            'run':None,'crew':[],'habitats':[],'cabin':None,'alerts_available':True,'alerts':[],'collection_tasks':[],'alert_rules_version':WORKBOOK['version']}
     if run is None:return result
     start,anchor=run_clock(run)
     rows=list(LatestMeasurement.objects.filter(run=run).select_related('metric','source_event','habitat'))
@@ -70,6 +68,8 @@ def dashboard(params):
     habitat_code=params.get('habitat_id')
     habitat=next((h for h in habitats if h.habitat_code==habitat_code),None) if habitat_code else (habitats[0] if habitats else None)
     if habitat_code and habitat is None:raise ReadError('Habitat not found in this run',404)
+    result['alerts']=active_alerts(run,anchor)
+    assessments={a.subject_key:a.coverage for a in AlertAssessment.objects.filter(run=run)}
     by_person=defaultdict(dict)
     by_zone=defaultdict(dict)
     for row in rows:
@@ -79,7 +79,9 @@ def dashboard(params):
     if params.get('zone_id') and zone not in by_zone:raise ReadError('Cabin zone has no readings in this run',404)
     if habitat:
         result['cabin']={'habitat_id':habitat.habitat_code,'name':habitat.name or habitat.habitat_code,
-                         'zone_id':zone,'zones':sorted(by_zone),'measurements':by_zone.get(zone,{})}
+                         'zone_id':zone,'zones':sorted(by_zone),'measurements':by_zone.get(zone,{}),
+                         'alerts':[a for a in result['alerts'] if a['domain']=='cabin' and a['habitat_id']==habitat.habitat_code and a['zone_id']==zone],
+                         'assessment':assessments.get(f'cabin:{habitat.pk}:{zone}',{})}
     profiles={p.astronaut_id:p for p in PreflightProfile.objects.filter(run=run).prefetch_related('baselines')}
     # Actual run participants, not all historical assignments from earlier simulation runs.
     people=list(Astronaut.objects.filter(measurement_events__run=run).distinct().order_by('astronaut_code'))
@@ -99,7 +101,20 @@ def dashboard(params):
             'habitat_id':latest.habitat.habitat_code if latest else None,
             'zone_id':latest.zone_id if latest else None,'activity':latest.context.get('activity') if latest else None,
             'latest_at':latest.measured_at if latest else None,'measurements':readings,'baselines':baselines,
+            'alerts':[a for a in result['alerts'] if a['astronaut_id']==person.astronaut_code],
+            'assessment':assessments.get(f'astronaut:{person.pk}',{}),
             'heart_rate_history':sorted(sparks[person.pk],key=lambda s:s['measured_at'])})
+    for row in rows:
+        due=row.measured_at+timedelta(seconds=COLLECTION_SECONDS.get(row.metric_id,900))
+        if anchor and anchor>due:
+            result['collection_tasks'].append({'kind':'measurement_overdue','metric':row.metric_id,
+                'astronaut_id':next((p.astronaut_code for p in people if p.pk==row.astronaut_id),None),
+                'habitat_id':row.habitat.habitat_code,'zone_id':row.zone_id,'due_at':due,'medical_alert':False})
+    for person in people:
+        for metric,interval in COLLECTION_SECONDS.items():
+            if metric not in by_person.get(person.pk,{}) and start and anchor and anchor>start+timedelta(seconds=interval):
+                result['collection_tasks'].append({'kind':'measurement_missing','metric':metric,'astronaut_id':person.astronaut_code,
+                    'due_at':start+timedelta(seconds=interval),'medical_alert':False})
     return result
 
 

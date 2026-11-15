@@ -46,17 +46,23 @@ export function adaptCrew(person,run) {
   const colors=['#eaa586','#a4c6aa','#b9b0d7','#8db5ce'];
   const number=(person.id.match(/\d+$/)||[])[0];
   const overdue=Object.values(readings).filter(r=>r.freshness==='overdue').length;
-  return {...person,...values,runId:run.id,observedAt:run.observation_time,
+  const alerts=person.alerts||[];const top=highestAlert(alerts);
+  return {...person,...values,topAlert:top,alerts,runId:run.id,observedAt:run.observation_time,
     initials:number?number.slice(-2).padStart(2,'0'):person.name.split(' ').map(p=>p[0]).join('').slice(0,2),
     color:colors[[...person.id].reduce((sum,c)=>sum+c.charCodeAt(0),0)%colors.length],
     role:'CREW MEMBER',location:[person.habitat_id,person.zone_id].filter(Boolean).join(' / ')||'Location unavailable',
     shift:person.activity?person.activity.replaceAll('_',' '):'No activity recorded',
-    status:!Object.keys(readings).length?'Awaiting telemetry':overdue?`${overdue} overdue`:'Data current',
+    status:top?`${tierLabel(top.tier)} · ${alerts.length}`:!Object.keys(readings).length?'Awaiting telemetry':overdue?`${overdue} overdue`:'Data current',
     overdue,wave:(person.heart_rate_history||[]).map(p=>p.value).filter(v=>typeof v==='number'&&Number.isFinite(v)),
   };
 }
 export function cabinReadings(cabin) {
   return CABIN_META.map(meta=>({...meta,...(cabin?.measurements?.[meta.metric]||{}),
-    value:cabin?.measurements?.[meta.metric]?.value??null}));
+    value:cabin?.measurements?.[meta.metric]?.value??null,alert:highestAlert((cabin?.alerts||[]).filter(a=>a.metric_id===meta.metric))}));
 }
 export function lastObservation(member,key) {return member?.measurements?.[KEY_METRICS[key]];}
+
+export const ALERT_RANK={advisory:1,caution:2,warning:3,emergency:4};
+export const ALERT_COLORS={advisory:'#4278ca',caution:'#b98320',warning:'#d57127',emergency:'#ce4257'};
+export function highestAlert(alerts=[]){return [...alerts].sort((a,b)=>(ALERT_RANK[b.tier]||0)-(ALERT_RANK[a.tier]||0))[0]||null;}
+export function tierLabel(tier){return tier?tier[0].toUpperCase()+tier.slice(1):'No active alert';}

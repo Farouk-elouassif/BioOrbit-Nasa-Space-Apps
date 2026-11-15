@@ -249,3 +249,49 @@ class LatestMeasurement(models.Model):
             models.UniqueConstraint(fields=['run', 'astronaut', 'metric'], condition=Q(domain=Domain.ASTRONAUT), name='uq_latest_astronaut'),
             models.UniqueConstraint(fields=['run', 'habitat', 'zone_id', 'metric'], condition=Q(domain=Domain.CABIN), name='uq_latest_cabin'),
         ]
+
+
+class MonitoringAlert(models.Model):
+    run = models.ForeignKey(SimulationRun, on_delete=models.PROTECT, related_name='monitoring_alerts')
+    subject_key = models.CharField(max_length=240)
+    rule_code = models.CharField(max_length=100)
+    domain = models.CharField(max_length=20, choices=Domain.choices)
+    astronaut = models.ForeignKey(Astronaut, on_delete=models.PROTECT, null=True, blank=True)
+    habitat = models.ForeignKey(Habitat, on_delete=models.PROTECT, null=True, blank=True)
+    zone_id = models.CharField(max_length=100, default='', blank=True)
+    region_index = models.PositiveSmallIntegerField(null=True, blank=True)
+    tier = models.CharField(max_length=20, choices=[(v,v.title()) for v in ('advisory','caution','warning','emergency')])
+    message = models.TextField()
+    evidence = models.JSONField(default=dict)
+    actions = models.JSONField(default=list)
+    recipients = models.TextField(blank=True)
+    provenance = models.JSONField(default=dict)
+    is_active = models.BooleanField(default=True)
+    detected_at = models.DateTimeField()
+    last_observation_at = models.DateTimeField()
+    recheck_due_at = models.DateTimeField()
+    normal_count = models.PositiveSmallIntegerField(default=0)
+    acknowledged_at = models.DateTimeField(null=True, blank=True)
+    acknowledged_for_at = models.DateTimeField(null=True, blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'monitoring_alerts'
+        constraints = [
+            models.UniqueConstraint(fields=['run','subject_key','rule_code'], name='uq_alert_rule_subject'),
+            models.CheckConstraint(condition=Q(tier__in=['advisory','caution','warning','emergency']), name='valid_alert_tier'),
+            models.CheckConstraint(condition=Q(domain__in=Domain.values), name='valid_alert_domain'),
+        ]
+        indexes = [models.Index(fields=['run','is_active'], name='idx_active_run_alerts')]
+
+
+class AlertAssessment(models.Model):
+    run = models.ForeignKey(SimulationRun, on_delete=models.PROTECT, related_name='alert_assessments')
+    subject_key = models.CharField(max_length=240)
+    evaluated_at = models.DateTimeField()
+    coverage = models.JSONField(default=dict)
+
+    class Meta:
+        db_table = 'alert_assessments'
+        constraints = [models.UniqueConstraint(fields=['run','subject_key'], name='uq_alert_assessment_subject')]

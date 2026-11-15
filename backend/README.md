@@ -59,7 +59,7 @@ Foreign keys have conventional Django names: `run`, `metric`, and `source_event`
 
 Defaults exist both in Python and at database level. The nullable defaulted fields from the supplied SQL remain nullable. `LatestMeasurement.updated_at` defaults on insert; it is **not** an automatic update trigger. The future ingestion/upsert path must explicitly advance it. Preflight background rate (mSv/year) and pre-mission career dose (mSv) remain separate fields.
 
-The ingestion service provisions consistent mission/habitat/crew references and metric definitions, validates run ownership and metric domain/type, journals events, and projects profiles/latest readings atomically. Direct ORM or SQL writes can still violate cross-row semantic relationships not expressed by the supplied foreign keys. A separate Django Bronze worker now exports committed raw events; an alert service is not implemented.
+The ingestion service provisions consistent mission/habitat/crew references and metric definitions, validates run ownership and metric domain/type, journals events, and projects profiles/latest readings atomically. Direct ORM or SQL writes can still violate cross-row semantic relationships not expressed by the supplied foreign keys. A separate Django Bronze worker now exports committed raw events; workbook alert evaluation runs during ingestion.
 
 Offline checks from the repository root (no database access):
 
@@ -263,8 +263,8 @@ The response includes:
 - Latest astronaut readings and habitat/zone-scoped cabin readings, including canonical metric, numeric/boolean value, unit, source event ID, measured/emitted/received timestamps, source, simulation flag, and context/activity.
 - Personal preflight baseline means, standard deviations, minima, maxima, and sample counts.
 - Up to 24 recent real heart-rate observations per astronaut for roster mini charts.
-- A freshness indicator (`current`/`overdue`) based on elapsed **simulated time** relative to the newest observation. Collection thresholds follow the simulator's default cadences with tolerance. They are not clinical alert classifications and do not yet adapt to arbitrary custom historical sampling intervals.
-- `alerts_available: false`, because the clinical alert engine is not implemented.
+- A freshness indicator (`current`/`overdue`) based on elapsed **simulated time** relative to the newest observation. Collection thresholds use workbook cadences, with a 15-minute continuous-stream gap tolerance. They are not clinical alert classifications and do not yet adapt to arbitrary custom historical sampling intervals.
+- `alerts_available: true`, with persisted workbook alerts, rule coverage and separate collection tasks.
 
 ### `GET /api/v1/trends`
 
@@ -282,3 +282,59 @@ docker compose exec backend python manage.py test core
 ```
 
 The read integration adds no models or migrations. `core.test_reads.ReadDatabaseTests` covers ingested values reaching dashboard/trend responses, per-run isolation, preflight references, boolean false, real aggregation, empty states, and invalid selections. Offline request/serialization tests are included in `backend/check_models.py`; PostgreSQL tests still require your running Docker setup.
+
+## Workbook alert mechanism
+
+Ingestion now evaluates alert rules inside the same database transaction, after updating the journal and latest values. No additional worker is needed. Migration `0003_workbook_alerts` adds `monitoring_alerts` (persistent lifecycle/evidence/acknowledgment) and `alert_assessments` (coverage and missing inputs). Run locks serialize ingestion and one-pass evaluation. Duplicate-only ingestion does not advance recovery counters. Late records cannot move the alert observation timestamp backward.
+
+`core/alerts/workbook.json` preserves the 83 parameter rows, patterns, tiers, row references and source-file SHA256 from `Data.xlsx`. This is a specification, not 83 collected measurements. `engine.py` implements explicit numerical rules and windowed combinations for available telemetry. Specialist rules with ambiguous prose require explicit reviewed source flags. Absent clinical inputs do not become normal observations or zero NEWS2 components.
+
+Supported telemetry rules include resting vital components (HR 5-minute persistence; SpO2 2-minute persistence), fasting glucose, personal baseline deviations, multi-day sleep/mood/stress/fluid summaries, cumulative career radiation, 24-hour mean dose rate, cabin O2/CO2/pressure/temperature/humidity, and qualified noise/dust observations. High resting heart rate is not inferred from exercise readings. Full NEWS2 requires all five numerical components, consciousness and supplemental oxygen with a coherent spot-check. Simulator `is_solar_storm=true` alone does not establish a NOAA severity or projected event dose.
+
+Windowed means require complete coverage with gaps no greater than 15 minutes; HR/SpO2 persistence tolerates gaps up to 60 seconds. Sparse backfill can therefore leave persistence rules pending. Fluid totals require complete days with known intervals; simulator six-hour summaries are recognized by source and window tag. Noise requires an explicit work/sleep period; surface dust requires `context.surface_body` (`moon` or `mars`). Low humidity uses an explicitly documented one-hour mean because the workbook does not specify its averaging duration. In-flight reference bands require at least 20 valid resting observations spanning a day, using the prior seven days excluding the latest day, with median-deviation trimming. NEWS2 integer bands round readings; raw observations remain unchanged.
+
+Four tiers are Advisory (blue), Caution (amber), Warning (orange), Emergency (red). Escalation is immediate once persistence/window requirements are met. Three distinct later normal observations lower severity by one tier; another three are required for another step. Missing, stale, or pending data never clear an alert. Advisory rechecks use four simulated hours, habit rules 24 hours, Caution/Warning one hour, symptomatic glucose 15 minutes, Emergency continuous monitoring. Workbook actions and recipients are reference metadata: no notifications or treatments are dispatched. Acknowledgment records review and does not resolve an alert. The current no-login console stores acknowledgment time, not an authenticated reviewer identity.
+
+API:
+
+- `GET /api/v1/alerts?run_id=...`: active alerts with tier, evidence, guidance, provenance, observation/recheck times and acknowledgment.
+- `GET /api/v1/alert-rules`: workbook specification and explicit prototype assumptions.
+- `GET /api/v1/dashboard`: includes alerts, per-subject assessments and separate collection tasks.
+- `POST /api/v1/alerts/{id}/acknowledge`, JSON `{"tier":"caution"}`: requires the current tier; returns 409 if severity changed or the alert resolved. Uses Django CSRF cookie/header protection. Dashboard GET initializes the CSRF cookie. Configure `DJANGO_CSRF_TRUSTED_ORIGINS` for custom frontend origins; localhost Vite/preview ports are included by default.
+
+Optional clinical facts can accompany an otherwise valid measurement, without changing its metric or raw observation:
+
+```json
+{"context":{"activity":"resting","rule_inputs":{
+  "consciousness":{"value":"alert"},
+  "supplemental_oxygen":{"value":false},
+  "noaa_s_level":{"value":1,"unit":"S-level"},
+  "projected_event_dose_msv":{"value":220,"unit":"mSv"},
+  "reaction_slower_two_tests":{"value":true}
+}}}
+```
+
+Supplemental numeric facts require exact workbook units, enumerations and booleans are type checked, and optional UTC `observed_at` cannot exceed the containing measurement's time. Canonical measurements cannot be overridden through supplemental facts. Invalid supplemental facts are ignored and remain unevaluated. Session notes in React do not supply these inputs.
+
+To apply the migration using the existing backend startup:
+
+```bash
+docker compose up --build
+```
+
+To evaluate already-stored latest data once, without waiting for another ingestion:
+
+```bash
+docker compose exec backend python manage.py evaluate_alerts
+# Optionally append: --run-id YOUR_RUN_ID
+```
+
+Evaluation concerns the current stored state and supporting history; it is not a chronological replay of every historical alert transition. Observation and recheck clocks use simulated mission time, acknowledgment uses real UTC time. If ingestion stops, the UI reports loss of contact and retains the latest state; there is no independent watchdog generating alerts while Django receives no data.
+
+Focused checks:
+
+```bash
+.venv/bin/python backend/check_models.py
+# Database-backed ingestion/acknowledgment/recovery test:
+docker compose exec backend python manage.py test core.test_alerts
+```

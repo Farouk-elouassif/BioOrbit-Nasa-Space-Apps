@@ -81,7 +81,7 @@ class ReadDatabaseTests(TestCase):
         self.assertEqual(person['baselines']['heart_rate']['count'],14)
         self.assertEqual(person['heart_rate_history'][0]['value'],68)
         self.assertIs(data['cabin']['measurements']['is_solar_storm']['value'],False)
-        self.assertFalse(data['alerts_available'])
+        self.assertTrue(data['alerts_available'])
 
     def test_run_filter_does_not_mix_other_run_participants(self):
         self.insert([observation(),observation(run_id='next-run',astronaut_id='AST_002',value=90)])

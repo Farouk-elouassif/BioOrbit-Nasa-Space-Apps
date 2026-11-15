@@ -57,3 +57,5 @@ npm run preview
 ```
 
 Preview uses the same API proxy. Browser interaction and real PostgreSQL round-trip verification must be performed against the services you run; no Docker containers or dev server were started by the assistant.
+
+The Alerts navigation item displays persisted workbook alerts, evidence, guidance, recheck times and acknowledgment. Crew cards, body regions and cabin pins reflect the highest applicable severity. Missing inputs and collection tasks are shown separately. This is a workbook-based prototype; session notes remain local and do not supply clinical rule inputs.
