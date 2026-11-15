@@ -1,5 +1,6 @@
-import React,{useEffect,useState} from 'react';
-import {ArrowDown,ArrowRight,ArrowUpRight,Moon,Orbit,Sun} from 'lucide-react';
+import React,{useState} from 'react';
+import {ArrowDown,ArrowUpRight} from 'lucide-react';
+import PublicLayout from './PublicLayout.jsx';
 
 const systems=[
   {id:'circulation',number:'01',title:'Circulation',label:'Heart rate · blood pressure',note:'Read cardiovascular observations against a person’s own baseline, with activity and cabin conditions in view.',point:[245,231]},
@@ -39,16 +40,8 @@ function ResearchPlate(){
 }
 
 export default function LandingPage(){
-  const [theme,setTheme]=useState(()=>{try{return localStorage.getItem('bioorbit-theme')==='dark'?'dark':'light'}catch{return 'light'}});
-  useEffect(()=>{document.documentElement.dataset.theme=theme;document.title='BioOrbit · The human body in space';try{localStorage.setItem('bioorbit-theme',theme)}catch{}},[theme]);
-  return <div id="landing-page" className="landing-page">
-    <a className="landing-skip" href="#landing-content">Skip to content</a>
-    <header className="landing-header">
-      <a className="landing-brand" href="/" aria-label="BioOrbit home"><span className="landing-brand-symbol"><Orbit size={25}/></span>Bio<span>Orbit</span></a>
-      <nav aria-label="Main navigation"><a href="#approach">The approach</a><a href="#research">Research context</a></nav>
-      <div className="landing-header-actions"><button className="landing-theme" aria-label={`Switch to ${theme==='dark'?'light':'dark'} mode`} onClick={()=>setTheme(theme==='dark'?'light':'dark')}>{theme==='dark'?<Sun size={18}/>:<Moon size={18}/>}</button><a href="/dashboard" className="landing-nav-cta">Visit dashboard<ArrowUpRight size={16}/></a></div>
-    </header>
-    <main id="landing-content">
+  return <PublicLayout>
+
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero-copy"><div className="landing-eyebrow"><span/>HUMAN SPACEFLIGHT / RESEARCH CONSOLE</div>
           <h1 id="landing-title">Space changes<br/>the human body<span>.</span></h1>
@@ -78,7 +71,6 @@ export default function LandingPage(){
         </div>
       </section>
       <section className="landing-entry" aria-labelledby="entry-title"><div><span className="landing-eyebrow">FROM RESEARCH CONTEXT TO OBSERVATION</span><h2 id="entry-title">Meet the crew.<br/>Explore the observations.</h2><p>Open the console for the body map, recorded trends, cabin conditions, and alert evidence.</p></div><a href="/dashboard" className="landing-primary-cta">Visit dashboard<ArrowUpRight size={20}/></a><span className="landing-entry-coordinate" aria-hidden="true">BIOORBIT / HUMAN SYSTEMS</span></section>
-    </main>
-    <footer className="landing-footer"><a className="landing-brand" href="/"><Orbit size={21}/>Bio<span>Orbit</span></a><p>An independent research prototype. Not affiliated with or endorsed by NASA.<br/>Simulated observations. Not for clinical use.</p><a href="#landing-content">Back to top<ArrowUpRight size={14}/></a></footer>
-  </div>;
+
+  </PublicLayout>;
 }

@@ -177,3 +177,12 @@ html[data-theme="dark"] #landing-page .plate-focus { fill: #e4a283; }
   #landing-page .landing-eyebrow { font-size: 9px; letter-spacing: 1px; }
 }
 @media (prefers-reduced-motion: reduce) { #landing-page *, #landing-page *::before, #landing-page *::after { transition: none; scroll-behavior: auto; } }
+
+/* Shared public navigation remains available on the documentation and library. */
+#landing-page .landing-header nav a[aria-current=page] { color: var(--lp-accent); text-decoration: underline; text-underline-offset: 6px; }
+#landing-page .public-footer-links { display: flex; flex-wrap: wrap; gap: 18px; font-size: 12px; color: var(--lp-muted); }
+#landing-page .public-footer-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 760px) {
+  #landing-page .landing-header { flex-wrap: wrap; }
+  #landing-page .landing-header nav { display: flex; order: 3; flex-basis: 100%; margin: 0; gap: 24px; overflow-x: auto; white-space: nowrap; font-size: 12px; }
+}

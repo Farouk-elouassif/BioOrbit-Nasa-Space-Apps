@@ -13,7 +13,7 @@ export default function CrewSnapshot({member,habitat,onMetric,onAlert,onCheckin}
   const panel=useRef(null);
   useEffect(()=>{if(panel.current)panel.current.scrollTop=0;},[member.id,member.runId]);
   const priority=highestAlert((member.alerts||[]).filter(alert=>alert.tier!=='advisory'));
-  const habitatMatches=habitat?.habitat_id===member.habitat_id;
+  const habitatMatches=Boolean(habitat&&member.habitat_id&&habitat.habitat_id===member.habitat_id);
   return <section className="crew-snapshot category-snapshot" aria-label={`Current observations for ${member.name}`}>
     <div className="snapshot-heading"><Activity size={19}/><div><h3>Crew measurements</h3><span>{member.name} · {member.shift||'Activity unavailable'}</span></div></div>
     {priority&&<button className={`snapshot-priority tier-${priority.tier}`} onClick={()=>onAlert?.(priority)}><Bell size={17}/><span><strong>{tierLabel(priority.tier)} · {member.name}</strong><span>{priority.title}</span><small>View alert details</small></span><ArrowUpRight size={16}/></button>}

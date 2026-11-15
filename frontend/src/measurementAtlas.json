@@ -1,0 +1,706 @@
+[
+  {
+    "code": "heart_rate",
+    "chapter": "circulation",
+    "label": "Heart rate",
+    "unit": "bpm",
+    "domain": "astronaut",
+    "biology": "Number of heartbeats per minute. Interpret with activity, personal resting reference, symptoms, and measurement time."
+  },
+  {
+    "code": "systolic_blood_pressure",
+    "chapter": "circulation",
+    "label": "Systolic blood pressure",
+    "unit": "mmHg",
+    "domain": "astronaut",
+    "biology": "Arterial pressure during heart contraction. Read with diastolic pressure and the conditions under which the measurement was taken."
+  },
+  {
+    "code": "diastolic_blood_pressure",
+    "chapter": "circulation",
+    "label": "Diastolic blood pressure",
+    "unit": "mmHg",
+    "domain": "astronaut",
+    "biology": "Arterial pressure between contractions. A change can reflect different influences from a change in systolic pressure."
+  },
+  {
+    "code": "blood_glucose",
+    "chapter": "metabolism",
+    "label": "Blood glucose",
+    "unit": "mg/dL",
+    "domain": "astronaut",
+    "biology": "Concentration of glucose in blood. Meal timing and the sampling method are important context for comparison."
+  },
+  {
+    "code": "body_temperature",
+    "chapter": "metabolism",
+    "label": "Body temperature",
+    "unit": "°C",
+    "domain": "astronaut",
+    "biology": "Recorded body temperature. Core and skin measurements have different meanings; check the measurement site and activity."
+  },
+  {
+    "code": "respiratory_rate",
+    "chapter": "respiration",
+    "label": "Respiratory rate",
+    "unit": "breaths/min",
+    "domain": "astronaut",
+    "biology": "Breaths per minute. Frequency alone does not reveal breath depth or establish adequate ventilation."
+  },
+  {
+    "code": "spo2",
+    "chapter": "respiration",
+    "label": "Oxygen saturation (SpO₂)",
+    "unit": "%",
+    "domain": "astronaut",
+    "biology": "Optical estimate of haemoglobin oxygen saturation. It does not measure haemoglobin concentration or directly quantify tissue oxygen delivery."
+  },
+  {
+    "code": "sleep_duration",
+    "chapter": "sleep-behavior",
+    "label": "Sleep duration",
+    "unit": "hours",
+    "domain": "astronaut",
+    "biology": "Amount of sleep recorded for an interval. Daily totals describe duration, not sleep quality or circadian alignment."
+  },
+  {
+    "code": "mood",
+    "chapter": "sleep-behavior",
+    "label": "Mood",
+    "unit": "0–10",
+    "domain": "astronaut",
+    "biology": "Self-reported mood on the configured scale. It records experience rather than a psychiatric diagnosis."
+  },
+  {
+    "code": "stress_level",
+    "chapter": "sleep-behavior",
+    "label": "Stress",
+    "unit": "0–10",
+    "domain": "astronaut",
+    "biology": "Self-reported stress. Compare observations within the same person and scale, alongside workload and sleep."
+  },
+  {
+    "code": "fluid_intake",
+    "chapter": "kidneys",
+    "label": "Fluid intake",
+    "unit": "L",
+    "domain": "astronaut",
+    "biology": "Recorded volume consumed during an interval. Intake alone does not establish hydration or fluid balance."
+  },
+  {
+    "code": "body_mass",
+    "chapter": "metabolism",
+    "label": "Body mass",
+    "unit": "kg",
+    "domain": "astronaut",
+    "biology": "Body mass can reflect fluid, lean tissue, or fat changes. The measurement method and mission phase matter."
+  },
+  {
+    "code": "preflight_radiation_level",
+    "chapter": "radiation-eva",
+    "label": "Preflight radiation rate",
+    "unit": "mSv/year",
+    "domain": "astronaut",
+    "biology": "Recorded preflight radiation rate. Its annual unit differs from the daily dose-rate units used in flight."
+  },
+  {
+    "code": "preflight_career_radiation_dose",
+    "chapter": "radiation-eva",
+    "label": "Preflight career radiation dose",
+    "unit": "mSv",
+    "domain": "astronaut",
+    "biology": "Exposure accumulated before this mission. It contributes historical context to the career exposure record."
+  },
+  {
+    "code": "personal_radiation_dose_rate",
+    "chapter": "radiation-eva",
+    "label": "Personal radiation dose rate",
+    "unit": "mSv/day",
+    "domain": "astronaut",
+    "biology": "Personal exposure per unit time. Duration is needed to connect rate with accumulated dose."
+  },
+  {
+    "code": "mission_cumulative_radiation_dose",
+    "chapter": "radiation-eva",
+    "label": "Mission cumulative dose",
+    "unit": "mSv",
+    "domain": "astronaut",
+    "biology": "Dose accumulated within the selected mission. It is not the same quantity as career dose."
+  },
+  {
+    "code": "total_career_radiation_dose",
+    "chapter": "radiation-eva",
+    "label": "Total career dose",
+    "unit": "mSv",
+    "domain": "astronaut",
+    "biology": "Recorded accumulated career exposure, including preflight history. It is not an estimate of an individual diagnosis."
+  },
+  {
+    "code": "co2_partial_pressure",
+    "chapter": "cabin",
+    "label": "Cabin CO₂ partial pressure",
+    "unit": "mmHg",
+    "domain": "cabin",
+    "biology": "Carbon dioxide pressure in the cabin atmosphere. Exposure duration and ventilation context are necessary for interpretation."
+  },
+  {
+    "code": "o2_partial_pressure",
+    "chapter": "cabin",
+    "label": "Cabin O₂ partial pressure",
+    "unit": "mmHg",
+    "domain": "cabin",
+    "biology": "Oxygen’s contribution to total gas pressure. It is not oxygen percentage and is not blood oxygen saturation."
+  },
+  {
+    "code": "total_cabin_pressure",
+    "chapter": "cabin",
+    "label": "Total cabin pressure",
+    "unit": "kPa",
+    "domain": "cabin",
+    "biology": "Total atmospheric pressure. Both the level and the rate of pressure change matter during transitions."
+  },
+  {
+    "code": "cabin_temperature",
+    "chapter": "cabin",
+    "label": "Cabin temperature",
+    "unit": "°C",
+    "domain": "cabin",
+    "biology": "Air temperature in a habitat zone. It contributes thermal context but does not measure core body temperature."
+  },
+  {
+    "code": "relative_humidity",
+    "chapter": "cabin",
+    "label": "Relative humidity",
+    "unit": "%",
+    "domain": "cabin",
+    "biology": "Water-vapour content relative to saturation at that temperature. It provides context for comfort, surfaces, and heat exchange."
+  },
+  {
+    "code": "noise_level",
+    "chapter": "cabin",
+    "label": "Cabin noise",
+    "unit": "dBA",
+    "domain": "cabin",
+    "biology": "Sound exposure in A-weighted decibels. Duration, sleep versus work, and the averaging method matter."
+  },
+  {
+    "code": "dust_concentration",
+    "chapter": "cabin",
+    "label": "Dust concentration",
+    "unit": "mg/m³",
+    "domain": "cabin",
+    "biology": "Suspended particulate concentration. Particle properties and exposure duration affect what a concentration means biologically."
+  },
+  {
+    "code": "radiation_level",
+    "chapter": "radiation-eva",
+    "label": "Cabin radiation dose rate",
+    "unit": "mSv/day",
+    "domain": "cabin",
+    "biology": "Cabin-area dose rate. Shielding and location can make this different from a personal dosimeter reading."
+  },
+  {
+    "code": "is_solar_storm",
+    "chapter": "radiation-eva",
+    "label": "Solar storm present",
+    "unit": "boolean",
+    "domain": "cabin",
+    "biology": "A source-supplied event flag. It does not quantify the dose received by a crew member."
+  },
+  {
+    "code": "consciousness",
+    "chapter": "sleep-behavior",
+    "label": "Consciousness / alertness",
+    "unit": "Alert / new confusion / voice / pain / unresponsive",
+    "domain": "astronaut",
+    "biology": "Recorded alertness or response category. New confusion and reduced responsiveness are distinct from an ordinary mood score."
+  },
+  {
+    "code": "news2",
+    "chapter": "interpretation",
+    "label": "Acute early-warning score (NEWS2 total)",
+    "unit": "score 0–20",
+    "domain": "astronaut",
+    "biology": "Recorded early-warning score. BioOrbit’s space-adjusted rules are a prototype, and missing components must not be assumed normal."
+  },
+  {
+    "code": "hrv",
+    "chapter": "circulation",
+    "label": "Heart-rate variability",
+    "unit": "ms (RMSSD)",
+    "domain": "astronaut",
+    "biology": "Variation in intervals between heartbeats, expressed here as RMSSD. Activity, recording duration, and signal quality affect comparisons."
+  },
+  {
+    "code": "ecg_flag",
+    "chapter": "circulation",
+    "label": "ECG rhythm, ST and QT flags",
+    "unit": "device flag",
+    "domain": "astronaut",
+    "biology": "A categorical finding from an electrical-heart assessment. A device flag needs its tracing and context for interpretation."
+  },
+  {
+    "code": "etco2",
+    "chapter": "respiration",
+    "label": "End-tidal CO2",
+    "unit": "mmHg",
+    "domain": "astronaut",
+    "biology": "CO₂ near the end of exhalation. It relates to ventilation and circulation, and differs from cabin-air CO₂."
+  },
+  {
+    "code": "spco",
+    "chapter": "respiration",
+    "label": "Carboxyhaemoglobin (SpCO)",
+    "unit": "%",
+    "domain": "astronaut",
+    "biology": "An optical estimate of carboxyhaemoglobin. This is a different haemoglobin species from oxygen-bound haemoglobin."
+  },
+  {
+    "code": "spmet",
+    "chapter": "respiration",
+    "label": "Methaemoglobin (SpMet)",
+    "unit": "%",
+    "domain": "astronaut",
+    "biology": "An optical estimate of methaemoglobin. It describes altered haemoglobin chemistry, not cabin oxygen concentration."
+  },
+  {
+    "code": "perfusion_index",
+    "chapter": "respiration",
+    "label": "Perfusion index",
+    "unit": "%",
+    "domain": "astronaut",
+    "biology": "A device-derived indicator of the pulsatile optical signal relative to its background. It is not a direct cardiac-output measurement."
+  },
+  {
+    "code": "sphb",
+    "chapter": "blood-immunity",
+    "label": "Haemoglobin, non-invasive (SpHb)",
+    "unit": "g/dL",
+    "domain": "astronaut",
+    "biology": "Non-invasive haemoglobin estimate. Interpret with device performance and distinguish it from a laboratory haemoglobin result."
+  },
+  {
+    "code": "hemoglobin",
+    "chapter": "blood-immunity",
+    "label": "Haemoglobin (lab)",
+    "unit": "g/dL",
+    "domain": "astronaut",
+    "biology": "Laboratory concentration of the oxygen-carrying protein in red cells. Fluid-volume changes can influence concentration."
+  },
+  {
+    "code": "hematocrit",
+    "chapter": "blood-immunity",
+    "label": "Haematocrit",
+    "unit": "%",
+    "domain": "astronaut",
+    "biology": "Fraction of blood volume occupied by red cells. It depends on cell populations and plasma volume."
+  },
+  {
+    "code": "platelets",
+    "chapter": "blood-immunity",
+    "label": "Platelets",
+    "unit": "×10⁹/L",
+    "domain": "astronaut",
+    "biology": "Count of cells involved in clot formation. A count alone does not establish normal clotting or rule out thrombosis."
+  },
+  {
+    "code": "wbc",
+    "chapter": "blood-immunity",
+    "label": "White cells and lymphocytes",
+    "unit": "×10⁹/L",
+    "domain": "astronaut",
+    "biology": "White-cell count. Total and differential cell counts provide different information; the stored total does not identify every cell subtype."
+  },
+  {
+    "code": "serum_calcium",
+    "chapter": "bone-muscle",
+    "label": "Serum calcium",
+    "unit": "mmol/L",
+    "domain": "astronaut",
+    "biology": "Calcium concentration in blood. Regulation can maintain serum levels despite changes in skeletal calcium turnover."
+  },
+  {
+    "code": "vitamin_d",
+    "chapter": "bone-muscle",
+    "label": "25-OH vitamin D",
+    "unit": "ng/mL",
+    "domain": "astronaut",
+    "biology": "25-hydroxyvitamin D provides context for vitamin D status. It is not a direct measurement of bone density."
+  },
+  {
+    "code": "ferritin",
+    "chapter": "blood-immunity",
+    "label": "Ferritin / serum iron",
+    "unit": "ng/mL",
+    "domain": "astronaut",
+    "biology": "Ferritin provides information about iron storage and can be influenced by other biological processes. It is not interchangeable with serum iron."
+  },
+  {
+    "code": "creatinine",
+    "chapter": "kidneys",
+    "label": "Creatinine",
+    "unit": "mg/dL",
+    "domain": "astronaut",
+    "biology": "A waste-product concentration used in renal assessment. Muscle-related factors and assay context also affect interpretation."
+  },
+  {
+    "code": "sodium",
+    "chapter": "kidneys",
+    "label": "Sodium (serum)",
+    "unit": "mmol/L",
+    "domain": "astronaut",
+    "biology": "Serum sodium relates to water and electrolyte regulation. It is not a direct measure of total dietary salt intake."
+  },
+  {
+    "code": "potassium",
+    "chapter": "kidneys",
+    "label": "Potassium (serum)",
+    "unit": "mmol/L",
+    "domain": "astronaut",
+    "biology": "Serum potassium supports interpretation of electrolyte balance. Sampling conditions and renal context are relevant."
+  },
+  {
+    "code": "cortisol_dhea",
+    "chapter": "blood-immunity",
+    "label": "Cortisol : DHEA ratio (saliva)",
+    "unit": "ratio",
+    "domain": "astronaut",
+    "biology": "Ratio of two salivary hormone measurements. Timing and assay methods matter; it is not equivalent to reported stress."
+  },
+  {
+    "code": "herpes_dna",
+    "chapter": "blood-immunity",
+    "label": "Herpes virus DNA (saliva/urine)",
+    "unit": "detected / not",
+    "domain": "astronaut",
+    "biology": "Detected or undetected viral DNA in the sampled material. Detection does not automatically establish symptomatic illness."
+  },
+  {
+    "code": "urine_sg_ph",
+    "chapter": "kidneys",
+    "label": "Urine specific gravity and pH",
+    "unit": "SG; pH",
+    "domain": "astronaut",
+    "biology": "Specific gravity describes urine concentration, while pH describes acidity. They are separate values with different interpretations."
+  },
+  {
+    "code": "urinary_calcium",
+    "chapter": "kidneys",
+    "label": "Urinary calcium",
+    "unit": "mg/24 h",
+    "domain": "astronaut",
+    "biology": "Calcium excreted during a collection period. This connects urinary chemistry with bone turnover and stone-risk research."
+  },
+  {
+    "code": "ntx",
+    "chapter": "bone-muscle",
+    "label": "Bone resorption markers (NTX)",
+    "unit": "vs baseline",
+    "domain": "astronaut",
+    "biology": "A marker related to breakdown of bone collagen. Baseline-relative values need consistent sampling and assay conditions."
+  },
+  {
+    "code": "urine_volume",
+    "chapter": "kidneys",
+    "label": "Urine volume",
+    "unit": "L/day",
+    "domain": "astronaut",
+    "biology": "Urine collected over a defined period. Interpret alongside intake, losses, collection completeness, and chemistry."
+  },
+  {
+    "code": "urine_colour",
+    "chapter": "kidneys",
+    "label": "Urine colour",
+    "unit": "pale / yellow / dark",
+    "domain": "astronaut",
+    "biology": "Categorical appearance of urine. It can provide context but is not a quantitative hydration or kidney-function test."
+  },
+  {
+    "code": "flank_pain",
+    "chapter": "kidneys",
+    "label": "Flank pain or blood in urine",
+    "unit": "yes / no",
+    "domain": "astronaut",
+    "biology": "A symptom flag covering flank pain or blood in urine. The flag alone does not identify the cause."
+  },
+  {
+    "code": "urinary_retention",
+    "chapter": "kidneys",
+    "label": "Cannot pass urine / painful urination",
+    "unit": "yes / no",
+    "domain": "astronaut",
+    "biology": "Reported inability or difficulty passing urine. It is a symptom observation that needs its own clinical context."
+  },
+  {
+    "code": "bone_density",
+    "chapter": "bone-muscle",
+    "label": "Bone density (DXA)",
+    "unit": "% of pre-mission",
+    "domain": "astronaut",
+    "biology": "A density assessment recorded relative to pre-mission data. Density and fracture resistance are related but distinct concepts."
+  },
+  {
+    "code": "resistance_ex",
+    "chapter": "bone-muscle",
+    "label": "Resistance exercise done vs planned",
+    "unit": "sessions",
+    "domain": "astronaut",
+    "biology": "Recorded resistance-exercise sessions. Completion describes a countermeasure, not the measured muscle or bone response."
+  },
+  {
+    "code": "exercise_min",
+    "chapter": "bone-muscle",
+    "label": "Exercise minutes",
+    "unit": "min/week",
+    "domain": "astronaut",
+    "biology": "Time spent exercising during a collection window. Duration alone does not specify intensity or mechanical loading."
+  },
+  {
+    "code": "fitness",
+    "chapter": "bone-muscle",
+    "label": "Aerobic capacity (VO2max)",
+    "unit": "% of pre-mission; mL/min/kg",
+    "domain": "astronaut",
+    "biology": "An aerobic-capacity observation. Check whether a record is baseline-relative or an absolute oxygen-uptake measurement before comparison."
+  },
+  {
+    "code": "strength",
+    "chapter": "bone-muscle",
+    "label": "Muscle strength",
+    "unit": "% of baseline",
+    "domain": "astronaut",
+    "biology": "Performance on a strength assessment relative to a reference. The task and muscle group determine what can be compared."
+  },
+  {
+    "code": "energy_intake",
+    "chapter": "metabolism",
+    "label": "Food energy intake",
+    "unit": "kcal/day",
+    "domain": "astronaut",
+    "biology": "Recorded food energy over a daily interval. Intake is different from energy expenditure and nutrient adequacy."
+  },
+  {
+    "code": "vision_change",
+    "chapter": "sensory",
+    "label": "New blur or blind spot (SANS symptom)",
+    "unit": "yes / no",
+    "domain": "astronaut",
+    "biology": "A report of altered vision. It does not establish SANS or identify the affected eye structures."
+  },
+  {
+    "code": "oct_rnfl",
+    "chapter": "sensory",
+    "label": "Retinal thickness around optic disc (OCT)",
+    "unit": "µm change",
+    "domain": "astronaut",
+    "biology": "Change in retinal nerve-fibre-layer thickness measured with OCT. Imaging protocol and the preflight comparison matter."
+  },
+  {
+    "code": "amsler_acuity",
+    "chapter": "sensory",
+    "label": "Visual acuity and Amsler grid",
+    "unit": "lines / distortion",
+    "domain": "astronaut",
+    "biology": "A structured record of visual acuity and reported distortion. These examine different aspects of visual function."
+  },
+  {
+    "code": "jugular_flow",
+    "chapter": "circulation",
+    "label": "Neck-vein (internal jugular) flow",
+    "unit": "normal / stagnant / reversed / clot",
+    "domain": "astronaut",
+    "biology": "An observed neck-vein flow category. Stasis, reversed flow, and a reported clot are distinct findings."
+  },
+  {
+    "code": "orthostatic",
+    "chapter": "circulation",
+    "label": "Standing tolerance (BP/HR on standing)",
+    "unit": "symptoms; BP/HR",
+    "domain": "astronaut",
+    "biology": "Symptoms and paired blood-pressure/heart-rate observations during upright challenge. The gravity and testing protocol matter."
+  },
+  {
+    "code": "motion_sickness",
+    "chapter": "sensory",
+    "label": "Motion sickness",
+    "unit": "grade 0–3",
+    "domain": "astronaut",
+    "biology": "Severity of reported motion sickness. Interpret relative to gravity transitions and exposure history."
+  },
+  {
+    "code": "balance",
+    "chapter": "sensory",
+    "label": "Balance / dizziness",
+    "unit": "check-in score",
+    "domain": "astronaut",
+    "biology": "A balance or dizziness check-in score. It is not a direct measurement of the vestibular organs."
+  },
+  {
+    "code": "hearing",
+    "chapter": "sensory",
+    "label": "Hearing thresholds",
+    "unit": "dB HL",
+    "domain": "astronaut",
+    "biology": "Hearing threshold in dB HL. This functional test uses a different scale from cabin sound exposure in dBA."
+  },
+  {
+    "code": "headache",
+    "chapter": "sensory",
+    "label": "Headache",
+    "unit": "severity 0–3",
+    "domain": "astronaut",
+    "biology": "Reported headache severity. Many physiological and environmental influences are possible; the score does not establish a cause."
+  },
+  {
+    "code": "infection_signs",
+    "chapter": "blood-immunity",
+    "label": "Infection signs (rash, cold sores, shingles pain, fever)",
+    "unit": "checklist",
+    "domain": "astronaut",
+    "biology": "A checklist of observed findings. Symptoms must be distinguished from laboratory confirmation of an infection."
+  },
+  {
+    "code": "skin",
+    "chapter": "sensory",
+    "label": "Skin: rash, dryness, cut, abrasion",
+    "unit": "photo + note",
+    "domain": "astronaut",
+    "biology": "A structured description of a skin finding. Current simulator records do not contain real clinical photographs."
+  },
+  {
+    "code": "pain_injury",
+    "chapter": "sensory",
+    "label": "Aches and injuries",
+    "unit": "0–10, location on body",
+    "domain": "astronaut",
+    "biology": "Reported pain severity and anatomical location. Pain location does not by itself establish an injury mechanism."
+  },
+  {
+    "code": "medication_log",
+    "chapter": "interpretation",
+    "label": "Medication taken and stock",
+    "unit": "log",
+    "domain": "astronaut",
+    "biology": "A record of medication use and stock. It is contextual information, not evidence of treatment effectiveness."
+  },
+  {
+    "code": "circadian",
+    "chapter": "sleep-behavior",
+    "label": "Sleep timing / circadian alignment",
+    "unit": "sleep midpoint",
+    "domain": "astronaut",
+    "biology": "Recorded sleep timing, such as midpoint. Timing alignment is a different question from total sleep duration."
+  },
+  {
+    "code": "workload",
+    "chapter": "sleep-behavior",
+    "label": "Workload (Bedford) / effort (Borg CR10)",
+    "unit": "Bedford 1–10; Borg 0–10",
+    "domain": "astronaut",
+    "biology": "Bedford workload and Borg perceived-effort scores are separate subjective scales and should not be merged into one quantity."
+  },
+  {
+    "code": "reaction_ms",
+    "chapter": "sleep-behavior",
+    "label": "Reaction time (3-min PVT-B)",
+    "unit": "ms",
+    "domain": "astronaut",
+    "biology": "Response latency during a vigilance task. Practice, timing, and task protocol affect interpretation."
+  },
+  {
+    "code": "cognition",
+    "chapter": "sleep-behavior",
+    "label": "Cognition battery (10 tests)",
+    "unit": "score vs baseline",
+    "domain": "astronaut",
+    "biology": "A baseline-relative cognitive-assessment score. It represents the configured task battery rather than all cognitive function."
+  },
+  {
+    "code": "team_cohesion",
+    "chapter": "sleep-behavior",
+    "label": "Team cohesion / conflict",
+    "unit": "survey score",
+    "domain": "astronaut",
+    "biology": "A survey-based account of team functioning. It is distinct from an individual biological assay."
+  },
+  {
+    "code": "eva_hr",
+    "chapter": "radiation-eva",
+    "label": "Heart rate during spacewalk",
+    "unit": "% of age-predicted max",
+    "domain": "astronaut",
+    "biology": "Heart rate during a spacewalk, recorded relative to an age-predicted maximum. It is not the same unit as beats per minute."
+  },
+  {
+    "code": "eva_core_temp",
+    "chapter": "radiation-eva",
+    "label": "Core temperature during spacewalk",
+    "unit": "°C",
+    "domain": "astronaut",
+    "biology": "Core temperature during a spacewalk. Interpret alongside metabolic workload and suit thermal conditions."
+  },
+  {
+    "code": "suit_status",
+    "chapter": "radiation-eva",
+    "label": "Suit pressure, O2, CO2, metabolic rate",
+    "unit": "per suit system",
+    "domain": "astronaut",
+    "biology": "Structured suit pressure, oxygen, CO₂, and metabolic-rate values. Each component has its own unit and physiological role."
+  },
+  {
+    "code": "dcs",
+    "chapter": "radiation-eva",
+    "label": "Decompression sickness symptoms",
+    "unit": "symptom check",
+    "domain": "astronaut",
+    "biology": "Symptoms recorded after pressure transitions. A symptom checklist does not confirm or exclude decompression sickness."
+  },
+  {
+    "code": "dust_symptoms",
+    "chapter": "cabin",
+    "label": "Dust exposure symptoms (eyes, throat, cough)",
+    "unit": "yes / no",
+    "domain": "astronaut",
+    "biology": "Reported eye, throat, or respiratory symptoms around dust exposure. Co-occurrence does not prove the dust caused them."
+  },
+  {
+    "code": "solar_storm",
+    "chapter": "radiation-eva",
+    "label": "Solar particle event (proton flux, NOAA S-scale)",
+    "unit": "S-level; projected mSv",
+    "domain": "astronaut",
+    "biology": "A structured event-level record with a solar-radiation-storm category and projected dose. A projection is not a measured personal dose."
+  },
+  {
+    "code": "rad_bfo",
+    "chapter": "radiation-eva",
+    "label": "Blood-forming organ dose",
+    "unit": "mGy-Eq",
+    "domain": "astronaut",
+    "biology": "A blood-forming-organ dose quantity. Its mGy-Eq unit cannot be directly substituted for effective dose in mSv."
+  },
+  {
+    "code": "ars_symptoms",
+    "chapter": "radiation-eva",
+    "label": "Acute radiation sickness symptoms",
+    "unit": "symptoms",
+    "domain": "astronaut",
+    "biology": "A checklist of symptoms that may have many causes. It does not establish radiation exposure or acute radiation syndrome."
+  },
+  {
+    "code": "combustion",
+    "chapter": "cabin",
+    "label": "Combustion products (CO, HCN, HCl, HF)",
+    "unit": "ppm",
+    "domain": "cabin",
+    "biology": "Concentrations of specific combustion products. Different chemicals have different biological mechanisms and exposure implications."
+  },
+  {
+    "code": "water_supply",
+    "chapter": "cabin",
+    "label": "Drinking water available",
+    "unit": "L/person/day",
+    "domain": "cabin",
+    "biology": "Water available per person per day. Shared supply is distinct from what an individual actually drinks."
+  }
+]

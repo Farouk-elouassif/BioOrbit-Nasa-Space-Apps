@@ -1,0 +1,1148 @@
+{
+  "title": "References",
+  "attribution": "BioOrbit: Astronaut Health Companion. Team Bioskopos, 2026 NASA Space Apps Challenge",
+  "groups": [
+    {
+      "id": "group-1",
+      "title": "NASA standards, technical briefs and program pages"
+    },
+    {
+      "id": "group-2",
+      "title": "NASA Technical Reports Server (NTRS) documents"
+    },
+    {
+      "id": "group-3",
+      "title": "Data sets: NASA Open Science Data Repository (OSDR)"
+    },
+    {
+      "id": "group-4",
+      "title": "Journal articles and research studies"
+    },
+    {
+      "id": "group-5",
+      "title": "Space agency partners, industry and news"
+    },
+    {
+      "id": "group-6",
+      "title": "Clinical references"
+    },
+    {
+      "id": "group-7",
+      "title": "Hackathon materials"
+    }
+  ],
+  "references": [
+    {
+      "id": "ref-001",
+      "groupId": "group-1",
+      "title": "Lunar dust (Technical Brief OCHMO-TB-011, Rev. B)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2022, November 17). Lunar dust (Technical Brief OCHMO-TB-011, Rev. B). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/03/lunar-dust-technical-brief-ochmo.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-002",
+      "groupId": "group-1",
+      "title": "Acoustics (Technical Brief OCHMO-TB-035, Rev. C)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023a, October 6). Acoustics (Technical Brief OCHMO-TB-035, Rev. C). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-035-acoustics.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-003",
+      "groupId": "group-1",
+      "title": "Behavioral health and performance (Technical Brief OCHMO-TB-016, Rev. B)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023b, October 24). Behavioral health and performance (Technical Brief OCHMO-TB-016, Rev. B). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-016-behavioral-health.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-004",
+      "groupId": "group-1",
+      "title": "Exercise overview (Technical Brief OCHMO-TB-031)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023c, October 2). Exercise overview (Technical Brief OCHMO-TB-031). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/ochmo-tb-031-exercise-overview-2/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-005",
+      "groupId": "group-1",
+      "title": "Food and nutrition (Technical Brief OCHMO-TB-013, Rev. E)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023d, December 7). Food and nutrition (Technical Brief OCHMO-TB-013, Rev. E). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-013-food-and-nutrition.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-006",
+      "groupId": "group-1",
+      "title": "Habitable atmosphere (Technical Brief OCHMO-TB-003, Rev. A)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023e, November 30). Habitable atmosphere (Technical Brief OCHMO-TB-003, Rev. A). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-003-habitable-atmosphere.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-007",
+      "groupId": "group-1",
+      "title": "Orthostatic intolerance (Technical Brief OCHMO-TB-019, Rev. B)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023f, December 1). Orthostatic intolerance (Technical Brief OCHMO-TB-019, Rev. B). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-019-orthostatic-intolerance.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-008",
+      "groupId": "group-1",
+      "title": "Sleep accommodations (Technical Brief OCHMO-TB-041, Rev. B)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023g, October 23). Sleep accommodations (Technical Brief OCHMO-TB-041, Rev. B). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-041-sleep-accommodations.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-009",
+      "groupId": "group-1",
+      "title": "Water: Human consumption (Technical Brief OCHMO-TB-027, Rev. C)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2023h, November 29). Water: Human consumption (Technical Brief OCHMO-TB-027, Rev. C). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-027-water.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-010",
+      "groupId": "group-1",
+      "title": "Spaceflight associated neuro-ocular syndrome (SANS) (Technical Brief OCHMO-MTB-001)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2024, February 21). Spaceflight associated neuro-ocular syndrome (SANS) (Technical Brief OCHMO-MTB-001). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2024/02/ochmo-mtb-001-sans.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-011",
+      "groupId": "group-1",
+      "title": "Design for ionizing radiation protection (Technical Brief OCHMO-TB-020, Rev. G)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2025a, June 6). Design for ionizing radiation protection (Technical Brief OCHMO-TB-020, Rev. G). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-020-radiation-protection.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-012",
+      "groupId": "group-1",
+      "title": "Medical operations: Spaceflight considerations (Technical Brief OCHMO-TB-044)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2025b, August 13). Medical operations: Spaceflight considerations (Technical Brief OCHMO-TB-044). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2025/08/ochmo-tb-044-medical-operations.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-013",
+      "groupId": "group-1",
+      "title": "Space adaptation sickness (SAS) (Technical Brief OCHMO-MTB-004, Rev. A)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2025c, September 25). Space adaptation sickness (SAS) (Technical Brief OCHMO-MTB-004, Rev. A). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2025/09/ochmo-mtb-004-space-adaptation-sickness-sas.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-014",
+      "groupId": "group-1",
+      "title": "Bone loss (Technical Brief OCHMO-MTB-013, Rev. D)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2026a, February 11). Bone loss (Technical Brief OCHMO-MTB-013, Rev. D). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2026/02/ochmo-mtb-013-bone-loss.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-015",
+      "groupId": "group-1",
+      "title": "Carbon dioxide (CO2) (Technical Brief OCHMO-TB-004, Rev. D)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2026b, March 10). Carbon dioxide (CO2) (Technical Brief OCHMO-TB-004, Rev. D). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/ochmo-tb-004-carbon-dioxide-2/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-016",
+      "groupId": "group-1",
+      "title": "Circadian desynchrony (Technical Brief OCHMO-MTB-009)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2026c, March 4). Circadian desynchrony (Technical Brief OCHMO-MTB-009). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2026/03/ochmo-mtb-009-circadian-desynchrony.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-017",
+      "groupId": "group-1",
+      "title": "Decompression sickness (DCS) risk mitigation (Technical Brief OCHMO-TB-037, Rev. D)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2026d, October 5). Decompression sickness (DCS) risk mitigation (Technical Brief OCHMO-TB-037, Rev. D). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-037-decompression-sickness.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-018",
+      "groupId": "group-1",
+      "title": "Urinary health (Technical Brief OCHMO-MTB-003, Rev. A)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2026e, March 10). Urinary health (Technical Brief OCHMO-MTB-003, Rev. A). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/ochmo-mtb-003-urinary-health-2/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-019",
+      "groupId": "group-1",
+      "title": "Venous thrombosis in spaceflight (Technical Brief OCHMO-MTB-007)",
+      "citation": "NASA Office of the Chief Health and Medical Officer. (2026f, January 8). Venous thrombosis in spaceflight (Technical Brief OCHMO-MTB-007). National Aeronautics and Space Administration.",
+      "url": "https://www.nasa.gov/wp-content/uploads/2026/01/ochmo-mtb-007-venous-thrombosis-in-spaceflight.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-020",
+      "groupId": "group-1",
+      "title": "[Space radiation fact sheet] [Archived fact sheet]",
+      "citation": "National Aeronautics and Space Administration. (2022, October). [Space radiation fact sheet] [Archived fact sheet]. University of North Texas Web Archive.",
+      "url": "https://webarchive.library.unt.edu/eot2008/20090112024921/http://spaceflight.nasa.gov/spacenews/factsheets/pdfs/radiation.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-021",
+      "groupId": "group-1",
+      "title": "NASA space flight human-system standard: Volume 1, Revision C",
+      "citation": "National Aeronautics and Space Administration. (2023). NASA space flight human-system standard: Volume 1, Revision C. Crew health (NASA-STD-3001).",
+      "url": "https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-022",
+      "groupId": "group-1",
+      "title": "Human spaceflight and aviation standards",
+      "citation": "National Aeronautics and Space Administration. (2025a, August 15). Human spaceflight and aviation standards. Office of the Chief Health and Medical Officer.",
+      "url": "https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-023",
+      "groupId": "group-1",
+      "title": "Human system risks",
+      "citation": "National Aeronautics and Space Administration. (2025b, March 20). Human system risks.",
+      "url": "https://www.nasa.gov/hhp/human-system-risks/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-024",
+      "groupId": "group-1",
+      "title": "3.0 Health and medical care [NASA-STD-3001 Volume 1 web text]",
+      "citation": "National Aeronautics and Space Administration. (2026a, April 22). 3.0 Health and medical care [NASA-STD-3001 Volume 1 web text].",
+      "url": "https://www.nasa.gov/reference/3-0-health-and-medical-care",
+      "format": "Web"
+    },
+    {
+      "id": "ref-025",
+      "groupId": "group-1",
+      "title": "5 hazards of human spaceflight",
+      "citation": "National Aeronautics and Space Administration. (2026b, June 12). 5 hazards of human spaceflight. Human Research Program.",
+      "url": "https://www.nasa.gov/hrp/hazards/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-026",
+      "groupId": "group-1",
+      "title": "6.0 Medical operations [NASA-STD-3001 Volume 1 web text]",
+      "citation": "National Aeronautics and Space Administration. (2026c, April 21). 6.0 Medical operations [NASA-STD-3001 Volume 1 web text].",
+      "url": "https://www.nasa.gov/reference/6-0-medical-operations/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-027",
+      "groupId": "group-1",
+      "title": "Appendix E: Health and medical care technical requirements [NASA-STD-3001 web text]",
+      "citation": "National Aeronautics and Space Administration. (2026d, April 22). Appendix E: Health and medical care technical requirements [NASA-STD-3001 web text].",
+      "url": "https://www.nasa.gov/reference/appendix-e-health-and-medical-care-technical-requirements/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-028",
+      "groupId": "group-1",
+      "title": "Artemis II crew both subjects and scientists in NASA deep space research",
+      "citation": "National Aeronautics and Space Administration. (2026e, January 9). Artemis II crew both subjects and scientists in NASA deep space research.",
+      "url": "https://www.nasa.gov/general/artemis-ii-crew-both-subjects-and-scientists-in-nasa-deep-space-research",
+      "format": "Web"
+    },
+    {
+      "id": "ref-029",
+      "groupId": "group-1",
+      "title": "NASA space flight human-system standard: Volume 2, Revision F",
+      "citation": "National Aeronautics and Space Administration. (2026f). NASA space flight human-system standard: Volume 2, Revision F. Human factors, habitability, and environmental health (NASA-STD-3001).",
+      "url": "https://www.nasa.gov/wp-content/uploads/2025/05/nasa-std-3001-vol-2.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-030",
+      "groupId": "group-1",
+      "title": "[Nutrition and the ISS Food Intake Tracker] [Web page]",
+      "citation": "National Aeronautics and Space Administration. (2026g, March 13). [Nutrition and the ISS Food Intake Tracker] [Web page].",
+      "url": "https://www.nasa.gov/?p=209742",
+      "format": "Web"
+    },
+    {
+      "id": "ref-031",
+      "groupId": "group-1",
+      "title": "OCHMO technical briefs",
+      "citation": "National Aeronautics and Space Administration. (2026h, November 9). OCHMO technical briefs. Office of the Chief Health and Medical Officer.",
+      "url": "https://www.nasa.gov/ochmo/hsa-standards/ochmo-technical-briefs/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-032",
+      "groupId": "group-1",
+      "title": "Ongoing HRP research in space",
+      "citation": "National Aeronautics and Space Administration. (2026i, August 18). Ongoing HRP research in space. Human Research Program.",
+      "url": "https://www.nasa.gov/hrp/ongoing-hrp-research",
+      "format": "Web"
+    },
+    {
+      "id": "ref-033",
+      "groupId": "group-1",
+      "title": "Risks of human spaceflight",
+      "citation": "National Aeronautics and Space Administration. (2026j, July 21). Risks of human spaceflight. Human Research Program.",
+      "url": "https://www.nasa.gov/hrp/risks/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-034",
+      "groupId": "group-1",
+      "title": "Resources",
+      "citation": "National Aeronautics and Space Administration. (n.d.-a). Resources. NASA Life Sciences Portal.",
+      "url": "https://nlsp.nasa.gov/resources",
+      "format": "Web"
+    },
+    {
+      "id": "ref-035",
+      "groupId": "group-1",
+      "title": "Standard measures on ISS",
+      "citation": "National Aeronautics and Space Administration. (n.d.-c). Standard measures on ISS. NASA Life Sciences Portal.",
+      "url": "https://nlsp.nasa.gov/resources/standard-measures/iss",
+      "format": "Web"
+    },
+    {
+      "id": "ref-036",
+      "groupId": "group-2",
+      "title": "Multilateral Medical Operations Panel's Acoustics Sub-Working Group for the International Space Station [Conference presentation]",
+      "citation": "Allen, C., & Danielson, D. (2020, February 20). Multilateral Medical Operations Panel's Acoustics Sub-Working Group for the International Space Station [Conference presentation]. National Hearing Conservation Association Conference.",
+      "url": "https://ntrs.nasa.gov/api/citations/20200002173/downloads/20200002173.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-037",
+      "groupId": "group-2",
+      "title": "Introduction to spaceflight associated neuro-ocular syndrome (SANS) and its risk to NASA astronauts [Presentation]",
+      "citation": "Brunstetter, T. (2017, October 6). Introduction to spaceflight associated neuro-ocular syndrome (SANS) and its risk to NASA astronauts [Presentation]. Ohio State University 2017 Optometry Homecoming.",
+      "url": "https://ntrs.nasa.gov/api/citations/20170009173/downloads/20170009173.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-038",
+      "groupId": "group-2",
+      "title": "SANS-related ISS hardware & data [Presentation]",
+      "citation": "Brunstetter, T. (2018, June 13). SANS-related ISS hardware & data [Presentation]. SANS OCT2 Technical Interchange Meeting.",
+      "url": "https://ntrs.nasa.gov/api/citations/20180004916/downloads/20180004916.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-039",
+      "groupId": "group-2",
+      "title": "Spaceflight standard measures [Presentation]",
+      "citation": "Clément, G. R., Mullenax, C. A., Wood, S. J., Zwart, S. R., Crucian, B. E., Lee, S., Ott, C. M., Reschke, M. F., Roma, P. G., Smith, S. M., & Stenger, M. B. (2020, January 27). Spaceflight standard measures [Presentation]. Human Research Program Investigators' Workshop 2020.",
+      "url": "https://ntrs.nasa.gov/api/citations/20200001281/downloads/20200001281.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-040",
+      "groupId": "group-2",
+      "title": "Effects of long duration space flight on low frequency hearing [Poster presentation]",
+      "citation": "Coste, A., & Robinette, M. (2024). Effects of long duration space flight on low frequency hearing [Poster presentation]. Annual Space Life Sciences Summer Institute Research Forum.",
+      "url": "https://ntrs.nasa.gov/citations/20240009887",
+      "format": "Web"
+    },
+    {
+      "id": "ref-041",
+      "groupId": "group-2",
+      "title": "Psychomotor vigilance self test on ISS (Reaction Self Test on Expeditions 21 and 22) [Presentation]",
+      "citation": "Dinges, D. F., Mollicone, D., & Ecker, A. (2009). Psychomotor vigilance self test on ISS (Reaction Self Test on Expeditions 21 and 22) [Presentation]. NASA Johnson Space Center.",
+      "url": "https://ntrs.nasa.gov/api/citations/20090029851/downloads/20090029851.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-042",
+      "groupId": "group-2",
+      "title": "Crew time analysis of planned medical activities & estimate of time required for 6 month increment [Poster presentation]",
+      "citation": "Dulin, N., Easter, B., & Stratton, E. (2023). Crew time analysis of planned medical activities & estimate of time required for 6 month increment [Poster presentation]. 94th Aerospace Medical Association Annual Scientific Meeting.",
+      "url": "https://ntrs.nasa.gov/api/citations/20230015627/downloads/Med%20Crew%20Time%20Analysis.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-043",
+      "groupId": "group-2",
+      "title": "Evidence report: Risk of injury and compromised performance due to EVA operations",
+      "citation": "Dunn, J., Benson, E., Norcross, J., & Newby, N. (2022). Evidence report: Risk of injury and compromised performance due to EVA operations. National Aeronautics and Space Administration.",
+      "url": "https://ntrs.nasa.gov/api/citations/20220004017/downloads/2021%20EVA%20Injury%20Evidence%20Report%20Final.docx.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-044",
+      "groupId": "group-2",
+      "title": "Considerations for health and performance during surface extravehicular activities [Presentation]",
+      "citation": "Estep, P., Schlotman, T., Norcross, J., Marshall-Goebel, K., & Somers, J. (2024). Considerations for health and performance during surface extravehicular activities [Presentation]. Aerospace Medical Association 2024 Annual Scientific Meeting.",
+      "url": "https://ntrs.nasa.gov/citations/20230015332",
+      "format": "Web"
+    },
+    {
+      "id": "ref-045",
+      "groupId": "group-2",
+      "title": "Human Physiology, Performance, Protection, and Operations (H-3PO) Lab [Seminar presentation]",
+      "citation": "Estep, P., Somers, J., & Marshall-Goebel, K. (2023). Human Physiology, Performance, Protection, and Operations (H-3PO) Lab [Seminar presentation]. Texas A&M University.",
+      "url": "https://ntrs.nasa.gov/api/citations/20230001791/downloads/H3PO%20-%20SSEO%20at%20TAMU%20Seminar%20-%202023%20February%20-%20Estep%20-%20ver3b.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-046",
+      "groupId": "group-2",
+      "title": "Autonomous mission operations [Conference paper]",
+      "citation": "Frank, J., Spirkovska, L., McCann, R., Wang, L., Pohlkamp, K., & Morin, L. (2012, March 3). Autonomous mission operations [Conference paper]. IEEE Aerospace Conference.",
+      "url": "https://ntrs.nasa.gov/api/citations/20170011337/downloads/20170011337.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-047",
+      "groupId": "group-2",
+      "title": "ISS technology demonstrations for future spaceflight medical systems [Conference paper]",
+      "citation": "Gilkey, K. M., Lewandowski, B. E., Schkurko, C. M., Miller, R. S., Valentine, R. W., Calaway, K. M., Ebert, D. J., Sargsyan, A., Byrne, V. E., Walton, M., Lemery, J. M., Suresh, R., Thompson, M. S., Easter, B. D., & Lehnhardt, K. R. (2024, July 29). ISS technology demonstrations for future spaceflight medical systems [Conference paper]. International Space Station Research and Development Conference.",
+      "url": "https://ntrs.nasa.gov/citations/20240004905",
+      "format": "Web"
+    },
+    {
+      "id": "ref-048",
+      "groupId": "group-2",
+      "title": "Exploration Medical Capability clinical decision support system concept of operations",
+      "citation": "Krihak, M., Russell, B., Shetye, S., & Shaw, T. L. (2021). Exploration Medical Capability clinical decision support system concept of operations. National Aeronautics and Space Administration.",
+      "url": "https://ntrs.nasa.gov/citations/20220017856",
+      "format": "Web"
+    },
+    {
+      "id": "ref-049",
+      "groupId": "group-2",
+      "title": "Analysis of noise exposure measurements acquired onboard the International Space Station [Conference paper]",
+      "citation": "Limardo, J. G., & Allen, C. S. (2011, July 17). Analysis of noise exposure measurements acquired onboard the International Space Station [Conference paper]. 41st International Conference on Environmental Systems.",
+      "url": "https://ntrs.nasa.gov/api/citations/20110013006/downloads/20110013006.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-050",
+      "groupId": "group-2",
+      "title": "rHealth One demonstration aboard ISS: A microfluidic bioanalyzer based on sheath/hydrodynamic focusing flow cytometry [Presentation]",
+      "citation": "Miller, R. S., Valentine, R. W., Calaway, K. M., Crucian, B. E., Bearg, S. B., Rea, D. J., Chan, E. Y., Nelson, E. S., Lewandowski, B. E., Perusek, G. P., Lehnhardt, K. R., & Easter, B. D. (2023). rHealth One demonstration aboard ISS: A microfluidic bioanalyzer based on sheath/hydrodynamic focusing flow cytometry [Presentation]. 2023 Human Research Program Investigators' Workshop.",
+      "url": "https://ntrs.nasa.gov/citations/20230001079",
+      "format": "Web"
+    },
+    {
+      "id": "ref-051",
+      "groupId": "group-2",
+      "title": "Earth-Independent Medical Operations (EIMO) concept of operations (ConOps) [Presentation]",
+      "citation": "Parker, M., Krihak, M., Laing, C., Bardina, J., & Anderson, A. (2024, February 13). Earth-Independent Medical Operations (EIMO) concept of operations (ConOps) [Presentation]. Human Research Program Investigators' Workshop.",
+      "url": "https://ntrs.nasa.gov/api/citations/20240001402/downloads/2024_IWS_EIMO_ConOps_FINAL.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-052",
+      "groupId": "group-2",
+      "title": "Development of medical capabilities and technologies for health monitoring, diagnostics, and treatment during human exploration spaceflight [White paper]",
+      "citation": "Phelps, S. E., Martin, K., Costes, S. V., Thompson, M., Suresh, R., Abadie, L., Lehnhardt, K., & Easter, B. (2021). Development of medical capabilities and technologies for health monitoring, diagnostics, and treatment during human exploration spaceflight [White paper].",
+      "url": "https://ntrs.nasa.gov/api/citations/20210023828/downloads/Decadal%20Topical%20-%20Development%20of%20Medical%20Capabilities%20and%20Technologies_New%20Graphic.docx.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-053",
+      "groupId": "group-2",
+      "title": "Human Research Program [Presentation]",
+      "citation": "Platts, S. H. (2023). Human Research Program [Presentation]. International Space Life Science Working Group.",
+      "url": "https://ntrs.nasa.gov/api/citations/20230017691/downloads/HRP_OverviewPlattS2.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-054",
+      "groupId": "group-2",
+      "title": "Moon 2 Mars space radiation protection: “Buying down” risks to crew [Conference paper]",
+      "citation": "Simonsen, L. C., Zawaski, J. A., & Weeks, J. (2025). Moon 2 Mars space radiation protection: “Buying down” risks to crew [Conference paper]. ASCEND 2025.",
+      "url": "https://ntrs.nasa.gov/api/citations/20250006168/downloads/ASCEND%20Simonsen%20draft%201.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-055",
+      "groupId": "group-2",
+      "title": "Calcium and bone metabolism during spaceflight",
+      "citation": "Smith, S. M. (2002). Calcium and bone metabolism during spaceflight. National Aeronautics and Space Administration.",
+      "url": "https://ntrs.nasa.gov/api/citations/20100030546/downloads/20100030546.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-056",
+      "groupId": "group-2",
+      "title": "Renal stone risk during space flight [Conference paper]",
+      "citation": "Whitson, P. A., Pietrzyk, R. A., Sams, C. F., Pak, C. Y. C., & Jones, J. A. (1999). Renal stone risk during space flight [Conference paper].",
+      "url": "https://ntrs.nasa.gov/citations/20000020539",
+      "format": "Web"
+    },
+    {
+      "id": "ref-057",
+      "groupId": "group-2",
+      "title": "Spaceflight standard measures [Presentation]",
+      "citation": "Zwart, S. R., Mullenax, C., Bloomberg, J., Crucian, B., Lee, S., Ott, M., Reschke, M., Smith, S., Stenger, M., & Roma, P. (2018, May 22). Spaceflight standard measures [Presentation]. NASA Johnson Space Center.",
+      "url": "https://ntrs.nasa.gov/api/citations/20180002943/downloads/20180002943.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-058",
+      "groupId": "group-3",
+      "title": "Biological data repository [Data repository]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Biological data repository [Data repository].",
+      "url": "https://osdr.nasa.gov/bio/repo/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-059",
+      "groupId": "group-3",
+      "title": "OSDR search API: GeneLab and ALSDA records, organism = Homo sapiens [Data set query]",
+      "citation": "NASA Open Science Data Repository. (n.d.). OSDR search API: GeneLab and ALSDA records, organism = Homo sapiens [Data set query].",
+      "url": null,
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-060",
+      "groupId": "group-3",
+      "title": "Woman skeletal muscle transcriptome with bed rest and countermeasures (OSD-51) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Woman skeletal muscle transcriptome with bed rest and countermeasures (OSD-51) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-51",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-061",
+      "groupId": "group-3",
+      "title": "Spaceflight modulates gene expression in astronauts (OSD-53) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Spaceflight modulates gene expression in astronauts (OSD-53) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-53",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-062",
+      "groupId": "group-3",
+      "title": "Immune responses to the in vitro LPS assault engineered in the spaceflight multi-omics study (OSD-54) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Immune responses to the in vitro LPS assault engineered in the spaceflight multi-omics study (OSD-54) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-54",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-063",
+      "groupId": "group-3",
+      "title": "Immediate transcriptional changes in response to high dose radiation exposure (OSD-71) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Immediate transcriptional changes in response to high dose radiation exposure (OSD-71) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-71",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-064",
+      "groupId": "group-3",
+      "title": "Dynamic nature of epigenetic patterns observed during the Mars 520-d mission simulation (OSD-140) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Dynamic nature of epigenetic patterns observed during the Mars 520-d mission simulation (OSD-140) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-140",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-065",
+      "groupId": "group-3",
+      "title": "Transcription profiling of human peripheral blood to development gene expression signatures for practical radiation biodosimetry (OSD-152) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Transcription profiling of human peripheral blood to development gene expression signatures for practical radiation biodosimetry (OSD-152) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-152",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-066",
+      "groupId": "group-3",
+      "title": "Gene expression in human peripheral blood 48 hours after exposure to ionizing radiation (OSD-157) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Gene expression in human peripheral blood 48 hours after exposure to ionizing radiation (OSD-157) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-157",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-067",
+      "groupId": "group-3",
+      "title": "Effects of a closed space environment on gene expression in hair follicles of astronauts in the International Space Station (OSD-174) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Effects of a closed space environment on gene expression in hair follicles of astronauts in the International Space Station (OSD-174) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-174",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-068",
+      "groupId": "group-3",
+      "title": "Effects of 21 days of bedrest on human skeletal muscle gene expression (OSD-195) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Effects of 21 days of bedrest on human skeletal muscle gene expression (OSD-195) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-195",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-069",
+      "groupId": "group-3",
+      "title": "Effects of bedrest and hypoxia on human skeletal muscle miRNA expression (OSD-198) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Effects of bedrest and hypoxia on human skeletal muscle miRNA expression (OSD-198) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-198",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-070",
+      "groupId": "group-3",
+      "title": "Plasticity of the human IgM repertoire in response to a long-term spaceflight (OSD-316) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Plasticity of the human IgM repertoire in response to a long-term spaceflight (OSD-316) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-316",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-071",
+      "groupId": "group-3",
+      "title": "The effects of spaceflight factors on the human plasma proteome, including both real space missions and ground-based experiments (OSD-353) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). The effects of spaceflight factors on the human plasma proteome, including both real space missions and ground-based experiments (OSD-353) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-353",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-072",
+      "groupId": "group-3",
+      "title": "Molecular transducers of human skeletal muscle remodeling under different loading states (OSD-354) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Molecular transducers of human skeletal muscle remodeling under different loading states (OSD-354) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-354",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-073",
+      "groupId": "group-3",
+      "title": "Proteome profiling of the exhaled breath condensate after long-term spaceflights (OSD-359) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Proteome profiling of the exhaled breath condensate after long-term spaceflights (OSD-359) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-359",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-074",
+      "groupId": "group-3",
+      "title": "Inflammatory gene expression signatures in idiopathic intracranial hypertension: Possible implications in microgravity-induced ICP elevation - CSF (OSD-363) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Inflammatory gene expression signatures in idiopathic intracranial hypertension: Possible implications in microgravity-induced ICP elevation - CSF (OSD-363) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-363",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-075",
+      "groupId": "group-3",
+      "title": "Inflammatory gene expression signatures in idiopathic intracranial hypertension: Possible implications in microgravity-induced ICP elevation - Plasma (OSD-364) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Inflammatory gene expression signatures in idiopathic intracranial hypertension: Possible implications in microgravity-induced ICP elevation - Plasma (OSD-364) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-364",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-076",
+      "groupId": "group-3",
+      "title": "Insulin resistance induced by physical inactivity is associated with multiple transcriptional changes in skeletal muscle in young men (OSD-370) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Insulin resistance induced by physical inactivity is associated with multiple transcriptional changes in skeletal muscle in young men (OSD-370) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-370",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-077",
+      "groupId": "group-3",
+      "title": "Dataset for dose and time-dependent transcriptional response to ionizing radiation exposure (OSD-410) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Dataset for dose and time-dependent transcriptional response to ionizing radiation exposure (OSD-410) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-410",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-078",
+      "groupId": "group-3",
+      "title": "New insights into the role of lncRNA after spaceflight (OSD-481) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). New insights into the role of lncRNA after spaceflight (OSD-481) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-481",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-079",
+      "groupId": "group-3",
+      "title": "Small-RNA sequencing of sEV isolated from plasma of astronauts (OSD-483) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Small-RNA sequencing of sEV isolated from plasma of astronauts (OSD-483) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-483",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-080",
+      "groupId": "group-3",
+      "title": "Cell-free RNA analysis of plasma samples collected from six astronauts in JAXA Cell-Free Epigenome (CFE) study (OSD-530) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Cell-free RNA analysis of plasma samples collected from six astronauts in JAXA Cell-Free Epigenome (CFE) study (OSD-530) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-530",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-081",
+      "groupId": "group-3",
+      "title": "Ten-day human unilateral lower limb suspension and active recovery in young healthy men (OSD-540) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Ten-day human unilateral lower limb suspension and active recovery in young healthy men (OSD-540) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-540",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-082",
+      "groupId": "group-3",
+      "title": "Effects of 14 days of confinement on blood gene expression profiles in men (OSD-542) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Effects of 14 days of confinement on blood gene expression profiles in men (OSD-542) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-542",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-083",
+      "groupId": "group-3",
+      "title": "Whole blood measurements from the SpaceX Inspiration4 mission (RNA-seq, epitranscriptome, WGS, clonal hematopoiesis, CBC) (OSD-569) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Whole blood measurements from the SpaceX Inspiration4 mission (RNA-seq, epitranscriptome, WGS, clonal hematopoiesis, CBC) (OSD-569) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-569",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-084",
+      "groupId": "group-3",
+      "title": "SpaceX Inspiration4 PBMC profiling: snRNA-seq, snATAC-seq, and T-cell and B-cell repertoire profiling (OSD-570) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). SpaceX Inspiration4 PBMC profiling: snRNA-seq, snATAC-seq, and T-cell and B-cell repertoire profiling (OSD-570) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-570",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-085",
+      "groupId": "group-3",
+      "title": "SpaceX Inspiration4 plasma profiling: Proteomics, EVPs, metabolomics, cfDNA sequencing and cfRNA sequencing (OSD-571) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). SpaceX Inspiration4 plasma profiling: Proteomics, EVPs, metabolomics, cfDNA sequencing and cfRNA sequencing (OSD-571) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-571",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-086",
+      "groupId": "group-3",
+      "title": "SpaceX Inspiration4 deltoid skin and microbiome data: Spatial transcriptomics (NanoString GeoMx), metagenomics, and metatranscriptomics (OSD-574) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). SpaceX Inspiration4 deltoid skin and microbiome data: Spatial transcriptomics (NanoString GeoMx), metagenomics, and metatranscriptomics (OSD-574) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-574",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-087",
+      "groupId": "group-3",
+      "title": "SpaceX Inspiration4 blood serum metabolic panel and immune/cardiac cytokine arrays (comprehensive metabolic panel and multiplex) (OSD-575) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). SpaceX Inspiration4 blood serum metabolic panel and immune/cardiac cytokine arrays (comprehensive metabolic panel and multiplex) (OSD-575) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-575",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-088",
+      "groupId": "group-3",
+      "title": "SpaceX Inspiration4 urine inflammation panel (multiplex, NULISAseq) (OSD-656) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). SpaceX Inspiration4 urine inflammation panel (multiplex, NULISAseq) (OSD-656) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-656",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-089",
+      "groupId": "group-3",
+      "title": "SpaceX Inspiration4 T-cell histone modification profiling (H3K4me1, H3K4me3, H3K27ac) (OSD-687) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). SpaceX Inspiration4 T-cell histone modification profiling (H3K4me1, H3K4me3, H3K27ac) (OSD-687) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-687",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-090",
+      "groupId": "group-3",
+      "title": "Multidirectional effect of low-intensity electrical myostimulation on gene expression and phenotype in thigh and calf muscles after one week of disuse - soleus data (OSD-783) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Multidirectional effect of low-intensity electrical myostimulation on gene expression and phenotype in thigh and calf muscles after one week of disuse - soleus data (OSD-783) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-783",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-091",
+      "groupId": "group-3",
+      "title": "Multidirectional effect of low-intensity electrical myostimulation on gene expression and phenotype in thigh and calf muscles after one week of disuse - vastus lateralis data (OSD-784) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Multidirectional effect of low-intensity electrical myostimulation on gene expression and phenotype in thigh and calf muscles after one week of disuse - vastus lateralis data (OSD-784) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-784",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-092",
+      "groupId": "group-3",
+      "title": "The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (ocular globe, photography) (OSD-815) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (ocular globe, photography) (OSD-815) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-815",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-093",
+      "groupId": "group-3",
+      "title": "The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (retina, RT-PCR and electroretinography) (OSD-816) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (retina, RT-PCR and electroretinography) (OSD-816) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-816",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-094",
+      "groupId": "group-3",
+      "title": "The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (optic nerve, histology and microscopy) (OSD-817) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (optic nerve, histology and microscopy) (OSD-817) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-817",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-095",
+      "groupId": "group-3",
+      "title": "The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (culture media, Western blot) (OSD-818) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). The ex vivo human translaminar autonomous system to study spaceflight associated neuro-ocular syndrome pathogenesis (culture media, Western blot) (OSD-818) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-818",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-096",
+      "groupId": "group-3",
+      "title": "Longitudinal transcriptomic and epigenetic analysis in astronauts reveals dynamic immune response to spaceflight [RNA-seq] (OSD-903) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Longitudinal transcriptomic and epigenetic analysis in astronauts reveals dynamic immune response to spaceflight [RNA-seq] (OSD-903) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-903",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-097",
+      "groupId": "group-3",
+      "title": "Exercise training attenuates the muscle mitochondria genomic response to bed rest (microarray data) (OSD-942) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Exercise training attenuates the muscle mitochondria genomic response to bed rest (microarray data) (OSD-942) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-942",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-098",
+      "groupId": "group-3",
+      "title": "Longitudinal transcriptomic and epigenetic analysis in astronauts reveals dynamic immune response to spaceflight [DNA methylation] (OSD-943) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Longitudinal transcriptomic and epigenetic analysis in astronauts reveals dynamic immune response to spaceflight [DNA methylation] (OSD-943) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-943",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-099",
+      "groupId": "group-3",
+      "title": "Exercise training attenuates the muscle mitochondria genomic response to bed rest (miRNA microarray data) (OSD-946) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Exercise training attenuates the muscle mitochondria genomic response to bed rest (miRNA microarray data) (OSD-946) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-946",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-100",
+      "groupId": "group-3",
+      "title": "Impact of neutron exposure on global gene expression in a human peripheral blood model (OSD-1012) [Data set]",
+      "citation": "NASA Open Science Data Repository. (n.d.). Impact of neutron exposure on global gene expression in a human peripheral blood model (OSD-1012) [Data set].",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-1012",
+      "format": "Dataset"
+    },
+    {
+      "id": "ref-101",
+      "groupId": "group-4",
+      "title": "A built-in guidance system to monitor vital signs in space and on Earth",
+      "citation": "Huerta, R., Kaduk, S. I., Fatai, L., Rusch, H., Weber, T., & Sammito, S. (2024). A built-in guidance system to monitor vital signs in space and on Earth. Aerospace Medicine and Human Performance, 95(3), 139–146.",
+      "url": "https://doi.org/10.3357/AMHP.6273.2024",
+      "format": "Web"
+    },
+    {
+      "id": "ref-102",
+      "groupId": "group-4",
+      "title": "Sleep deficiency in spaceflight is associated with degraded neurobehavioral functions and elevated stress in astronauts on six-month missions aboard the International Space Station",
+      "citation": "Jones, C. W., Basner, M., Mollicone, D. J., Mott, C. M., & Dinges, D. F. (2022). Sleep deficiency in spaceflight is associated with degraded neurobehavioral functions and elevated stress in astronauts on six-month missions aboard the International Space Station. Sleep, 45(3), Article zsac006.",
+      "url": "https://doi.org/10.1093/sleep/zsac006",
+      "format": "Web"
+    },
+    {
+      "id": "ref-103",
+      "groupId": "group-4",
+      "title": "Alterations in hematologic indices during long-duration spaceflight",
+      "citation": "Kunz, H., Quiriarte, H., Simpson, R. J., Ploutz-Snyder, R., McMonigal, K., Sams, C., & Crucian, B. (2017). Alterations in hematologic indices during long-duration spaceflight. BMC Hematology, 17, Article 12.",
+      "url": "https://doi.org/10.1186/s12878-017-0083-y",
+      "format": "Web"
+    },
+    {
+      "id": "ref-104",
+      "groupId": "group-4",
+      "title": "Assessment of jugular venous blood flow stasis and thrombosis during spaceflight",
+      "citation": "Marshall-Goebel, K., Laurie, S. S., Alferova, I. V., Arbeille, P., Auñón-Chancellor, S. M., Ebert, D. J., Lee, S. M. C., Macias, B. R., Martin, D. S., Pattarini, J. M., Ploutz-Snyder, R., Ribeiro, L. C., Tarver, W. J., Dulchavsky, S. A., Hargens, A. R., & Stenger, M. B. (2019). Assessment of jugular venous blood flow stasis and thrombosis during spaceflight. JAMA Network Open, 2(11), Article e1915011.",
+      "url": "https://doi.org/10.1001/jamanetworkopen.2019.15011",
+      "format": "Web"
+    },
+    {
+      "id": "ref-105",
+      "groupId": "group-4",
+      "title": "Fluid shifts, vasodilatation and ambulatory blood pressure reduction during long duration spaceflight",
+      "citation": "Norsk, P., Asmar, A., Damgaard, M., & Christensen, N. J. (2015). Fluid shifts, vasodilatation and ambulatory blood pressure reduction during long duration spaceflight. The Journal of Physiology, 593(3), 573–584.",
+      "url": "https://doi.org/10.1113/jphysiol.2014.284869",
+      "format": "Web"
+    },
+    {
+      "id": "ref-106",
+      "groupId": "group-4",
+      "title": "The impact of delayed communication on NASA’s human-systems operations: Preliminary results of a systematic review",
+      "citation": "Parisi, M. E., McTigue, K. R., Wu, S. C., Karasinski, J., Panontin, T. L., Landon, L., & Vera, A. H. (2024). The impact of delayed communication on NASA’s human-systems operations: Preliminary results of a systematic review. In Advances in Human Factors of Transportation (Vol. 148, pp. 49–57). AHFE Open Access.",
+      "url": "https://doi.org/10.54941/ahfe1005194",
+      "format": "Web"
+    },
+    {
+      "id": "ref-107",
+      "groupId": "group-4",
+      "title": "Overview of lunar dust toxicity risk",
+      "citation": "Pohlen, M., Carroll, D., Prisk, G. K., & Sawyer, A. J. (2022). Overview of lunar dust toxicity risk. npj Microgravity, 8, Article 55.",
+      "url": "https://doi.org/10.1038/s41526-022-00244-1",
+      "format": "Web"
+    },
+    {
+      "id": "ref-108",
+      "groupId": "group-4",
+      "title": "Herpes virus reactivation in astronauts during spaceflight and its application on Earth",
+      "citation": "Rooney, B. V., Crucian, B. E., Pierson, D. L., Laudenslager, M. L., & Mehta, S. K. (2019). Herpes virus reactivation in astronauts during spaceflight and its application on Earth. Frontiers in Microbiology, 10, Article 16.",
+      "url": "https://doi.org/10.3389/fmicb.2019.00016",
+      "format": "Web"
+    },
+    {
+      "id": "ref-109",
+      "groupId": "group-4",
+      "title": "Bone markers, calcium metabolism, and calcium kinetics during extended-duration space flight on the Mir space station",
+      "citation": "Smith, S. M., Wastney, M. E., O’Brien, K. O., Morukov, B. V., Larina, I. M., Abrams, S. A., Davis-Street, J. E., Oganov, V., & Shackelford, L. C. (2005). Bone markers, calcium metabolism, and calcium kinetics during extended-duration space flight on the Mir space station. Journal of Bone and Mineral Research, 20(2), 208–218.",
+      "url": "https://doi.org/10.1359/JBMR.041105",
+      "format": "Web"
+    },
+    {
+      "id": "ref-110",
+      "groupId": "group-4",
+      "title": "The nutritional status of astronauts is altered after long-term space flight aboard the International Space Station",
+      "citation": "Smith, S. M., Zwart, S. R., Block, G., Rice, B. L., & Davis-Street, J. E. (2005). The nutritional status of astronauts is altered after long-term space flight aboard the International Space Station. The Journal of Nutrition, 135(3), 437–443.",
+      "url": "https://doi.org/10.1093/jn/135.3.437",
+      "format": "Web"
+    },
+    {
+      "id": "ref-111",
+      "groupId": "group-4",
+      "title": "Increased core body temperature in astronauts during long-duration space missions",
+      "citation": "Stahn, A. C., Werner, A., Opatz, O., Maggioni, M. A., Steinach, M., von Ahlefeld, V. W., Moore, A., Crucian, B. E., Smith, S. M., Zwart, S. R., Schlabs, T., Mendt, S., Trippel, T., Koralewski, E., Koch, J., Choukèr, A., Reitz, G., Shang, P., Röcker, L., . . . Gunga, H.-C. (2017). Increased core body temperature in astronauts during long-duration space missions. Scientific Reports, 7, Article 16180.",
+      "url": "https://doi.org/10.1038/s41598-017-15560-w",
+      "format": "Web"
+    },
+    {
+      "id": "ref-112",
+      "groupId": "group-4",
+      "title": "Hemolysis contributes to anemia during long-duration space flight",
+      "citation": "Trudel, G., Shahin, N., Ramsay, T., Laneuville, O., & Louati, H. (2022). Hemolysis contributes to anemia during long-duration space flight. Nature Medicine, 28(1), 59–62.",
+      "url": "https://doi.org/10.1038/s41591-021-01637-7",
+      "format": "Web"
+    },
+    {
+      "id": "ref-113",
+      "groupId": "group-5",
+      "title": "Suite Ride research unlocks potential for first astronaut with diabetes [Press release]",
+      "citation": "Axiom Space. (2025, September 26). Suite Ride research unlocks potential for first astronaut with diabetes [Press release].",
+      "url": "https://axiomspace.com/release/suite-ride-research-unlocks-potential-for-first-astronaut-with-diabetes",
+      "format": "Web"
+    },
+    {
+      "id": "ref-114",
+      "groupId": "group-5",
+      "title": "How does radiation affect the human body in space?",
+      "citation": "Canadian Space Agency. (2006, August 18). How does radiation affect the human body in space?",
+      "url": "https://www.asc-csa.gc.ca/eng/astronauts/space-medicine/radiation.asp",
+      "format": "Web"
+    },
+    {
+      "id": "ref-115",
+      "groupId": "group-5",
+      "title": "Bio-Monitor [Image]",
+      "citation": "Canadian Space Agency. (2018, October 19). Bio-Monitor [Image].",
+      "url": "https://www.asc-csa.gc.ca/eng/multimedia/search/image/watch/8166",
+      "format": "Web"
+    },
+    {
+      "id": "ref-116",
+      "groupId": "group-5",
+      "title": "Why do we conduct science experiments in space?",
+      "citation": "Canadian Space Agency. (2025, October 28). Why do we conduct science experiments in space?",
+      "url": "https://asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp",
+      "format": "Web"
+    },
+    {
+      "id": "ref-117",
+      "groupId": "group-5",
+      "title": "Bio-Monitor",
+      "citation": "Canadian Space Agency. (2026a, February 26). Bio-Monitor.",
+      "url": "https://asc-csa.gc.ca/eng/sciences/astroskin.asp",
+      "format": "Web"
+    },
+    {
+      "id": "ref-118",
+      "groupId": "group-5",
+      "title": "Monitoring radiation for astronaut health",
+      "citation": "Canadian Space Agency. (2026b, February 26). Monitoring radiation for astronaut health.",
+      "url": "https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp",
+      "format": "Web"
+    },
+    {
+      "id": "ref-119",
+      "groupId": "group-5",
+      "title": "Scientific research during Artemis II",
+      "citation": "Canadian Space Agency. (2026c, May 1). Scientific research during Artemis II.",
+      "url": "https://www.asc-csa.gc.ca/eng/missions/artemis-ii/scientific-research-during-mission.asp",
+      "format": "Web"
+    },
+    {
+      "id": "ref-120",
+      "groupId": "group-5",
+      "title": "Telemedicine via satellite improves care at astronaut landings",
+      "citation": "European Space Agency. (2017, September 29). Telemedicine via satellite improves care at astronaut landings.",
+      "url": "https://www.esa.int/Applications/Connectivity_and_Secure_Communications/Telemedicine_via_satellite_improves_care_at_astronaut_landings",
+      "format": "Web"
+    },
+    {
+      "id": "ref-121",
+      "groupId": "group-5",
+      "title": "Space Health Institute demonstrates self-reliant performance of the Butterfly iQ portable handheld ultrasound system in space",
+      "citation": "MedWrench. (2021, October 4). Space Health Institute demonstrates self-reliant performance of the Butterfly iQ portable handheld ultrasound system in space.",
+      "url": "https://www.medwrench.com/article/59206/space-health-institute-demonstrates-self-reliant-performance-of-the-butterfly-iq-portable-handheld-ultrasound-system-in-space",
+      "format": "Web"
+    },
+    {
+      "id": "ref-122",
+      "groupId": "group-5",
+      "title": "Insights into US astronauts’ use of medication on ISS between 2002 and 2012",
+      "citation": "New Space Economy. (2022, November 19). Insights into US astronauts’ use of medication on ISS between 2002 and 2012.",
+      "url": "https://newspaceeconomy.ca/2022/11/19/insights-into-us-astronauts-use-of-medication-on-iss-between-2002-and-2012",
+      "format": "Web"
+    },
+    {
+      "id": "ref-123",
+      "groupId": "group-5",
+      "title": "Tempus Pro specifications (Publication No. 44-2001EN-02) [Product specification]",
+      "citation": "Remote Diagnostic Technologies. (2021). Tempus Pro specifications (Publication No. 44-2001EN-02) [Product specification]. Philips.",
+      "url": "https://www.documents.philips.com/assets/20211018/6f12d073e7a14a2cb94aadc5010b36fd.pdf",
+      "format": "PDF"
+    },
+    {
+      "id": "ref-124",
+      "groupId": "group-5",
+      "title": "What the first medical evacuation from the International Space Station tells us about healthcare in space",
+      "citation": "Space.com. (2026, January 19). What the first medical evacuation from the International Space Station tells us about healthcare in space.",
+      "url": "https://www.space.com/space-exploration/human-spaceflight/what-the-first-medical-evacuation-from-the-international-space-station-tells-us-about-healthcare-in-space",
+      "format": "Web"
+    },
+    {
+      "id": "ref-125",
+      "groupId": "group-5",
+      "title": "[ESA tests the Tempus Pro monitor in Antarctica] [News article]",
+      "citation": "SpaceNews. (2020, February 3). [ESA tests the Tempus Pro monitor in Antarctica] [News article].",
+      "url": "https://spacenews.com/?p=462310",
+      "format": "Web"
+    },
+    {
+      "id": "ref-126",
+      "groupId": "group-5",
+      "title": "Healthcare on the Moon and beyond: How NASA is preparing for medical emergencies in deep space",
+      "citation": "Starlust. (2026, June 1). Healthcare on the Moon and beyond: How NASA is preparing for medical emergencies in deep space.",
+      "url": "https://starlust.org/healthcare-on-the-moon-and-beyondhow-nasa-is-preparing-for-medical-emergencies-in-deep-space/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-127",
+      "groupId": "group-5",
+      "title": "[ISS Food Intake Tracker case study]",
+      "citation": "Topcoder. (n.d.). [ISS Food Intake Tracker case study].",
+      "url": "https://topcoder.com/?p=1627",
+      "format": "Web"
+    },
+    {
+      "id": "ref-128",
+      "groupId": "group-5",
+      "title": "How much radiation would you get during a Mars mission?",
+      "citation": "Universe Today. (2013, December 10). How much radiation would you get during a Mars mission?",
+      "url": "https://www.universetoday.com/articles/how-much-radiation-would-you-get-during-a-mars-mission",
+      "format": "Web"
+    },
+    {
+      "id": "ref-129",
+      "groupId": "group-5",
+      "title": "[News release on hemolysis and space anemia]",
+      "citation": "University of Ottawa. (2022). [News release on hemolysis and space anemia]. EurekAlert!",
+      "url": "https://www.eurekalert.org/news-releases/939794",
+      "format": "Web"
+    },
+    {
+      "id": "ref-130",
+      "groupId": "group-5",
+      "title": "Cognition [Test battery description]",
+      "citation": "University of Pennsylvania, Unit for Experimental Psychiatry. (n.d.). Cognition [Test battery description].",
+      "url": "https://www.med.upenn.edu/uep/cognition.html",
+      "format": "Web"
+    },
+    {
+      "id": "ref-131",
+      "groupId": "group-6",
+      "title": "S-scale",
+      "citation": "American Meteorological Society. (n.d.). S-scale. In Glossary of meteorology.",
+      "url": "https://glossary.ametsoc.org/wiki/s-scale/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-132",
+      "groupId": "group-6",
+      "title": "Acute radiation syndrome: Clinical guidance",
+      "citation": "Centers for Disease Control and Prevention. (n.d.). Acute radiation syndrome: Clinical guidance.",
+      "url": "https://www.cdc.gov/radiation-emergencies/hcp/clinical-guidance/ars.html",
+      "format": "Web"
+    },
+    {
+      "id": "ref-133",
+      "groupId": "group-6",
+      "title": "Vital signs",
+      "citation": "MedlinePlus. (2025). Vital signs. National Library of Medicine.",
+      "url": "https://medlineplus.gov/ency/article/002341.htm",
+      "format": "Web"
+    },
+    {
+      "id": "ref-134",
+      "groupId": "group-6",
+      "title": "Laboratory values",
+      "citation": "National Board of Medical Examiners. (2026, April 14). Laboratory values.",
+      "url": "https://www.nbme.org/?p=217124",
+      "format": "Web"
+    },
+    {
+      "id": "ref-135",
+      "groupId": "group-6",
+      "title": "NEWS2 [Nursing essentials crib card]",
+      "citation": "Royal College of Nursing. (n.d.). NEWS2 [Nursing essentials crib card].",
+      "url": "https://shop.rcn.org.uk/products/crib-cards-26-28",
+      "format": "Web"
+    },
+    {
+      "id": "ref-136",
+      "groupId": "group-6",
+      "title": "National Early Warning Score (NEWS) 2: Standardising the assessment of acute-illness severity in the NHS",
+      "citation": "Royal College of Physicians. (2017). National Early Warning Score (NEWS) 2: Standardising the assessment of acute-illness severity in the NHS.",
+      "url": "https://www.rcp.ac.uk/resources/national-early-warning-score-news-2/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-137",
+      "groupId": "group-6",
+      "title": "Adult lab normals",
+      "citation": "StatPearls. (n.d.). Adult lab normals. StatPearls Publishing.",
+      "url": "https://www.statpearls.com/AdultLabNormals.html",
+      "format": "Web"
+    },
+    {
+      "id": "ref-138",
+      "groupId": "group-7",
+      "title": "2026 NASA Space Apps Challenge",
+      "citation": "NASA Space Apps Challenge. (2026a). 2026 NASA Space Apps Challenge.",
+      "url": "https://www.spaceappschallenge.org/2026/",
+      "format": "Web"
+    },
+    {
+      "id": "ref-139",
+      "groupId": "group-7",
+      "title": "Create health monitoring software for astronauts on space missions [Challenge statement]",
+      "citation": "NASA Space Apps Challenge. (2026b). Create health monitoring software for astronauts on space missions [Challenge statement].",
+      "url": "https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/",
+      "format": "Web"
+    }
+  ]
+}

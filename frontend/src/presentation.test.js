@@ -89,7 +89,7 @@ test('rendered decisions and charts expose evidence, dual blood pressure, refere
     assert.doesNotMatch(body,/aria-label="Eyes"|aria-label="Skin"|Brain &amp; mind/);
     assert.doesNotMatch(body,/No measurement available/);
     assert.match(body,/Crew measurements/);
-    assert.equal((body.match(/role="tab"/g)||[]).length,4);
+    assert.equal((body.match(/role="tab"/g)||[]).length,0);
     assert.match(body,/Awaiting reading/);
     const partial=renderToStaticMarkup(React.createElement(HistoryChart,{series:{data},secondary:{data:{...data,points:[]}}}));
     assert.match(partial,/No recorded measurements for this component/);

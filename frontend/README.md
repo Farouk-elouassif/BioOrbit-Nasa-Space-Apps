@@ -129,3 +129,31 @@ All 88 current wire metrics have an explicit category in
 `src/measurementCatalogue.json`. Values retain their backend units, timestamps,
 missing/overdue states and alert links. Categories support numeric, boolean,
 categorical and structured readings; independent random fixtures are labelled.
+
+## Biology documentation and reference library
+
+- `/documentation` explains the biology behind circulation, breathing, sleep,
+  metabolism, bone/muscle changes, urinary health, immunity, sensory systems,
+  cabin exposures, radiation and EVA, with source links and interpretation limits.
+- Its searchable measurement atlas covers all 88 configured measurement types,
+  preserving the prototype’s declared units and distinguishing measurement types
+  from actual collected observations. A glossary explains key abbreviations.
+- `/resources` contains all 139 references in the seven categories supplied in
+  `References.docx`. Search works across titles, authors, dates and study IDs;
+  category filters combine with search. Full citations remain expandable.
+- `/downloads/References.docx` serves the unchanged original bibliography. One
+  entry has no supplied URL and is explicitly marked. Bibliography metadata and
+  links are preserved as supplied, rather than represented as independently
+  verified revisions or datasets connected to the console.
+
+Both pages share the landing page navigation, mobile layout and saved theme.
+Cross-references open the relevant library entry using a stable reference anchor.
+
+### Check-ins when opening the dashboard over the local network
+
+When the browser uses a LAN address rather than localhost, append that exact
+frontend origin (including `http://` or `https://` and its port) to
+`DJANGO_CSRF_TRUSTED_ORIGINS` in the root `.env`. Preserve the existing entries.
+Apply the change with `docker compose up -d --no-deps backend`; a frontend
+refresh alone cannot update Django’s origin configuration. Session login and a
+valid CSRF token are still required to save a check-in.
