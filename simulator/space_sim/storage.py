@@ -74,13 +74,26 @@ class Store:
             if action == 'speed':
                 engine.config.speed = kwargs['value']
                 engine.config.validate()
+            elif action == 'error-level':
+                engine.config.error_level = kwargs['value']
+                engine.config.validate()
             elif action == 'environment':
                 engine.config.environment = kwargs['value']
                 engine.config.validate()
             elif action == 'storm':
-                engine.add_storm(engine.state['seconds'] + kwargs['after'], kwargs['duration'], kwargs['peak'])
+                engine.add_storm(engine.state['seconds'] + kwargs['after'], kwargs['duration'], kwargs['peak'], kwargs.get('noaa_s_level',1))
+            elif action == 'symptom':
+                from .scenarios import SYMPTOMS
+                code=kwargs['symptom']
+                if code not in SYMPTOMS: raise ValueError('Unsupported symptom')
+                engine.add_scenario({'name':'symptom_'+code,'astronaut_id':kwargs['astronaut'],
+                    'duration':engine.config.duration_days*86400-engine.state['seconds'],
+                    'context':{'rule_inputs':{code:{'value':True}}}})
+            elif action == 'scenario':
+                engine.add_scenario(kwargs['data'])
             elif action == 'normal':
                 engine.state['storms'] = []
+                engine.state['scenarios'] = []
             else:
                 raise ValueError('Unknown control')
             self._save(engine, [])

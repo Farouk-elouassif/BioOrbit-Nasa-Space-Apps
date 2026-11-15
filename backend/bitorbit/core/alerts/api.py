@@ -21,6 +21,8 @@ def serialize(alert,anchor=None):
             'metric_id':canonical_metric(source.get('id'),alert.domain) if canonical_metric(source.get('id'),alert.domain) in CATALOGUE else None,
             'region_index':alert.region_index,'tier':alert.tier,'color':COLORS[alert.tier],
             'message':alert.message,'evidence':alert.evidence,'actions':alert.actions,'recipients':alert.recipients,
+            'rule_reference':{'condition':source.get(alert.tier), 'unit':source.get('unit'),
+                              'lower_limit':source.get('lower_limit'), 'upper_limit':source.get('upper_limit')},
             'detected_at':alert.detected_at,'last_observation_at':alert.last_observation_at,
             'recheck_due_at':alert.recheck_due_at,'recheck_interval_seconds':recheck_seconds(alert.rule_code,alert.tier),
             'recheck_overdue':bool(anchor and anchor>=alert.recheck_due_at),
@@ -52,11 +54,13 @@ def rules_view(request):
     return JsonResponse({**WORKBOOK,'evaluation_notes':{
         'precedence':'Highest matching tier wins; three distinct normal observations lower one tier.',
         'missing_data':'Not evaluated; never assumed normal or zero.',
-        'news2':'Space-adjusted prototype; all seven inputs and coherent spot-check required.',
+        'news2':'Space-adjusted prototype; complete scoring requires seven inputs. A coherent partial lower bound can escalate at 5/7; missing components remain unknown.',
         'continuous_gap_tolerance_seconds':900,'persistence_max_gap_seconds':60,
         'prototype_choices':['One-hour humidity mean because workbook average duration is unspecified.',
             'Resting in-flight baseline: ≥20 valid samples over ≥24h, from prior seven days excluding last 24h.',
             'Integer NEWS2 bands round numeric readings to nearest integer; raw values remain unchanged.',
+            'Diastolic drift uses the observed in-flight band with ±5 mmHg prototype tolerance.',
+            'An unplanned cabin pressure fall >6.9 kPa within 10 minutes is a prototype Emergency.',
             'Explicit source flags are required where prose does not define a numerical cutoff.'],
     }})
 

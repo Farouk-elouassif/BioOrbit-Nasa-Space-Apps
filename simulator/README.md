@@ -1,6 +1,6 @@
 # Astronaut & cabin simulation service
 
-Standalone Python 3.11+ service. **No runtime dependencies**; no Django, PostgreSQL, lakehouse, alert rules, or AI components are implemented here. All measurements are synthetic observations, not a validated physiological or radiation-transport model.
+Standalone Python 3.11+ service. **No runtime dependencies**; no Django, PostgreSQL, alert rules, or AI components are implemented here. All measurements are synthetic observations, not a validated physiological or radiation-transport model.
 
 ## Quick start
 
@@ -8,7 +8,7 @@ Run from this directory; no installation is needed:
 
 ```bash
 cd /home/farouk/Desktop/bioorbit/simulator
-python -m space_sim init
+python -m space_sim init --environment space_station
 python -m space_sim history
 python -m space_sim export --output data/events.jsonl
 python -m space_sim live
@@ -20,12 +20,12 @@ For a finite accelerated demo:
 
 ```bash
 python -m space_sim storm --duration 7200 --peak 12
-python -m space_sim live --ticks 6 --interval 1 --speed 1200
+python -m space_sim live --ticks 120 --interval 1 --speed 60
 python -m space_sim status
 python -m space_sim export --output data/events.jsonl
 ```
 
-The storm peaks halfway through its two-hour simulated duration and then recovers. `--peak` is the cabin radiation **target in mSv/day**, not a dose and not a medical limit. At speed 1200, each one-second tick advances twenty mission minutes. Tiny storms are unsuitable for coarse demo sampling; use minute/hour-scale events so the rise and fall are visible.
+The storm peaks halfway through its two-hour simulated duration and then recovers. `--peak` is the cabin radiation **target in mSv/day**, not a dose and not a medical limit. At speed 60, each one-second tick advances one mission minute. Keep interval × speed at most 60 simulated seconds so HR/SpO₂ persistence can be evaluated; coarse history does not establish that persistence. Tiny storms are unsuitable for coarse demo sampling; use minute/hour-scale events so the rise and fall are visible.
 
 ## Configuration and controls
 
@@ -34,7 +34,7 @@ Global arguments go **before** the subcommand:
 ```bash
 python -m space_sim --state data/station.sqlite3 init --astronauts 4 --seed 91 --environment space_station --mission-id ISS_DEMO --habitat-id HAB_002 --start 2026-11-14T00:00:00Z --duration-days 90 --speed 60 --run-id station-001
 python -m space_sim --state data/station.sqlite3 history --days 2 --interval 600
-python -m space_sim --state data/station.sqlite3 live --interval 5 --ticks 10
+python -m space_sim --state data/station.sqlite3 live --interval 1 --ticks 10
 ```
 
 | Control | Command |
@@ -119,15 +119,15 @@ Every record includes `schema_version`, `kind`, stable `event_id`, `run_id`, `mi
 | `personal_radiation_dose_rate` | mSv/day | astronaut | Frequent |
 | `mission_cumulative_radiation_dose` | mSv | astronaut | Frequent |
 | `total_career_radiation_dose` | mSv | astronaut | Frequent |
-| `systolic_blood_pressure` | mmHg | astronaut | Hourly |
+| `systolic_blood_pressure` | mmHg | astronaut | Every 5 minutes; coherent vital spot check |
 | `diastolic_blood_pressure` | mmHg | astronaut | Hourly |
 | `blood_glucose` | mg/dL | astronaut | Every 4 hours; fasting/after_meal context |
-| `body_temperature` | °C | astronaut | Every 30 minutes |
+| `body_temperature` | °C | astronaut | Every 5 minutes; coherent vital spot check |
 | `sleep_duration` | hours | astronaut | Daily at 06:00; accumulated window |
 | `mood` | 0–10 | astronaut | Daily at 06:00 |
 | `stress_level` | 0–10 | astronaut | Every 6 hours |
 | `fluid_intake` | L | astronaut | Every 6 hours; accumulated window |
-| `body_mass` | kg | astronaut | Preflight only |
+| `body_mass` | kg | astronaut | Daily, plus preflight |
 | `preflight_radiation_level` | mSv/year | astronaut | Preflight only |
 | `preflight_career_radiation_dose` | mSv | astronaut | Preflight only |
 | `co2_partial_pressure` | mmHg | cabin | Frequent |
@@ -236,3 +236,134 @@ docker compose up --build simulator
 
 
 The backend also accepts the equivalent workbook metric identifiers listed in [its mapping table](../backend/README.md#workbook-metric-identifier-compatibility). The simulator continues to emit its existing canonical identifiers; both forms resolve to the same database metrics. No simulator state reset or migration is required for this compatibility change.
+
+## PDF alert coverage and scheduled scenarios (15 November update)
+
+The 26-metric catalogue now has 15 in-flight astronaut types, 9 cabin types, and
+2 preflight-only types. New runs include a thirteenth baseline (`stress_level`).
+Old twelve-baseline profiles remain accepted and immutable. Resuming old state
+adds the body-mass schedule but does not invent a historical stress baseline;
+use a fresh state path and run ID when demonstrating the new preflight reference.
+
+Events now carry explicit **synthetic** consciousness, oxygen-treatment status,
+negative symptom/review findings, awake time, urinary findings, fitness context,
+noise work/sleep tags, pressure-loss negatives, and Moon/Mars surface context.
+`init --surface-body moon` or `SIM_SURFACE_BODY=moon` selects the surface; Mars is
+the default. NOAA level is zero outside storms. New scheduled storms default to an explicit synthetic S1 (override with `storm --noaa-s-level 0..5`); this is not inferred from dose. Scheduled storms supply projected
+excess dose from the synthetic sin² event envelope; NOAA severity is never inferred
+from dose. It can be injected explicitly. These inputs are simulated facts, not
+an external space-weather feed or a clinical classification.
+
+Run from `simulator/` (with Django's migration applied before delivering events):
+
+```bash
+python -m space_sim --state data/pdf-demo.sqlite3 init --run-id pdf-demo-001
+python -m space_sim --state data/pdf-demo.sqlite3 scenario --file examples/scenarios/post-eva.json
+python -m space_sim --state data/pdf-demo.sqlite3 live --interval 1 --speed 30 --ticks 24
+```
+
+Add `--endpoint` to `live` to deliver to Django, with `SIM_INGEST_TOKEN` set.
+The post-EVA scenario lasts five simulated minutes. It then stops overriding
+normal observations; twelve later normal observations can recover an Emergency
+through all four tiers. An acknowledged alert still requires recovery observations.
+`normal` cancels scheduled scenarios and storms; it does not clear Django alerts.
+
+Scenario JSON supports `name`, `after` (seconds from scheduling), `duration`
+(seconds), `astronaut_id` (omit for cabin), `measurements` (catalogue values), and
+`context` (including typed `rule_inputs`). Scenarios persist across restarts.
+Later overlapping scenarios override earlier ones. Overrides apply only to samples
+actually emitted during `[start,end)`, at each metric's normal schedule; sample
+more frequently than the scenario duration. Values are controlled test fixtures,
+not changes to the physical dynamics or accumulated-dose integrator. Use `storm`
+when demonstrating integrated physical radiation exposure.
+
+Other examples cover hypoxia, explicit NOAA/projected-dose severity, and pressure
+loss. The same mechanism can inject every catalogue measurement and conditional
+PDF input, including reviewed diastolic drift, fasting glucose symptoms, mood
+symptoms, noise exposure, hydration findings, and surface dust. Supplementary
+numeric entries require the exact workbook unit; boolean negatives must be explicit.
+
+NEWS2 needs prior resting in-flight baseline history, a coherent current spot check,
+and any required HR/SpO2 persistence. History at 300-second intervals does not
+establish 60-second-gap persistence; follow it with at least five minutes of
+30-second or finer live samples. Noise requires consistently tagged full 8-hour
+sleep or 16-hour work exposure, not a mixture. Daily habit rules need their complete
+history. Missing history never counts as a normal recovery observation.
+
+## Percentage of abnormal data
+
+Set `SIM_ERROR_LEVEL=20` in the root `.env` to deliberately inject abnormal values
+into approximately 20% of newly generated in-flight measurement records. Compose
+passes this value to the simulator. Accepted range: 0–100, including fractional
+percentages; default `0` disables injection. Standalone initialization also accepts
+`init --error-level 20`.
+
+After changing the value, rebuild/recreate only the simulator:
+
+```bash
+docker compose up -d --build simulator
+```
+
+The setting updates an existing saved run on startup without clearing its journal
+or rewriting old data. Preflight data and profiles are excluded. Stable event-ID
+sampling makes selection reproducible across restarts and delivery retries without
+changing the dynamics RNG. Positive levels add `context.error_injection` with
+`selected` and `percentage` for inspection. Explicit scheduled scenarios take
+precedence over automatic injected values.
+
+The percentage describes **injected measurements**, not the percentage of active
+alerts or a requested severity. Some injected readings trigger immediately; others
+require sustained readings, complete history or applicable environment context.
+Normal dynamics can also trigger alerts. `0` disables deliberate injection rather
+than guaranteeing zero alerts. Automatic fixtures do not alter the physical state
+or dose integrator, and deliberately high dose fixtures may therefore decrease
+when the next uninjected observation arrives. Use scheduled scenarios/storms for
+coherent sustained incidents and physical accumulated-dose demonstrations.
+
+## Alert-fix demo controls
+
+Use a fresh station state for a nominal demo; transit remains 1.8 mSv/day and can
+legitimately produce a persistent design-reference Advisory. Existing saved states
+retain their environment. Historical storms without severity metadata remain S0.
+
+```bash
+python -m space_sim storm --duration 7200 --peak 12 --noaa-s-level 1
+python -m space_sim live --interval 1 --speed 60
+# In another terminal, using the same --state if specified:
+python -m space_sim symptom --astronaut AST_002 chest_pain
+python -m space_sim normal
+```
+
+Symptoms persist on subsequent emitted observations until `normal` clears all
+scheduled scenarios and storms. Controls do not send an observation immediately;
+the next generation tick carries the change. `normal` does not directly clear
+backend alerts: their existing recovery rules still apply.
+
+The alert engine now scores working vitals, applies only low-value checks during
+exercise/EVA and the following 20 mission minutes, suppresses pulse 41–50 and
+breathing 9–11 sleep Advisories, and uses a ±5 mmHg systolic reference tolerance.
+Heart-rate baseline drift applies only at rest. These are team prototype rules.
+Low glucose is checked regardless of meal context (<70 Advisory; <54 or shaking/
+sweating Caution; low glucose with confusion Emergency). The last fasting reading
+within 24 hours remains available for fasting-specific checks.
+
+Coherent available vital components within five minutes can establish a partial
+space-adjusted NEWS2 lower bound: ≥5 Warning, ≥7 Emergency. Missing components
+remain listed; a low partial score cannot establish normality. This is a prototype
+adaptation, not a complete or validated NEWS2 assessment. Storm Cautions use
+explicit synthetic severity and workbook shelter guidance. No 250 mSv projection
+limit or validated coverage count is claimed by these changes.
+
+ECG reports use the same durable scenario control:
+
+```bash
+python -m space_sim symptom --astronaut AST_002 ecg_alarm
+python -m space_sim symptom --astronaut AST_002 lightheadedness
+```
+
+Normal events supply explicit negative ECG findings; the controls supply an alarm
+until `normal` clears scenarios. The engine combines an alarm with associated
+symptoms for escalation. Diastolic drift and rapid cabin-pressure loss can now be
+detected from measured history without injected flags; diastolic needs its
+in-flight baseline window. A scenario may tag a planned pressure change with
+`context.planned_pressure_change: true` to suppress the inferred loss rule.

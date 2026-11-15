@@ -4,12 +4,12 @@ from datetime import datetime,timedelta,timezone
 import math
 import statistics
 
-from django.db.models import Min
+from django.db.models import Min,Max
 from django.core.cache import cache
 
 from core.ingestion.catalogue import CATALOGUE,canonical_metric
-from core.models import AlertAssessment,LatestMeasurement,MeasurementEvent,MonitoringAlert,PreflightProfile
-from .engine import DAY,Frame,Point,evaluate,patterns,valid
+from core.models import AlertAssessment,LatestMeasurement,MeasurementEvent,MonitoringAlert,PreflightProfile,LatestRuleInput,CrewCheckIn
+from .engine import DAY,Frame,Point,evaluate,patterns,valid,combination,truth,disjunction
 from .spec import COLLECTION_SECONDS,COLORS,PARAMETERS,RANK,REGIONS,TIERS,WORKBOOK
 
 NUMERIC_INPUTS={'hours_awake','noaa_s_level','projected_event_dose_msv','headache','pain_injury','reaction_ms',
@@ -28,7 +28,7 @@ def extract_inputs(context,at,identity):
     inputs=context.get('rule_inputs',{})
     if not isinstance(inputs,dict):return result
     for code,entry in inputs.items():
-        if not isinstance(code,str) or not isinstance(entry,dict) or 'value' not in entry:continue
+        if not isinstance(code,str) or not code or len(code)>100 or not isinstance(entry,dict) or 'value' not in entry:continue
         value=entry['value'];observed=at
         if code in CATALOGUE:continue  # Supplemental facts cannot override validated measurement columns.
         if code in NUMERIC_INPUTS and type(value) not in (int,float):continue
@@ -50,6 +50,29 @@ def extract_inputs(context,at,identity):
         tags.pop('rule_inputs',None)
         result[code]=Point(value,observed,str(identity),tags)
     return result
+
+
+def project_rule_inputs(events):
+    """Caller holds the run lock. Works for ingestion and explicit journal rebuilds."""
+    candidates={}
+    for event in events:
+        if event.kind!='measurement' or event.phase!='inflight':continue
+        key=f'astronaut:{event.astronaut_id}' if event.domain=='astronaut' else f'cabin:{event.habitat_id}:{event.zone_id}'
+        for code,point in extract_inputs({**event.context,'_source':event.raw_payload.get('source')},event.measured_at,event.event_id).items():
+            identity=(event.run_id,key,code)
+            if identity not in candidates or (point.at,point.event_id)>(candidates[identity][0].at,candidates[identity][0].event_id):
+                candidates[identity]=(point,event)
+    if not candidates:return
+    current={(r.run_id,r.subject_key,r.code):r for r in LatestRuleInput.objects.filter(run_id__in={k[0] for k in candidates})}
+    creates=[];updates=[]
+    for identity,(point,event) in candidates.items():
+        row=current.get(identity)
+        if row and (point.at,point.event_id)<=(row.observed_at,str(row.source_event_id)):continue
+        if row is None:row=LatestRuleInput(run_id=identity[0],subject_key=identity[1],code=identity[2])
+        row.value=point.value;row.observed_at=point.at;row.context=point.context;row.source_event_id=event.event_id
+        (creates if row.pk is None else updates).append(row)
+    LatestRuleInput.objects.bulk_create(creates)
+    if updates:LatestRuleInput.objects.bulk_update(updates,['value','observed_at','context','source_event'])
 
 
 class History:
@@ -86,7 +109,7 @@ def references(profile,run,person,anchor):
                                           'stddev':baseline.stddev,'min':baseline.min_value,'max':baseline.max_value}
             cache.set(key,result,300)
     history=History(run,person=person)
-    for code in ('body_temperature','systolic_blood_pressure'):
+    for code in ('body_temperature','systolic_blood_pressure','diastolic_blood_pressure'):
         samples=[p for p in history(code,anchor-timedelta(days=7),anchor-timedelta(days=1)) if valid(p) and p.context.get('activity') in ('resting','sleeping')]
         if len(samples)>=20 and (samples[-1].at-samples[0].at).total_seconds()>=DAY:
             values=[p.value for p in samples];median=statistics.median(values)
@@ -103,6 +126,19 @@ def frame_from_rows(run,rows,anchor,start,baselines=None,inflight=None,person=No
         latest[row.metric_id]=Point(row.boolean_value if row.boolean_value is not None else row.numeric_value,row.measured_at,str(row.source_event_id),context)
         for code,point in extract_inputs(context,row.measured_at,row.source_event_id).items():
             if code not in latest or point.at>=latest[code].at:latest[code]=point
+    key=f'astronaut:{person}' if person is not None else f'cabin:{habitat}:{zone}'
+    for row in LatestRuleInput.objects.filter(run=run,subject_key=key):
+        point=Point(row.value,row.observed_at,str(row.source_event_id),row.context)
+        old=latest.get(row.code)
+        if old is None or (point.at,point.event_id)>(old.at,old.event_id):latest[row.code]=point
+    if person is not None:
+        # Simulator negative fixtures must not overwrite a crew report on the
+        # next tick. Reports expire after one mission hour; omissions are unknown.
+        reports=CrewCheckIn.objects.filter(run=run,astronaut_id=person,
+            observed_at__gte=anchor-timedelta(hours=1),observed_at__lte=anchor).order_by('observed_at','created_at')
+        for report in reports:
+            latest.update(extract_inputs({'rule_inputs':report.rule_inputs,'activity':report.activity,
+                '_source':'crew-checkin'},report.observed_at,report.pk))
     return Frame(anchor,latest,History(run,person,habitat,zone),baselines,inflight,run.environment,start,'astronaut' if person is not None else 'cabin')
 
 
@@ -116,10 +152,11 @@ def recheck_seconds(rule,tier):
 def persist(run,key,domain,frame,astronaut=None,habitat=None,zone=''):
     existing={a.rule_code:a for a in MonitoringAlert.objects.filter(run=run,subject_key=key)}
     for code,decision in frame.decisions.items():
-        if domain=='astronaut' and code in ('cabin_co2','cabin_o2','cabin_pressure','cabin_temp','cabin_humidity','noise','dust'):continue
+        if domain=='astronaut' and code in ('cabin_co2','cabin_o2','cabin_pressure','cabin_temp','cabin_humidity','noise','dust','pattern_cabin_first'):continue
         active=existing.get(code);tier=decision['tier'];at=decision['observed_at']
         if not tier and (not active or not active.is_active or decision['state']!='normal'):continue
-        if active and at<active.last_observation_at:continue
+        if active and (at<active.last_observation_at or
+                       at==active.last_observation_at and (not tier or RANK[tier]<=RANK[active.tier])):continue
         source=PARAMETERS.get('heart_rate' if code=='acute_symptoms' and decision.get('evidence',{}).get('symptom')=='chest_pain' else PATTERN_SOURCE.get(code,code),{})
         if tier:
             if not active:active=MonitoringAlert(run=run,subject_key=key,rule_code=code,domain=domain,
@@ -167,6 +204,8 @@ def evaluate_run(run):
     rows=list(LatestMeasurement.objects.filter(run=run).select_related('source_event'))
     if not rows:return
     anchor=max(row.measured_at for row in rows)
+    report_at=CrewCheckIn.objects.filter(run=run).aggregate(at=Max('observed_at'))['at']
+    if report_at is not None:anchor=max(anchor,report_at)
     start=MeasurementEvent.objects.filter(run=run,phase='inflight').aggregate(start=Min('measured_at'))['start']
     people=defaultdict(list);cabins=defaultdict(list)
     for row in rows:
@@ -184,14 +223,27 @@ def evaluate_run(run):
         evaluate(frame);patterns(frame,frame.cabin)
         frames[person]=frame;locations[person]=location
     for key,frame in cabin_frames.items():
-        symptoms=defaultdict(list)
-        for person,pf in frames.items():
-            if locations[person]!=key:continue
-            for code in ('headache','nausea','vomiting','dizziness','breathlessness'):
-                point=pf.point(code,DAY)
-                if point and (point.value is True or type(point.value) in (int,float) and point.value>0):symptoms[code].append(person)
-        shared=next(((code,actors) for code,actors in symptoms.items() if len(set(actors))>=2),None)
-        if shared:frame.decide('pattern_shared_cause','warning','Same symptom in at least two co-located crew within 24h; review shared environment',point=frame.point('co2_partial_pressure'),evidence={'symptom':shared[0],'astronaut_ids':shared[1]})
+        colocated=[pf for person,pf in frames.items() if locations[person]==key]
+        # A cabin-first finding aggregates all occupants; a normal occupant must
+        # never overwrite another occupant's active finding.
+        candidates=[pf.decisions.get('pattern_cabin_first') for pf in colocated]
+        candidates=[d for d in candidates if d]
+        if candidates:
+            triggered=[d for d in candidates if d['tier']]
+            if triggered:frame.decisions['pattern_cabin_first']=max(triggered,key=lambda d:d['observed_at'])
+            elif all(d['state']=='normal' for d in candidates):frame.decisions['pattern_cabin_first']=min(candidates,key=lambda d:d['observed_at'])
+        conditions=[];points=[];evidence={}
+        for code in ('headache','nausea','vomiting','dizziness','breathlessness'):
+            observations=[pf.point(code,DAY) for pf in colocated]
+            points.extend(observations)
+            positives=sum(bool(v and (v.value is True or type(v.value) in (int,float) and v.value>0)) for v in observations)
+            unknown=sum(v is None for v in observations)
+            conditions.append(True if positives>=2 else None if positives+unknown>=2 else False)
+            evidence[code]=positives
+        if colocated:
+            combination(frame,'pattern_shared_cause',disjunction(*conditions),'warning',
+                        'Shared symptom review across co-located crew',points)
+            frame.decisions['pattern_shared_cause']['evidence']['positive_counts']=evidence
         persist(run,f'cabin:{key[0]}:{key[1]}','cabin',frame,habitat=key[0],zone=key[1])
     for person,frame in frames.items():
         location=locations[person]

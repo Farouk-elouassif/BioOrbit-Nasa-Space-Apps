@@ -47,6 +47,10 @@ def parser():
     init.add_argument('--speed', type=positive, default=1.)
     init.add_argument('--preflight-days', type=int, default=14)
     init.add_argument('--run-id', default='demo-001')
+    init.add_argument('--error-level', type=nonnegative, default=0., help='Percentage of in-flight measurements to inject abnormal values into (0–100)')
+    init.add_argument('--surface-body', choices=('moon','mars'), default='mars')
+    scenario = sub.add_parser('scenario', help='Schedule explicit synthetic measurements/context from JSON')
+    scenario.add_argument('--file', required=True)
     history = sub.add_parser('history', help='Append days of mission history to existing state')
     history.add_argument('--days', type=positive, default=30.)
     history.add_argument('--interval', type=positive, default=300., help='Frequent historical sampling, simulated seconds')
@@ -70,6 +74,11 @@ def parser():
     storm.add_argument('--after', type=nonnegative, default=0., help='Simulated seconds from now')
     storm.add_argument('--duration', type=positive, default=21600., help='Simulated seconds')
     storm.add_argument('--peak', type=positive, default=12., help='Cabin target peak, mSv/day')
+    storm.add_argument('--noaa-s-level', type=int, choices=range(6), default=1, help='Explicit synthetic severity; not inferred from radiation')
+    symptom=sub.add_parser('symptom', help='Report a synthetic symptom until normal clears it')
+    symptom.add_argument('--astronaut', required=True)
+    from .scenarios import SYMPTOMS
+    symptom.add_argument('symptom', choices=SYMPTOMS)
     sub.add_parser('normal', help='Cancel storms; radiation relaxes gradually to ambient')
     speed = sub.add_parser('speed'); speed.add_argument('value', type=positive)
     env = sub.add_parser('environment'); env.add_argument('value', choices=ENVIRONMENTS)
@@ -149,8 +158,15 @@ def run(args):
             if client is None:
                 raise ValueError('Provide --endpoint or SIM_INGEST_URL')
             log.info('Delivered %d events', client.flush(store, args.batch_size))
+        elif args.command == 'scenario':
+            with open(args.file, encoding='utf-8') as handle:
+                store.control('scenario', data=json.load(handle))
+            log.info('Synthetic scenario scheduled')
+        elif args.command == 'symptom':
+            store.control('symptom', astronaut=args.astronaut, symptom=args.symptom)
+            log.info('Synthetic symptom recorded')
         elif args.command == 'storm':
-            store.control('storm', after=args.after, duration=args.duration, peak=args.peak)
+            store.control('storm', after=args.after, duration=args.duration, peak=args.peak, noaa_s_level=args.noaa_s_level)
             log.info('Solar storm scheduled')
         elif args.command in ('normal', 'speed', 'environment'):
             store.control(args.command, **({'value': args.value} if hasattr(args, 'value') else {}))

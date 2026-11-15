@@ -24,4 +24,3 @@ htmlcov
 *.pdf
 
 backend/bitorbit/data
-lakehouse/bronze

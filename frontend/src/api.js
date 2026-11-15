@@ -58,3 +58,14 @@ export async function acknowledgeAlert(alert){
   if(!response.ok)throw new Error(data.message||`Acknowledgment failed (${response.status}).`);
   return data;
 }
+
+export async function postJSON(resource,payload){
+  // GET establishes CSRF before first login; login may rotate it for later writes.
+  if(!document.cookie.split(';').some(v=>v.trim().startsWith('csrftoken=')))await readJSON(apiUrl('session'));
+  const cookie=document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith('csrftoken='));
+  const csrf=cookie?decodeURIComponent(cookie.slice('csrftoken='.length)):'';
+  const response=await fetch(apiUrl(resource),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRFToken':csrf},body:JSON.stringify(payload)});
+  let data;try{data=await response.json()}catch{throw new Error('The server could not save the report. Retry the same report.');}
+  if(!response.ok){const error=new Error(data.message||`Save failed (${response.status}).`);error.status=response.status;throw error;}
+  return data;
+}

@@ -1,10 +1,11 @@
-"""BioOrbit operational schema. Ingestion and analytical export are separate concerns."""
-from uuid import uuid4
+"""PostgreSQL schema for raw history, current state, baselines and alerts."""
 
 from django.db import models
 from django.db.models import Q
 from django.db.models.functions import Now
 from django.utils import timezone
+from django.conf import settings
+import uuid
 
 
 class Domain(models.TextChoices):
@@ -33,10 +34,6 @@ class Phase(models.TextChoices):
     PREFLIGHT = 'preflight', 'Preflight'
     INFLIGHT = 'inflight', 'In-flight'
 
-
-class BronzeStatus(models.TextChoices):
-    PENDING = 'pending', 'Pending'
-    EXPORTED = 'exported', 'Exported'
 
 
 class Mission(models.Model):
@@ -100,6 +97,24 @@ class SimulationRun(models.Model):
         return self.run_id
 
 
+class CrewCheckIn(models.Model):
+    """Authenticated observations in mission time; not synthetic sensor samples."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    run = models.ForeignKey(SimulationRun, on_delete=models.PROTECT)
+    astronaut = models.ForeignKey(Astronaut, on_delete=models.PROTECT)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    observed_at = models.DateTimeField()
+    created_at = models.DateTimeField(default=timezone.now)
+    measurements = models.JSONField(default=dict)
+    rule_inputs = models.JSONField(default=dict)
+    activity = models.CharField(max_length=20)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-observed_at', '-created_at']
+        indexes = [models.Index(fields=['run', 'astronaut', 'observed_at'], name='idx_checkin_run_person_time')]
+
+
 class MetricCatalog(models.Model):
     code = models.CharField(max_length=100, primary_key=True)
     domain = models.CharField(max_length=20, choices=Domain.choices)
@@ -131,19 +146,6 @@ VALID_SUBJECT = (
 )
 
 
-class BronzeExportBatch(models.Model):
-    """Persist batch membership before filesystem I/O so retries use the same file."""
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    relative_path = models.CharField(max_length=1024, unique=True)
-    event_count = models.PositiveIntegerField()
-    created_at = models.DateTimeField(default=timezone.now, db_default=Now())
-    exported_at = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        db_table = 'bronze_export_batches'
-        constraints = [models.CheckConstraint(condition=Q(event_count__gte=1), name='valid_bronze_batch_count')]
-        indexes = [models.Index(fields=['created_at'], condition=Q(exported_at__isnull=True), name='idx_pending_bronze_batches')]
-
 
 class MeasurementEvent(models.Model):
     event_id = models.UUIDField(primary_key=True)
@@ -164,10 +166,6 @@ class MeasurementEvent(models.Model):
     received_at = models.DateTimeField(default=timezone.now, db_default=Now(), null=True, blank=True)
     context = models.JSONField(blank=True, default=dict, db_default={})
     raw_payload = models.JSONField(blank=True)
-    bronze_status = models.CharField(max_length=20, choices=BronzeStatus.choices,
-                                    default=BronzeStatus.PENDING, db_default='pending')
-    bronze_exported_at = models.DateTimeField(null=True, blank=True)
-    bronze_batch = models.ForeignKey(BronzeExportBatch, on_delete=models.PROTECT, related_name='events', null=True, blank=True)
 
     class Meta:
         db_table = 'measurement_events'
@@ -175,7 +173,6 @@ class MeasurementEvent(models.Model):
             models.CheckConstraint(condition=Q(kind__in=EventKind.values), name='valid_event_kind'),
             models.CheckConstraint(condition=Q(phase__in=Phase.values), name='valid_event_phase'),
             models.CheckConstraint(condition=Q(domain__in=Domain.values), name='valid_event_domain'),
-            models.CheckConstraint(condition=Q(bronze_status__in=BronzeStatus.values), name='valid_bronze_status'),
             models.CheckConstraint(
                 condition=(
                     Q(kind=EventKind.PREFLIGHT_PROFILE, phase=Phase.PREFLIGHT, domain=Domain.ASTRONAUT,
@@ -187,7 +184,6 @@ class MeasurementEvent(models.Model):
             models.CheckConstraint(condition=VALID_SUBJECT, name='valid_event_subject'),
         ]
         indexes = [
-            models.Index(fields=['received_at'], condition=Q(bronze_status=BronzeStatus.PENDING), name='idx_pending_bronze'),
             models.Index(fields=['run', 'astronaut', 'metric', '-measured_at'], name='idx_measurement_history'),
         ]
 
@@ -295,3 +291,18 @@ class AlertAssessment(models.Model):
     class Meta:
         db_table = 'alert_assessments'
         constraints = [models.UniqueConstraint(fields=['run','subject_key'], name='uq_alert_assessment_subject')]
+
+
+class LatestRuleInput(models.Model):
+    """Independent projection: an omitted fact never erases a prior observation."""
+    run = models.ForeignKey(SimulationRun, on_delete=models.PROTECT)
+    subject_key = models.CharField(max_length=240)
+    code = models.CharField(max_length=100)
+    value = models.JSONField()
+    observed_at = models.DateTimeField()
+    context = models.JSONField(default=dict)
+    source_event = models.ForeignKey(MeasurementEvent, on_delete=models.PROTECT)
+
+    class Meta:
+        db_table = 'latest_rule_inputs'
+        constraints = [models.UniqueConstraint(fields=['run','subject_key','code'], name='uq_latest_rule_input')]

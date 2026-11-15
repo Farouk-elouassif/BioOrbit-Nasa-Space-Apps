@@ -142,8 +142,6 @@ INGEST_MAX_BODY_BYTES = 4 * 1024 * 1024
 DATA_UPLOAD_MAX_MEMORY_SIZE = INGEST_MAX_BODY_BYTES
 
 
-# Local Bronze lakehouse storage, shared by the backend and exporter containers.
-BRONZE_ROOT = Path(os.environ.get('BRONZE_ROOT', str(BASE_DIR / 'data' / 'bronze')))
 
 
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.environ.get(

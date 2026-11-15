@@ -1,12 +1,13 @@
 """Evaluate the current stored mission state without starting another worker."""
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from core.models import SimulationRun
-from core.alerts.service import evaluate_run
+from core.models import SimulationRun, MeasurementEvent
+from core.alerts.service import evaluate_run, project_rule_inputs
 
 class Command(BaseCommand):
     help='Evaluate workbook alerts for existing latest measurements (one pass).'
     def add_arguments(self, parser):
+        parser.add_argument('--rebuild-inputs', action='store_true', help='Rebuild supplemental facts from the immutable journal before evaluation')
         parser.add_argument('--run-id', help='Defaults to all active simulation runs.')
     def handle(self, *args, **options):
         runs=SimulationRun.objects.all()
@@ -16,5 +17,12 @@ class Command(BaseCommand):
         for identity in ids:
             with transaction.atomic():
                 run=SimulationRun.objects.select_for_update().get(pk=identity)
+                if options['rebuild_inputs']:
+                    rows=MeasurementEvent.objects.filter(run=run,kind='measurement',phase='inflight',context__has_key='rule_inputs').order_by('measured_at','event_id')
+                    batch=[]
+                    for row in rows.iterator(chunk_size=1000):
+                        batch.append(row)
+                        if len(batch)==1000:project_rule_inputs(batch);batch=[]
+                    project_rule_inputs(batch)
                 evaluate_run(run)
             self.stdout.write(self.style.SUCCESS(f'Evaluated {identity}'))

@@ -49,7 +49,6 @@ Model/table mapping:
 | `PreflightProfile` | `preflight_profiles` |
 | `PreflightBaseline` | `preflight_baselines` |
 | `LatestMeasurement` | `latest_measurements` |
-| `BronzeExportBatch` | `bronze_export_batches` |
 
 The models preserve the supplied column lengths, nullable columns, database defaults, UUID/string identifiers, enum CHECK constraints, value/subject checks, and named partial indexes. Generated numeric IDs use Django's PostgreSQL bigint identity implementation of `BigAutoField`. JSON fields use PostgreSQL JSONB. All FK deletions use ORM `PROTECT`; the database also enforces referential integrity. Django may create its normal additional foreign-key indexes.
 
@@ -59,7 +58,7 @@ Foreign keys have conventional Django names: `run`, `metric`, and `source_event`
 
 Defaults exist both in Python and at database level. The nullable defaulted fields from the supplied SQL remain nullable. `LatestMeasurement.updated_at` defaults on insert; it is **not** an automatic update trigger. The future ingestion/upsert path must explicitly advance it. Preflight background rate (mSv/year) and pre-mission career dose (mSv) remain separate fields.
 
-The ingestion service provisions consistent mission/habitat/crew references and metric definitions, validates run ownership and metric domain/type, journals events, and projects profiles/latest readings atomically. Direct ORM or SQL writes can still violate cross-row semantic relationships not expressed by the supplied foreign keys. A separate Django Bronze worker now exports committed raw events; workbook alert evaluation runs during ingestion.
+The ingestion service provisions consistent mission/habitat/crew references and metric definitions, validates run ownership and metric domain/type, journals events, and projects profiles/latest readings atomically. Direct ORM or SQL writes can still violate cross-row semantic relationships not expressed by the supplied foreign keys. PostgreSQL retains the complete raw journal and serves both current readings and historical trends; workbook alert evaluation runs during ingestion.
 
 Offline checks from the repository root (no database access):
 
@@ -107,11 +106,11 @@ A successful request returns HTTP 200 **after committing**:
 
 Behavior:
 
-- The whole batch is validated before database writes. Every new event is stored in `measurement_events` with the original v1 payload in `raw_payload` (UUID spelling canonicalized), context and timestamps intact, and `bronze_status='pending'`. The Bronze worker exports it asynchronously after commit.
+- The whole batch is validated before database writes. Every new event is stored in `measurement_events` with the original v1 payload in `raw_payload` (UUID spelling canonicalized), context and timestamps intact. PostgreSQL is the sole application event store.
 - Source `mission_id`, `habitat_id`, and `astronaut_id` are external **codes**, resolved to internal rows. Missing missions, habitats, astronauts, runs, crew assignments, and catalogue entries are created as needed. Names remain unspecified because the simulator contract supplies codes, not personal names. The first observed habitat becomes the crew assignment; event habitat/zone tracks later locations.
 - The same `run_id` cannot belong to another mission. Existing catalogue definitions cannot silently change unit, domain, value type, or aggregation meaning. Run metadata reflects the newest observed environment; late backfill does not overwrite it.
 - Duplicate event IDs with identical payloads, or payloads differing only in documented equivalent metric identifiers/units, are acknowledged without a second write or projection. Conflicting payloads return 409 and roll back the **entire batch**, including newly provisioned metadata. `emitted_at` is part of the payload: resend from the original journal, rather than regenerating the same run ID with different emission timestamps.
-- Preflight profiles create `preflight_profiles` and all twelve `preflight_baselines`. Profiles are immutable per run/astronaut; resend the original event ID to retry. Ordinary preflight observations stay in the journal and never overwrite live measurements.
+- Preflight profiles create `preflight_profiles` and the twelve required `preflight_baselines`, plus an optional stress baseline. Profiles are immutable per run/astronaut; resend the original event ID to retry. Ordinary preflight observations stay in the journal and never overwrite live measurements.
 - In-flight measurements update `latest_measurements` by run/astronaut/metric or run/habitat/zone/metric. Late records are still journaled but cannot regress latest state. Equal timestamps use the greater UUID integer as a deterministic tie break. Updated rows explicitly refresh `updated_at`. Boolean `false` is preserved separately from numeric values.
 - Run-row locks serialize concurrent projections for the same run; journal, profiles, latest rows, and references commit in one transaction. Successful acknowledgments include existing duplicates. The request-level `Idempotency-Key` header is optional; **event IDs** are the durable deduplication keys.
 
@@ -155,102 +154,9 @@ The same aliases also work in a profile's `baseline_statistics` keys. Supplying 
 Example: keep the normal event envelope and send `"metric":"bp_systolic","value":112,"unit":"mmHg"`. The journal retains `bp_systolic` in its raw payload; its `metric_code`, latest measurement, and any corresponding baseline use `systolic_blood_pressure`.
 
 
-## Bronze raw JSON export
-
-The ingestion transaction commits to PostgreSQL first. The separate `bronze-worker` service runs the Django management command `export_bronze --watch` against the committed journal. It polls every two seconds by default; ingestion acknowledgments do not wait for disk I/O or Bronze export.
-
-```text
-Simulator → ingestion → PostgreSQL measurement_events (pending)
-                                ↓
-                      durable export-batch manifest
-                                ↓
-                      immutable Bronze JSON file
-                                ↓
-                      exported status + timestamp
-```
-
-Migration `0002_bronze_export_batches` adds `bronze_export_batches` and the nullable `measurement_events.bronze_batch_id` link. This records the exact event membership and file path **before** writing files. Existing pending events are automatically eligible; no simulator reset or historical replay is needed.
-
-Run yourself from the repository root:
-
-```bash
-docker compose up --build
-```
-
-Compose now runs PostgreSQL, the Django backend, the simulator, and the Django Bronze worker. Backend startup applies pending migrations. Both the worker and simulator wait for backend readiness; the worker uses the same backend Dockerfile and has no exposed HTTP port.
-
-Files are stored directly in **`lakehouse/bronze/` in the repository root**, bind-mounted at `/data/bronze` in both Django containers. Compose uses `BIOORBIT_UID`/`BIOORBIT_GID` from `.env` so generated files belong to the host user. The shared `:z` mount label supports SELinux hosts. Fresh checkouts should set these IDs to the output of `id -u` and `id -g` when they differ from 1000. Example layout:
-
-```text
-/data/bronze/
-  run=demo-001/
-    domain=astronaut/
-      phase=inflight/
-        date=2026-11-14/
-          batch=<export-batch-uuid>.json
-    domain=cabin/
-      phase=inflight/
-        date=2026-11-14/
-          batch=<export-batch-uuid>.json
-```
-
-Every `.json` file is a JSON **array of complete `raw_payload` objects** from the database. It includes normal and unusual measurements, boolean cabin measurements, preflight observations, and profile records. Source metric aliases and units remain intact; no cleaning, normalization, aggregation, or medical scoring occurs in Bronze. UUID spelling is already canonicalized by ingestion. `received_at` and export timestamps remain in PostgreSQL; `measured_at` and `emitted_at` remain inside each raw event.
-
-Files are partitioned by run, domain, phase, and **UTC observation date**, including historical or accelerated dates. Run codes are escaped for paths; exceptionally long encoded codes use a SHA-256 `run_hash=` directory to stay within filesystem limits. The original code remains inside every raw event. Rows inside each file are ordered by observation timestamp and event ID. Filenames are immutable batch identities, not chronological sequence numbers; a later analytical reader should order by the event timestamps. The default claim takes at most 1,000 events and splits them into separate files for each partition represented.
-
-Reliability behavior:
-
-- Export workers read committed PostgreSQL records only. The durable claim transaction fixes batch membership before file I/O; these helpers must not be called inside an outer application transaction.
-- Files are written to a temporary file, flushed and synced, then published atomically without overwriting an existing final file. Parent directory entries are synced too. Local POSIX filesystem operations are used; the project Bronze directory must be on a filesystem supporting hard links and directory syncing.
-- The database is marked `exported` only after publication succeeds. A failed write leaves the batch/event rows pending. Watch mode logs the failure and retries; HTTP ingestion can continue independently.
-- If the process stops after file publication but before database confirmation, retry uses the same manifest, same event IDs, and same path. An identical existing file is accepted without duplication or replacement.
-- If an existing final file has different content, export stops that pass and retries with an error log; it never overwrites or marks corrupted data as successfully exported. Investigate/restore that file before expecting the queue to continue past it.
-- PostgreSQL row locks with `skip_locked` prevent simultaneous workers from processing the same claimed batch. Replayed ingestion events do not reset their export state.
-- A forced interruption can leave hidden `.tmp` files. Final `.json` files are complete arrays; readers should ignore temporary files. Back up PostgreSQL and the Bronze directory together. Deleting Bronze files does not automatically reset already-exported database receipts.
-
-Configuration in `.env`:
-
-```dotenv
-BRONZE_BATCH_SIZE=1000
-BRONZE_POLL_INTERVAL=2
-```
-
-`BRONZE_ROOT` defaults to `backend/bitorbit/data/bronze` outside Docker; Compose sets `/data/bronze` explicitly. Generation controls and simulator delivery are unchanged.
-
-Inspection and one-shot commands to run yourself:
-
-```bash
-# Worker progress and failures
-docker compose logs -f bronze-worker
-
-# Export pending data manually; safe alongside the worker
-docker compose exec backend python manage.py export_bronze --max-batches 5
-
-# Files already appear directly on the host
-ls lakehouse/bronze
-
-# Run PostgreSQL ingestion, model, and exporter transaction tests
-docker compose exec backend python manage.py test core
-```
-
-Ordinary `docker compose down` preserves the PostgreSQL/simulator named volumes and the host `lakehouse/bronze/` directory. Silver, Gold, Parquet transformations, and DuckDB queries remain future work.
-
-The offline checker runs real temporary-filesystem tests for publication, raw-payload preservation, idempotent retry, conflicting-file protection, traversal protection, and failed-write cleanup. PostgreSQL tests additionally cover manifest claiming, crash-after-publication recovery, pending-state retention, limits, and replay. Database tests are supplied for the Docker command above; they have not been executed by the assistant.
-
-
-If an older deployment already wrote Bronze files to the former named volume, copy them from the old container **before recreating it**. The old named volume is not deleted by this configuration change. Preserving its files matters because PostgreSQL may already mark those batches as exported.
-
-```bash
-docker compose stop bronze-worker
-docker compose cp bronze-worker:/data/bronze/. ./lakehouse/bronze/
-docker compose up --build
-```
-
-For a first deployment with no previous Bronze files, only `docker compose up --build` is needed.
-
 ## Connected frontend read APIs
 
-The shared local crew console now uses two **GET-only** endpoints. They do not require the ingestion bearer token and do not modify state. The backend is still published only on localhost by Compose; Vite forwards browser `/api` requests to it through its development/preview proxy. There is no user-login flow. Apply network access controls before exposing crew health data outside the intended local environment.
+The shared local crew console now uses two **GET-only** endpoints. They do not require the ingestion bearer token and do not modify state. The backend is still published only on localhost by Compose; Vite forwards browser `/api` requests to it through its development/preview proxy. Read views remain shared; authenticated crew check-ins use the session flow documented below. Apply network access controls before exposing crew health data outside the intended local environment.
 
 ### `GET /api/v1/dashboard`
 
@@ -272,7 +178,7 @@ Required: `metric` plus `astronaut_id` for astronaut measurements or `habitat_id
 
 Charts use **in-flight PostgreSQL measurement history** anchored to the selected run's latest observation time. They do not invent missing days or include preflight observations as flight trends. The 24-hour view groups by UTC hour; longer windows group by UTC day. Point metrics use the mean, cumulative metrics use the maximum, and interval-total metrics use the sum of recorded window totals. Each bucket contains timestamp, value, and source sample count. Boolean metrics remain available in the dashboard but have no numeric trend endpoint.
 
-This operational history endpoint is an interim serving path while Gold/DuckDB is pending. Both endpoints set `Cache-Control: no-store`; database failures return 503 rather than synthetic fallback data. The frontend polls dashboard data every five seconds and charts every fifteen seconds.
+Historical trends are served directly from the PostgreSQL event journal. Both endpoints set `Cache-Control: no-store`; database failures return 503 rather than synthetic fallback data. The frontend polls dashboard data every five seconds and charts every fifteen seconds.
 
 Run these yourself after rebuilding:
 
@@ -289,7 +195,7 @@ Ingestion now evaluates alert rules inside the same database transaction, after 
 
 `core/alerts/workbook.json` preserves the 83 parameter rows, patterns, tiers, row references and source-file SHA256 from `Data.xlsx`. This is a specification, not 83 collected measurements. `engine.py` implements explicit numerical rules and windowed combinations for available telemetry. Specialist rules with ambiguous prose require explicit reviewed source flags. Absent clinical inputs do not become normal observations or zero NEWS2 components.
 
-Supported telemetry rules include resting vital components (HR 5-minute persistence; SpO2 2-minute persistence), fasting glucose, personal baseline deviations, multi-day sleep/mood/stress/fluid summaries, cumulative career radiation, 24-hour mean dose rate, cabin O2/CO2/pressure/temperature/humidity, and qualified noise/dust observations. High resting heart rate is not inferred from exercise readings. Full NEWS2 requires all five numerical components, consciousness and supplemental oxygen with a coherent spot-check. Simulator `is_solar_storm=true` alone does not establish a NOAA severity or projected event dose.
+Supported telemetry rules include activity-aware vital components (HR 5-minute persistence; SpO2 2-minute persistence), all-meal low glucose and fasting reference checks, personal baseline deviations, multi-day sleep/mood/stress/fluid summaries, cumulative career radiation, 24-hour mean dose rate, cabin O2/CO2/pressure/temperature/humidity, and qualified noise/dust observations. High resting heart rate is not inferred from exercise readings. Full NEWS2 requires all five numerical components, consciousness and supplemental oxygen with a coherent spot-check; a partial lower bound can escalate at 5/7 while missing components remain unknown. Simulator `is_solar_storm=true` alone does not establish a NOAA severity or projected event dose.
 
 Windowed means require complete coverage with gaps no greater than 15 minutes; HR/SpO2 persistence tolerates gaps up to 60 seconds. Sparse backfill can therefore leave persistence rules pending. Fluid totals require complete days with known intervals; simulator six-hour summaries are recognized by source and window tag. Noise requires an explicit work/sleep period; surface dust requires `context.surface_body` (`moon` or `mars`). Low humidity uses an explicitly documented one-hour mean because the workbook does not specify its averaging duration. In-flight reference bands require at least 20 valid resting observations spanning a day, using the prior seven days excluding the latest day, with median-deviation trimming. NEWS2 integer bands round readings; raw observations remain unchanged.
 
@@ -338,3 +244,121 @@ Focused checks:
 # Database-backed ingestion/acknowledgment/recovery test:
 docker compose exec backend python manage.py test core.test_alerts
 ```
+
+## PDF coverage completion and upgrade (15 November)
+
+Apply migrations through `0004_latest_rule_inputs`. Independent supplementary
+observations now project into `latest_rule_inputs`; later measurements omitting
+an observation do not erase it. Original observation time, source event, validity,
+and deterministic timestamp/UUID ordering are preserved. Stale, invalid and
+unknown observations cannot clear an alert. The projection commits with ingestion.
+
+Rebuild/restart the backend and simulator images to use the new source. After
+migration, rebuild historical supplementary projections without editing the journal:
+
+```bash
+docker compose exec backend python manage.py evaluate_alerts --rebuild-inputs
+```
+
+Add `--run-id <id>` for one run. This reconstructs current supplementary facts;
+it does not replay all historical alert transitions. New profiles may optionally
+include `stress_level`; existing twelve-field profiles remain valid. Old immutable
+profiles are not enriched with invented stress references.
+
+Patterns now emit explicit normal results using three-valued logic. Known false,
+known true and unavailable inputs are distinct. Recovery uses later participating
+observations, not repeated evaluations or unrelated measurements. Cabin patterns
+aggregate occupants so a normal person cannot overwrite another person's trigger.
+Acute symptom groups require explicit negative review for recovery. Three normal
+observations lower one tier; another three are needed for the next step.
+
+Noise windows require matching historical work/sleep tags. Sleep recovery requires
+negative evidence for the three-night, seven-day and awake-time conditions; normal
+awake time alone is insufficient. Symptomatic solar storms retain the workbook's
+Warning path (`is_solar_storm` with nausea/vomiting), in addition to the PDF's
+numerical NOAA/projected-dose paths. The original PDF omits that extra workbook path.
+
+`core.test_pdf_scenarios` checks threshold boundaries, missing data, exposure tags,
+all four recovery tiers, duplicate/late delivery, symptom retention and real
+simulator-to-Django scenarios. Run `python manage.py test core` on PostgreSQL;
+`backend/check_models.py` runs only the offline subset.
+
+### Chronological alert evaluation within ingestion batches
+
+New in-flight events are projected and evaluated in ascending observation time,
+with all measurements and supplemental facts at the same timestamp published
+before evaluation. A cabin O2 reading of 120 mmHg followed by 150 mmHg in one
+batch therefore raises and retains the Emergency; the later reading cannot hide
+it. Recovery counts each qualifying later observation, just as with separate
+requests. The existing transaction and run locks cover every intermediate step,
+so retries remain atomic and duplicate-only delivery does not advance recovery.
+
+Already-stored newer observations are never rewound by late historical delivery.
+Late-only batches reassess the current state using the added history; they do not
+replay historical transitions. This change prevents missed transitions in new
+batches; it does not reconstruct alerts already missed by earlier versions.
+Large batches spanning many observation times now require more evaluations.
+
+Regression coverage is in `core.test_alerts.BatchAlertIntegrationTests`, including
+reversed wire order, Emergency retention, single/batch recovery equivalence,
+supplemental flags, simultaneous inputs and late history.
+
+
+## PostgreSQL-only storage upgrade
+
+Compose runs three services: `db`, `backend`, and `simulator`. PostgreSQL stores
+all accepted measurements and original raw payloads, as well as baselines, latest
+readings and alerts. Historical charts query the same event journal.
+
+Migration `0005_remove_bronze_export` removes obsolete export receipts and fields;
+it does not delete measurement events or their original JSON. Earlier migrations
+remain intact so existing databases can upgrade safely. The simulator's persistent
+SQLite journal remains its generation/checkpoint/retry mechanism.
+
+Rebuild/restart the backend to apply pending migrations automatically. Database
+and simulator volumes remain intact. No filesystem export worker is required.
+
+## Crew check-ins and remaining alert inputs
+
+Migration `0006_crewcheckin` adds durable crew reports. Rebuild the backend using
+`docker compose up -d --build backend` to apply pending migrations through its
+existing startup command. The console requires a Django account with the
+`core.add_crewcheckin` permission (superusers have it). Use existing admin accounts,
+or create an account with `docker compose exec backend python manage.py createsuperuser`;
+no password is embedded in the frontend or simulator.
+
+- `GET /api/v1/session` establishes CSRF and reports login capability;
+  `POST` signs in with username/password, and `DELETE` signs out.
+- `GET /api/v1/check-ins?run_id=...` returns the last 100 reports to authorized users.
+- `POST /api/v1/check-ins` requires the session, CSRF, a client UUID `id`, active
+  `run_id`, participating `astronaut_id`, and an explicit `activity`. Optional
+  `measurements` accepts heart rate, breathing rate, SpO2, systolic/diastolic BP,
+  glucose, core temperature, sleep, and mood. Glucose requires `meal_context`.
+  Optional `rule_inputs` accepts consciousness, supplemental oxygen, headache
+  severity, red-flag symptoms and ECG alarm findings; values are scalar observations.
+  Omitted findings remain unknown. `notes` alone do not trigger rules.
+
+The backend uses the current mission clock, records the author, persists the report
+and evaluates alerts in one transaction. Repeating the same UUID/body returns the
+original result without new observations; reusing it with different contents is a
+conflict. Actual manual measurements enter the existing journal and trend path.
+Symptom-only reports never manufacture heart-rate or other sensor samples.
+Crew findings override simulator fixtures for one mission hour; consciousness and
+oxygen treatment still obey the scorer's five-minute freshness check. Repeated
+polling does not count the same report as a new normal recovery observation.
+Explicitly reviewed negative reports can replace earlier positives.
+
+Diastolic drift now compares non-exertion measurements against an observed
+in-flight reference (same prior-seven-day window, excluding the last day, ≥20
+samples spanning ≥24h), with ±5 mmHg prototype tolerance. Missing reference data
+remain unevaluated. Explicit reviewed drift flags remain supported.
+An unplanned fall **>6.9 kPa within 10 mission minutes** now raises a pressure
+Emergency; `context.planned_pressure_change: true` suppresses this inference,
+while explicit pressure-loss flags still take precedence.
+
+ECG inputs are supplied by normal simulator observations (negative fixtures),
+scenarios, the `symptom ... ecg_alarm` control, and crew reports. An alarm raises
+Caution; associated symptoms raise Warning; chest pain/collapse raises Emergency.
+These adaptations are team prototype rules, not clinical validation or an external
+sensor connection. This work does not establish complete collection of all 83
+workbook indicators or tracking against a 250 mSv event limit.

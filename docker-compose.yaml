@@ -15,7 +15,6 @@ services:
       start_period: 10s
 
   backend:
-    user: "${BIOORBIT_UID:-1000}:${BIOORBIT_GID:-1000}"
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,11 +27,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       SIM_INGEST_TOKEN: ${SIM_INGEST_TOKEN:?Set SIM_INGEST_TOKEN in .env}
-      BRONZE_ROOT: /data/bronze
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
-    volumes:
-      - ./lakehouse/bronze:/data/bronze:z
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/admin/login/', timeout=3).close()"]
       interval: 5s
@@ -45,30 +41,6 @@ services:
       db:
         condition: service_healthy
 
-  bronze-worker:
-    user: "${BIOORBIT_UID:-1000}:${BIOORBIT_GID:-1000}"
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["python", "manage.py", "export_bronze", "--watch"]
-    environment:
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
-      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
-      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      BRONZE_ROOT: /data/bronze
-      BRONZE_BATCH_SIZE: ${BRONZE_BATCH_SIZE:-1000}
-      BRONZE_POLL_INTERVAL: ${BRONZE_POLL_INTERVAL:-2}
-    volumes:
-      - ./lakehouse/bronze:/data/bronze:z
-    depends_on:
-      backend:
-        condition: service_healthy
-    stop_grace_period: 60s
-    restart: unless-stopped
-
   simulator:
     build:
       context: ./simulator
@@ -80,6 +52,8 @@ services:
       SIM_RUN_ID: ${SIM_RUN_ID:-demo-001}
       SIM_ASTRONAUTS: ${SIM_ASTRONAUTS:-3}
       SIM_ENVIRONMENT: ${SIM_ENVIRONMENT:-transit_spacecraft}
+      SIM_SURFACE_BODY: ${SIM_SURFACE_BODY:-mars}
+      SIM_ERROR_LEVEL: ${SIM_ERROR_LEVEL:-0}
       SIM_SEED: ${SIM_SEED:-42}
       SIM_START: ${SIM_START:-2026-11-14T00:00:00Z}
       SIM_DURATION_DAYS: ${SIM_DURATION_DAYS:-180}

@@ -71,8 +71,8 @@ def profile(data, measured_at):
     if not start <= end <= measured_at:
         raise IngestionError('Preflight window must end on/before the profile observation time')
     stats = data['baseline_statistics']
-    if not isinstance(stats, dict) or set(stats) != set(PREFLIGHT_METRICS):
-        raise IngestionError('Profile must contain the twelve preflight baseline metrics')
+    if not isinstance(stats, dict) or not set(PREFLIGHT_METRICS) <= set(stats) <= set(PREFLIGHT_METRICS) | {'stress_level'}:
+        raise IngestionError('Profile requires the twelve baseline metrics and optionally stress_level')
     for code, values in stats.items():
         if not isinstance(values, dict) or set(values) != {'mean', 'stddev', 'min', 'max', 'count', 'unit'}:
             raise IngestionError(f'Invalid statistics for {code}')

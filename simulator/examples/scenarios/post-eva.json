@@ -1,0 +1,12 @@
+{
+  "name": "post_eva_emergency",
+  "duration": 300,
+  "astronaut_id": "AST_001",
+  "context": {
+    "activity": "resting",
+    "rule_inputs": {
+      "within_24h_eva": {"value": true},
+      "numbness": {"value": true}
+    }
+  }
+}

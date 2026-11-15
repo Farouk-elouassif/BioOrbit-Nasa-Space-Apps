@@ -1,0 +1,6 @@
+{
+  "name": "pressure_loss",
+  "duration": 300,
+  "measurements": {"total_cabin_pressure": 30},
+  "context": {"rapid_pressure_loss": true}
+}

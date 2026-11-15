@@ -12,7 +12,7 @@ from django.test import SimpleTestCase, TestCase
 from django.utils import timezone
 
 from .models import (
-    Astronaut, BronzeExportBatch, Habitat, LatestMeasurement, MeasurementEvent, MetricCatalog,
+    Astronaut, Habitat, LatestMeasurement, MeasurementEvent, MetricCatalog,
     Mission, MissionCrew, PreflightBaseline, PreflightProfile, SimulationRun,
 )
 
@@ -39,14 +39,10 @@ class OperationalModelDefinitionTests(SimpleTestCase):
         self.assertEqual(MissionCrew(mission_id=2, astronaut_id=3).pk, (2, 3))
         self.assertEqual(PreflightBaseline(profile_id=7, metric_id='heart_rate').pk, (7, 'heart_rate'))
 
-    def test_bronze_manifest_and_journal_link(self):
-        self.assertEqual(BronzeExportBatch._meta.db_table, 'bronze_export_batches')
-        self.assertIsInstance(BronzeExportBatch._meta.pk, models.UUIDField)
-        field = MeasurementEvent._meta.get_field('bronze_batch')
-        self.assertTrue(field.null)
-        self.assertIs(field.related_model, BronzeExportBatch)
-        self.assertEqual(field.column, 'bronze_batch_id')
-        self.assertTrue(BronzeExportBatch._meta.get_field('relative_path').unique)
+    def test_journal_keeps_raw_payload_without_export_metadata(self):
+        fields={field.name for field in MeasurementEvent._meta.fields}
+        self.assertIn('raw_payload',fields)
+        self.assertFalse(any(name.startswith('bronze_') for name in fields))
 
     def test_foreign_key_columns_and_deletion_policy(self):
         for model in (MeasurementEvent, LatestMeasurement, PreflightProfile):
@@ -60,8 +56,6 @@ class OperationalModelDefinitionTests(SimpleTestCase):
 
     def test_partial_indexes_and_uniqueness(self):
         indexes = {i.name: i for i in MeasurementEvent._meta.indexes}
-        self.assertEqual(indexes['idx_pending_bronze'].fields, ['received_at'])
-        self.assertEqual(indexes['idx_pending_bronze'].condition, models.Q(bronze_status='pending'))
         self.assertEqual(indexes['idx_measurement_history'].fields, ['run', 'astronaut', 'metric', '-measured_at'])
         constraints = {c.name: c for c in LatestMeasurement._meta.constraints}
         self.assertEqual(constraints['uq_latest_astronaut'].fields, ('run', 'astronaut', 'metric'))
@@ -72,7 +66,6 @@ class OperationalModelDefinitionTests(SimpleTestCase):
     def test_defaults_and_json_objects_are_independent(self):
         self.assertEqual(Mission().status, 'planned')
         self.assertTrue(SimulationRun().is_active)
-        self.assertEqual(MeasurementEvent().bronze_status, 'pending')
         first, second = MeasurementEvent(), MeasurementEvent()
         first.context['activity'] = 'resting'
         self.assertEqual(second.context, {})
@@ -95,12 +88,12 @@ class OperationalDatabaseTests(TestCase):
         cls.mission = Mission.objects.create(mission_code='MARS_001')
         cls.habitat = Habitat.objects.create(mission=cls.mission, habitat_code='HAB_001')
         cls.astronaut = Astronaut.objects.create(astronaut_code='AST_001')
-        cls.run = SimulationRun.objects.create(run_id='run-001', mission=cls.mission, environment='transit_spacecraft')
+        cls.simulation_run = SimulationRun.objects.create(run_id='run-001', mission=cls.mission, environment='transit_spacecraft')
         cls.numeric = MetricCatalog.objects.create(code='heart_rate', domain='astronaut', unit='bpm', value_type='numeric')
         cls.boolean = MetricCatalog.objects.create(code='is_solar_storm', domain='cabin', unit='boolean', value_type='boolean', aggregation_kind='boolean')
 
     def event(self, **overrides):
-        values = dict(event_id=uuid4(), run=self.run, mission=self.mission, habitat=self.habitat,
+        values = dict(event_id=uuid4(), run=self.simulation_run, mission=self.mission, habitat=self.habitat,
                       astronaut=self.astronaut, zone_id='CABIN_MAIN', kind='measurement',
                       phase='inflight', domain='astronaut', metric=self.numeric, numeric_value=68,
                       measured_at=timezone.now(), emitted_at=timezone.now(), raw_payload={'simulated': True})
@@ -126,7 +119,7 @@ class OperationalDatabaseTests(TestCase):
 
     def test_event_subject_and_enumerations(self):
         for updates in ({'domain': 'cabin'}, {'astronaut': None}, {'domain': 'invalid'},
-                        {'kind': 'invalid'}, {'phase': 'invalid'}, {'bronze_status': 'invalid'}):
+                        {'kind': 'invalid'}, {'phase': 'invalid'}):
             self.assert_rejected(lambda updates=updates: self.event(**updates))
 
     def test_event_id_is_unique(self):
@@ -145,8 +138,8 @@ class OperationalDatabaseTests(TestCase):
 
     def test_preflight_profile_and_baseline_keys(self):
         source = self.event(kind='preflight_profile', phase='preflight', metric=None, numeric_value=None)
-        profile = PreflightProfile.objects.create(run=self.run, astronaut=self.astronaut, source_event=source)
-        self.assert_rejected(lambda: PreflightProfile.objects.create(run=self.run, astronaut=self.astronaut))
+        profile = PreflightProfile.objects.create(run=self.simulation_run, astronaut=self.astronaut, source_event=source)
+        self.assert_rejected(lambda: PreflightProfile.objects.create(run=self.simulation_run, astronaut=self.astronaut))
         data = dict(profile=profile, metric=self.numeric, mean=68, stddev=2, min_value=64, max_value=72, sample_count=14)
         row = PreflightBaseline.objects.create(**data)
         self.assertEqual(row.pk, (profile.pk, 'heart_rate'))
@@ -156,7 +149,7 @@ class OperationalDatabaseTests(TestCase):
 
     def latest(self, **overrides):
         source = self.event()
-        data = dict(run=self.run, domain='astronaut', astronaut=self.astronaut, habitat=self.habitat,
+        data = dict(run=self.simulation_run, domain='astronaut', astronaut=self.astronaut, habitat=self.habitat,
                     zone_id='CABIN_MAIN', metric=self.numeric, numeric_value=68,
                     measured_at=source.measured_at, source_event=source)
         data.update(overrides)
@@ -185,4 +178,4 @@ class OperationalDatabaseTests(TestCase):
     def test_referenced_records_are_protected(self):
         self.event()
         with self.assertRaises(ProtectedError):
-            self.run.delete()
+            self.simulation_run.delete()

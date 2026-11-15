@@ -12,9 +12,9 @@ DAY = 86400.0
 RADIATION = {'transit_spacecraft': 1.8, 'space_station': .35, 'rover': .8, 'surface_base': .67}
 FREQUENT = ('heart_rate', 'respiratory_rate', 'spo2', 'personal_radiation_dose_rate',
             'mission_cumulative_radiation_dose', 'total_career_radiation_dose')
-PERIODIC = {'systolic_blood_pressure': 3600., 'diastolic_blood_pressure': 3600.,
-            'blood_glucose': 14400., 'body_temperature': 1800.,
-            'sleep_duration': DAY, 'mood': DAY, 'stress_level': 21600., 'fluid_intake': 21600.}
+PERIODIC = {'systolic_blood_pressure': 300., 'diastolic_blood_pressure': 3600.,
+            'blood_glucose': 14400., 'body_temperature': 300.,
+            'sleep_duration': DAY, 'mood': DAY, 'stress_level': 21600., 'fluid_intake': 21600., 'body_mass': DAY}
 
 
 @dataclass
@@ -29,8 +29,14 @@ class Config:
     speed: float = 1.
     preflight_days: int = 14
     run_id: str = 'demo-001'
+    surface_body: str = 'mars'
+    error_level: float = 0.
 
     def validate(self):
+        if type(self.error_level) not in (int,float) or not math.isfinite(self.error_level) or not 0<=self.error_level<=100:
+            raise ValueError('Error level must be a finite percentage between 0 and 100')
+        if self.surface_body not in ('moon', 'mars'):
+            raise ValueError('Surface body must be moon or mars')
         if self.environment not in ENVIRONMENTS:
             raise ValueError('Unsupported environment')
         if not 1 <= self.astronauts <= 100 or not 2 <= self.preflight_days <= 365:
@@ -71,6 +77,10 @@ class Engine:
         if state is not None:
             self.state = state
             self.rng.setstate(tuples(state['rng']))
+            # Existing journals remain immutable; new schedules start at resume time.
+            for code in PERIODIC:
+                state['next_periodic'].setdefault(code, state['seconds'])
+            state.setdefault('scenarios', [])
             return
         self.state = {'seconds': 0., 'sequence': 0, 'storms': [], 'next_periodic': {},
                       'crew': [], 'cabin': {}, 'rng': None}
@@ -102,13 +112,13 @@ class Engine:
                         'body_temperature': rng.uniform(36.65, 37.05),
                         'respiratory_rate': 16 - fitness * 3,
                         'spo2': 98 + fitness * .8, 'sleep_duration': rng.uniform(7.3, 8.3),
-                        'mood': rng.uniform(7, 9), 'body_mass': mass,
+                        'mood': rng.uniform(7, 9), 'body_mass': mass, 'stress_level': 3.,
                         'preflight_radiation_level': rng.uniform(1.6, 2.4),
                         'preflight_career_radiation_dose': rng.uniform(8, 160)}
             samples = []
             noise = {'heart_rate': 2., 'systolic_blood_pressure': 3., 'diastolic_blood_pressure': 2.,
                      'blood_glucose': 3., 'body_temperature': .08, 'respiratory_rate': .5,
-                     'spo2': .2, 'sleep_duration': .35, 'mood': .4, 'body_mass': .2,
+                     'spo2': .2, 'sleep_duration': .35, 'mood': .4, 'body_mass': .2, 'stress_level': .3,
                      'preflight_radiation_level': .04, 'preflight_career_radiation_dose': 0.}
             for day in range(self.config.preflight_days):
                 shared = rng.gauss(0, .5)
@@ -117,7 +127,7 @@ class Engine:
                     observation = value + rng.gauss(0, noise[key])
                     if key in ('heart_rate', 'respiratory_rate'):
                         observation += shared
-                    sample[key] = round(max(0, min(100 if key == 'spo2' else 10 if key == 'mood' else float('inf'), observation)), 4)
+                    sample[key] = round(max(0, min(100 if key == 'spo2' else 10 if key in ('mood', 'stress_level') else float('inf'), observation)), 4)
                 samples.append(sample)
             stats = {k: {'mean': statistics.mean(row[k] for row in samples),
                          'stddev': statistics.stdev(row[k] for row in samples),
@@ -188,10 +198,12 @@ class Engine:
                 extra += max(0, storm['peak'] - base) * math.sin(math.pi * t) ** 2
         return active, base + extra
 
-    def add_storm(self, start, duration, peak):
+    def add_storm(self, start, duration, peak, noaa_s_level=1):
         if not all(math.isfinite(v) for v in (start, duration, peak)) or start < self.state['seconds'] or duration <= 0 or peak <= RADIATION[self.config.environment]:
             raise ValueError('Storm must start now/later, have positive duration, and peak above ambient')
-        self.state['storms'].append({'start': start, 'duration': duration, 'peak': peak})
+        if type(noaa_s_level) is not int or not 0<=noaa_s_level<=5:
+            raise ValueError('Synthetic NOAA level must be an integer from 0 to 5')
+        self.state['storms'].append({'start': start, 'duration': duration, 'peak': peak, 'noaa_s_level': noaa_s_level})
 
     def _smooth(self, old, target, dt, tau, noise=0.):
         alpha = 1 - math.exp(-dt / tau)
@@ -261,18 +273,33 @@ class Engine:
                 values['personal_radiation_dose_rate'] = rate
             self.state['seconds'] = t
 
+    def rule_inputs(self, seconds, person=None):
+        from .scenarios import normal_inputs
+        return normal_inputs(self, seconds, person)
+
+    def add_scenario(self, data):
+        from .scenarios import validate_scenario
+        self.state.setdefault('scenarios', []).append(validate_scenario(self, data))
+
+    def apply_scenarios(self, events):
+        from .scenarios import apply
+        return apply(self, events)
+
     def _emit(self, frequent, periodic):
         t = self.state['seconds']; events = []
         active, _ = self.storm_at(t)
         scenario = 'solar_storm' if active else 'normal'
-        context = {'scenario': scenario}
+        context = {'scenario': scenario, 'surface_body': self.config.surface_body,
+                   'sleep_period': t / 3600 % 24 < 6 or t / 3600 % 24 >= 22,
+                   'rapid_pressure_loss': False,
+                   'rule_inputs': self.rule_inputs(t)}
         if frequent:
             for metric, value in self.state['cabin'].items():
                 events.append(self.event(metric, value, t, context=dict(context)))
             events.append(self.event('is_solar_storm', active, t, context=dict(context)))
         for person in self.state['crew']:
             for metric in ((*FREQUENT,) if frequent else ()) + tuple(periodic):
-                details = dict(context)
+                details = {**context, 'rule_inputs': self.rule_inputs(t, person)}
                 if metric == 'mission_cumulative_radiation_dose':
                     value = person['mission_dose']
                 elif metric == 'total_career_radiation_dose':
@@ -289,8 +316,10 @@ class Engine:
                 if metric == 'blood_glucose':
                     hour = t / 3600 % 24
                     details['meal_context'] = 'fasting' if hour < 7 else 'after_meal'
+                if metric == 'fluid_intake': details['interval_seconds'] = 21600
                 events.append(self.event(metric, value, t, person, context=details))
-        return events
+        from .errors import inject
+        return self.apply_scenarios(inject(self, events))
 
     def initial_events(self):
         periodic = [k for k, due in self.state['next_periodic'].items() if due == 0]

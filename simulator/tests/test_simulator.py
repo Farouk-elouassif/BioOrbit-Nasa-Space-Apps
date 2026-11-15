@@ -25,6 +25,32 @@ def comparable(events):
 
 
 class ModelTests(unittest.TestCase):
+    def test_explicit_storm_severity_and_persistent_symptom_control(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store=Store(Path(tmp)/'test.sqlite3')
+            store.initialize(Config(environment='space_station'))
+            store.control('storm',after=0,duration=7200,peak=12,noaa_s_level=2)
+            store.control('symptom',astronaut='AST_002',symptom='chest_pain')
+            store.control('symptom',astronaut='AST_002',symptom='ecg_alarm')
+            store.advance(delta=30)
+            events=list(store.events())
+            latest=[e for e in events if e.get('measured_at')==store.load().iso(30)]
+            self.assertTrue(any(e['context']['rule_inputs']['noaa_s_level']['value']==2 for e in latest))
+            self.assertTrue(any(e['astronaut_id']=='AST_002' and e['context']['rule_inputs']['chest_pain']['value'] for e in latest))
+            self.assertTrue(any(e['astronaut_id']=='AST_002' and e['context']['rule_inputs']['ecg_alarm']['value'] for e in latest))
+            store.control('normal');store.advance(delta=30)
+            latest=[e for e in store.events() if e.get('measured_at')==store.load().iso(60)]
+            self.assertTrue(all(e['context']['rule_inputs']['noaa_s_level']['value']==0 for e in latest))
+            self.assertTrue(all(not e['context']['rule_inputs']['chest_pain']['value'] for e in latest if e['astronaut_id']=='AST_002'))
+            store.close()
+
+    def test_alert_fix_commands_parse_explicit_severity_and_symptoms(self):
+        from space_sim.cli import parser
+        args=parser().parse_args(['storm','--noaa-s-level','3'])
+        self.assertEqual(args.noaa_s_level,3)
+        args=parser().parse_args(['symptom','--astronaut','AST_002','chest_pain'])
+        self.assertEqual((args.astronaut,args.symptom),('AST_002','chest_pain'))
+
     def test_preflight_profiles_statistics_and_units(self):
         e = Engine(Config()); events = e.preflight_events()
         self.assertEqual(len(e.state['crew']), 3)
@@ -32,7 +58,7 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(len(profiles), 3)
         for c, profile in zip(e.state['crew'], profiles):
             self.assertEqual(len(c['samples']), 14)
-            self.assertEqual(len(c['statistics']), 12)
+            self.assertEqual(len(c['statistics']), 13)
             self.assertGreater(c['baseline']['systolic_blood_pressure'], c['baseline']['diastolic_blood_pressure'])
             self.assertGreater(c['baseline']['heart_rate'], 40)
             self.assertLess(c['baseline']['heart_rate'], 100)
@@ -292,3 +318,63 @@ class TransportTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+class AlertInputTests(unittest.TestCase):
+    def test_all_catalogue_types_and_required_context_are_generated(self):
+        e=Engine(Config(astronauts=1, environment='surface_base', surface_body='moon'))
+        events=e.preflight_events()+e.initial_events()+e.advance(DAY)
+        self.assertEqual({v['metric'] for v in events if v['kind']=='measurement'},set(CATALOGUE))
+        profile=next(v for v in events if v['kind']=='preflight_profile')
+        self.assertIn('stress_level',profile['profile']['baseline_statistics'])
+        mass=[v for v in events if v.get('metric')=='body_mass' and v['phase']=='inflight']
+        self.assertTrue(mass)
+        current=[v for v in events if v['phase']=='inflight']
+        self.assertTrue(all(v['context']['surface_body']=='moon' for v in current))
+        personal=next(v for v in current if v['astronaut_id'])
+        facts=personal['context']['rule_inputs']
+        self.assertEqual(facts['consciousness']['value'],'alert')
+        self.assertIs(facts['supplemental_oxygen']['value'],False)
+        self.assertIs(facts['breathlessness']['value'],False)
+        self.assertIn('sleep_period',current[0]['context'])
+
+    def test_scenario_survives_restart_and_returns_to_explicit_normal(self):
+        e=engine(astronauts=1)
+        e.add_scenario({'name':'hypoxia','duration':90,'astronaut_id':'AST_001',
+                        'measurements':{'spo2':90},'context':{'activity':'resting',
+                        'rule_inputs':{'breathlessness':{'value':True}}}})
+        e=Engine(e.config,json.loads(json.dumps(e.snapshot())))
+        abnormal=next(v for v in e.advance(30) if v['metric']=='spo2')
+        self.assertEqual(abnormal['value'],90)
+        self.assertTrue(abnormal['context']['rule_inputs']['breathlessness']['value'])
+        normal=next(v for v in e.advance(90) if v['metric']=='spo2')
+        self.assertGreater(normal['value'],95)
+        self.assertFalse(normal['context']['rule_inputs']['breathlessness']['value'])
+
+    def test_cli_schedules_scenario_and_normal_cancels_it(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state=str(Path(directory)/'state.sqlite3')
+            fixture=Path(directory)/'scenario.json'
+            fixture.write_text(json.dumps({'duration':60,'astronaut_id':'AST_001','measurements':{'spo2':90}}))
+            self.assertEqual(main(['--state',state,'init','--astronauts','1','--preflight-days','2']),0)
+            self.assertEqual(main(['--state',state,'scenario','--file',str(fixture)]),0)
+            store=Store(state)
+            try:self.assertEqual(len(store.load().state['scenarios']),1)
+            finally:store.close()
+            self.assertEqual(main(['--state',state,'normal']),0)
+            store=Store(state)
+            try:self.assertEqual(store.load().state['scenarios'],[])
+            finally:store.close()
+
+    def test_invalid_scenario_does_not_enter_checkpoint(self):
+        e=engine()
+        for spec in ({'duration':0},{'duration':60,'measurements':{'spo2':90}},
+                     {'duration':60,'astronaut_id':'AST_001','measurements':{'spo2':101}}):
+            with self.assertRaises(ValueError):e.add_scenario(spec)
+        self.assertEqual(e.state.get('scenarios',[]),[])
+
+    def test_old_checkpoint_gets_new_schedule_without_rewriting_profiles(self):
+        e=engine();e.advance(60)
+        e.state['next_periodic'].pop('body_mass')
+        restored=Engine(e.config,json.loads(json.dumps(e.snapshot())))
+        self.assertTrue(any(v['metric']=='body_mass' for v in restored.advance(30)))

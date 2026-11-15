@@ -28,6 +28,17 @@ class ReadSerializationTests(SimpleTestCase):
         self.assertEqual(reading(row,when)['freshness'],'current')
         self.assertEqual(reading(row,when-timedelta(seconds=10))['age_simulated_seconds'],0)
 
+    def test_alert_reference_exposes_recorded_workbook_condition(self):
+        from .models import MonitoringAlert
+        from .alerts.api import serialize
+        from .alerts.spec import PARAMETERS
+        at=timezone.now()
+        alert=MonitoringAlert(rule_code='heart_rate',domain='astronaut',tier='caution',
+            detected_at=at,last_observation_at=at,recheck_due_at=at)
+        data=serialize(alert)
+        self.assertEqual(data['rule_reference']['condition'],PARAMETERS['heart_rate']['caution'])
+        self.assertEqual(data['rule_reference']['unit'],PARAMETERS['heart_rate']['unit'])
+
 
 @override_settings(ROOT_URLCONF='core.urls')
 class ReadRequestTests(SimpleTestCase):
@@ -90,6 +101,27 @@ class ReadDatabaseTests(TestCase):
         self.assertEqual(data['crew'][0]['measurements']['heart_rate']['value'],68)
         self.assertEqual(self.client.get('/dashboard',{'run_id':'missing'}).status_code,404)
         self.assertEqual(self.client.get('/dashboard',{'run_id':'demo-001','habitat_id':'missing'}).status_code,404)
+
+    def test_dashboard_receipt_time_excludes_manual_reports(self):
+        from .models import MeasurementEvent
+        from django.utils.dateparse import parse_datetime
+        self.insert([observation(),observation(source='crew-checkin',value=75,
+                     measured_at='2026-11-14T02:00:00Z')])
+        telemetry=MeasurementEvent.objects.exclude(raw_payload__source='crew-checkin')
+        manual=MeasurementEvent.objects.filter(raw_payload__source='crew-checkin')
+        received=timezone.now().replace(microsecond=0)-timedelta(minutes=10)
+        telemetry.update(received_at=received)
+        manual.update(received_at=timezone.now())
+        run=self.client.get('/dashboard').json()['run']
+        self.assertEqual(parse_datetime(run['telemetry_received_at']),received)
+        self.assertEqual(parse_datetime(run['observation_time']).hour,2)
+
+    def test_dashboard_zone_selection_scopes_cabin(self):
+        self.insert([cabin(zone_id='CABIN_MAIN'),cabin(zone_id='LAB')])
+        data=self.client.get('/dashboard',{'zone_id':'LAB'}).json()
+        self.assertEqual(data['cabin']['zone_id'],'LAB')
+        self.assertEqual(data['cabin']['zones'],['CABIN_MAIN','LAB'])
+        self.assertEqual(self.client.get('/dashboard',{'zone_id':'unknown'}).status_code,404)
 
     def test_history_aggregates_real_observations_and_accepts_alias(self):
         self.insert([observation(value=60),observation(value=80,measured_at='2026-11-14T01:30:00Z')])

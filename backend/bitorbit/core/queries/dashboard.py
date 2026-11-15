@@ -7,7 +7,7 @@ from django.db.models.functions import RowNumber, TruncDay, TruncHour
 from django.utils import timezone
 
 from core.ingestion.catalogue import CATALOGUE, canonical_metric, metric_spec
-from core.models import Astronaut, Habitat, LatestMeasurement, MeasurementEvent, PreflightProfile, SimulationRun, AlertAssessment
+from core.models import Astronaut, Habitat, LatestMeasurement, MeasurementEvent, PreflightProfile, SimulationRun, AlertAssessment, CrewCheckIn
 from core.alerts.api import active_alerts
 from core.alerts.spec import COLLECTION_SECONDS,WORKBOOK
 
@@ -60,9 +60,14 @@ def dashboard(params):
     start,anchor=run_clock(run)
     rows=list(LatestMeasurement.objects.filter(run=run).select_related('metric','source_event','habitat'))
     if rows:anchor=max([r.measured_at for r in rows]+([anchor] if anchor else []))
+    report_at=CrewCheckIn.objects.filter(run=run).aggregate(at=Max('observed_at'))['at']
+    if report_at is not None:anchor=max(anchor,report_at) if anchor else report_at
     result['run']={'id':run.pk,'environment':run.environment,'mission_code':run.mission.mission_code,
                    'mission_name':run.mission.name or run.mission.mission_code,'started_at':start,
-                   'observation_time':anchor,'mission_day':int((anchor-start).total_seconds()//86400)+1 if start and anchor else None}
+                   'observation_time':anchor,
+                   'telemetry_received_at':MeasurementEvent.objects.filter(run=run,phase='inflight',kind='measurement')
+                       .exclude(raw_payload__source='crew-checkin').aggregate(at=Max('received_at'))['at'],
+                   'mission_day':int((anchor-start).total_seconds()//86400)+1 if start and anchor else None}
     habitats=list(Habitat.objects.filter(measurement_events__run=run).distinct().order_by('habitat_code'))
     result['habitats']=[{'id':h.habitat_code,'name':h.name or h.habitat_code} for h in habitats]
     habitat_code=params.get('habitat_id')

@@ -232,7 +232,7 @@ class IngestionDatabaseTests(TestCase):
         self.assertEqual(PreflightBaseline.objects.count(), 12)
         for model in (Mission, Habitat, Astronaut, SimulationRun, MissionCrew):
             self.assertEqual(model.objects.count(), 1, model)
-        self.assertEqual(MeasurementEvent.objects.filter(bronze_status='pending').count(), 3)
+        self.assertEqual(MeasurementEvent.objects.count(), 3)
         latest = LatestMeasurement.objects.get(domain='cabin')
         self.assertIs(latest.boolean_value, False)
         self.assertIsNone(latest.numeric_value)

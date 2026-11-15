@@ -1,0 +1,12 @@
+{
+  "name": "explicit_synthetic_space_weather",
+  "duration": 300,
+  "astronaut_id": "AST_001",
+  "context": {
+    "rule_inputs": {
+      "noaa_s_level": {"value": 2, "unit": "S-level"},
+      "projected_event_dose_msv": {"value": 220, "unit": "mSv"},
+      "dose_rate_rising": {"value": true}
+    }
+  }
+}

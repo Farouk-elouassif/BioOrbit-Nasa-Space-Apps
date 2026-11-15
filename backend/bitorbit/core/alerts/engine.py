@@ -69,13 +69,28 @@ def band_score(metric,value,reference=None):
     if metric=='systolic_blood_pressure':
         if value<=90 or value>=220:return 3
         if value<=100:return 2
-        return (0 if reference and reference['min']<=value<=reference['max'] else 1) if value<=110 else 0
+        return (0 if reference and reference['min']-5<=value<=reference['max']+5 else 1) if value<=110 else 0
     if metric=='body_temperature':
         if value<=35:return 3
         if value>=39.1:return 2
         if value<36.1:return 1
         if reference:return 1 if value>=reference['mean']+1 else 0
         return None  # Space-adjusted scoring needs an actual in-flight reference.
+
+
+def vital_score(metric, point, reference, restricted=False):
+    """Team prototype adaptations; exercise only contributes low-value scores."""
+    if restricted and (metric=='respiratory_rate' or
+        metric=='heart_rate' and point.value>50 or
+        metric=='systolic_blood_pressure' and point.value>100 or
+        metric=='body_temperature' and point.value>35):
+        return None
+    score=band_score(metric,point.value,reference)
+    if point.context.get('activity')=='sleeping' and (
+        metric=='heart_rate' and 41<=point.value<=50 or
+        metric=='respiratory_rate' and 9<=point.value<=11):
+        return 0
+    return score
 
 
 class Frame:
@@ -147,18 +162,23 @@ def evaluate(frame):
         p=f.point(metric,3600 if metric in ('systolic_blood_pressure','body_temperature') else 900)
         if p is None or type(p.value) not in (int,float) or p.value<=0:
             f.decide(rule,state='insufficient_data',missing=[metric]);continue
-        if p.context.get('activity') not in ('resting','sleeping'):
-            f.decide(rule,state='insufficient_data',missing=['resting observation'],point=p);continue
+        activity=p.context.get('activity')
+        if activity not in ('resting','sleeping','working','exercising','eva'):
+            f.decide(rule,state='insufficient_data',missing=['known activity'],point=p);continue
+        restricted=activity in ('exercising','eva') or any(
+            sample.context.get('activity') in ('exercising','eva')
+            for sample in f.history('heart_rate',1200) if sample.at<=p.at)
+
         reference=f.inflight.get(metric) if metric in ('body_temperature','systolic_blood_pressure') else f.baselines.get(metric)
-        score=band_score(metric,p.value,reference)
+        score=vital_score(metric,p,reference,restricted)
         if score is None:
-            f.decide(rule,state='insufficient_data',missing=['in-flight resting baseline'],point=p);continue
-        drift=bool(metric=='heart_rate' and reference and reference.get('median') is not None and reference['stddev']>0 and abs(p.value-reference['median'])>=3*reference['stddev'])
+            f.decide(rule,state='insufficient_data',missing=['low-value observation during exertion/recovery' if restricted else 'in-flight resting baseline'],point=p);continue
+        drift=bool(metric=='heart_rate' and activity=='resting' and not restricted and reference and reference.get('median') is not None and reference['stddev']>0 and abs(p.value-reference['median'])>=3*reference['stddev'])
         urgent=metric=='spo2' and p.value<=91 and f.flag('breathlessness')
         if (score or drift) and metric in ('heart_rate','spo2') and not urgent:
             seconds=300 if metric=='heart_rate' else 120
             held=sustained(f.history(metric,seconds+60),p.at-timedelta(seconds=seconds),p.at,
-                           lambda sample:sample.context.get('activity') in ('resting','sleeping') and ((abs(sample.value-reference['median'])>=3*reference['stddev']) if drift and score==0 else (band_score(metric,sample.value,reference) or 0)>=score))
+                           lambda sample:sample.context.get('activity') in ('resting','sleeping','working','exercising','eva') and ((sample.context.get('activity')=='resting' and abs(sample.value-reference['median'])>=3*reference['stddev']) if drift and score==0 else (vital_score(metric,sample,reference,restricted) or 0)>=score))
             if held is not True:
                 f.decide(rule,state='pending',missing=[f'{seconds}s persistence with valid readings and gaps ≤60s'],point=p);continue
         scores[metric]=score;score_points[metric]=p
@@ -179,13 +199,29 @@ def evaluate(frame):
         total=sum(scores.values())+(3 if abnormal else 0)+(2 if oxygen.value else 0)
         tier='emergency' if total>=7 else 'warning' if total>=5 else 'caution' if 3 in scores.values() else 'advisory' if total else None
         f.decide('news2',tier,f'Space-adjusted NEWS2 prototype total {total}',point=max(score_points.values(),key=lambda p:p.at),evidence={'total':total,'components':scores,'supplemental_oxygen':oxygen.value,'consciousness':consciousness.value})
-    else:f.decide('news2',state='insufficient_data',missing=sorted(required-set(scores))+(['consciousness'] if not consciousness else [])+(['supplemental_oxygen'] if not oxygen else [])+(['coherent spot-check within 5 minutes'] if not coherent else []))
+    else:
+        # Only a coherent set of available components can establish a lower bound.
+        recent={k:v for k,v in scores.items() if (f.anchor-score_points[k].at).total_seconds()<=300}
+        total=sum(recent.values())+(3 if abnormal else 0)+(2 if oxygen and oxygen.value is True else 0)
+        missing=sorted(required-set(recent))+(['consciousness'] if not consciousness else [])+(['supplemental_oxygen'] if not oxygen else [])
+        tier='emergency' if total>=7 else 'warning' if total>=5 else None
+        f.decide('news2',tier,f'Partial space-adjusted NEWS2 prototype lower bound {total}; missing components remain unknown',
+                 state='insufficient_data',missing=missing,evidence={'total':total,'partial':True,'components':recent},
+                 point=max((score_points[k] for k in recent),key=lambda p:p.at,default=consciousness))
 
     p=f.point('blood_glucose',24*3600)
-    if p and p.context.get('meal_context')=='fasting':
-        outside=p.context.get('meal_context')=='fasting' and (p.value<65 or p.value>110)
-        f.decide('glucose','caution' if outside and any(f.flag(s) for s in ('sweating','shaking','confusion')) else 'advisory' if outside else None,
-                 'Fasting glucose outside 65–110 mg/dL' if outside else None,point=p,evidence={'value':p.value,'meal_context':p.context.get('meal_context')})
+    if p:
+        fasting=p.context.get('meal_context')=='fasting'
+        low=p.value<70
+        confused=f.flag('confusion') or f.flag('new_confusion')
+        tier=('emergency' if confused else 'caution' if p.value<54 or f.flag('sweating') or f.flag('shaking') else 'advisory') if low else ('caution' if any(f.flag(symptom) for symptom in ('sweating','shaking','confusion')) else 'advisory') if fasting and p.value>110 else None
+        if fasting or low:
+            f.decide('glucose',tier,'Glucose: all-meal low-value rule and fasting reference',point=p,evidence={'value':p.value,'meal_context':p.context.get('meal_context')})
+        else:
+            fasting_points=[q for q in f.history('blood_glucose',24*3600) if valid(q) and q.context.get('meal_context')=='fasting']
+            if fasting_points:
+                q=max(fasting_points,key=lambda q:q.at)
+                f.decide('glucose','advisory' if q.value<65 or q.value>110 else None,'Last fasting glucose reference; current reading is not low',point=q,evidence={'value':q.value,'meal_context':'fasting'})
     for code,metric,direction in [('sleep_hours','sleep_duration',-1),('mood','mood',-1),('stress','stress_level',1)]:
         p=f.point(metric,2*DAY);values=f.daily(metric,3);reference=f.baselines.get(metric)
         triggered=False
@@ -194,7 +230,8 @@ def evaluate(frame):
             triggered=bool(values and all(v<6 for v in values)) or bool(week and statistics.mean(week)<6)
             awake=f.point('hours_awake',86400)
             triggered=triggered or bool(awake and awake.value>16)
-            enough=values is not None or week is not None or awake is not None
+            enough=values is not None and week is not None and awake is not None
+            if triggered and p is None and awake and awake.value>16:p=awake
         else:
             enough=values is not None and reference is not None and reference.get('median') is not None
             triggered=bool(enough and all(direction*(v-reference['median'])>=2 for v in values))
@@ -222,8 +259,16 @@ def evaluate(frame):
         p=f.point(metric,900)
         if p:
             level=tier if p.value<bounds[0] or p.value>bounds[1] else None
-            if code=='cabin_pressure' and (p.context.get('rapid_pressure_loss') is True or f.flag('rapid_pressure_loss')):level='emergency'
-            f.decide(code,level,f'{metric}: {p.value:g} outside {bounds[0]}–{bounds[1]}' if level else None,point=p)
+            loss=None
+            if code=='cabin_pressure':
+                prior=[q for q in f.history(metric,600) if valid(q) and type(q.value) in (int,float)
+                       and 0<(p.at-q.at).total_seconds()<=600]
+                if prior:loss=max(q.value-p.value for q in prior)
+                inferred=loss is not None and loss>6.9 and not math.isclose(loss,6.9,abs_tol=1e-9) and p.context.get('planned_pressure_change') is not True
+                if inferred or p.context.get('rapid_pressure_loss') is True or f.flag('rapid_pressure_loss'):level='emergency'
+            f.decide(code,level,'Rapid cabin pressure loss' if code=='cabin_pressure' and level=='emergency' else
+                     f'{metric}: {p.value:g} outside {bounds[0]}–{bounds[1]}' if level else None,point=p,
+                     evidence={'pressure_drop_kpa_within_10min':loss} if code=='cabin_pressure' else {})
     p=f.point('o2_partial_pressure',900)
     if p:
         mean=f.mean('o2_partial_pressure',3600)
@@ -240,16 +285,29 @@ def evaluate(frame):
         f.decide('cabin_humidity','advisory' if p.value>60 or (mean is not None and mean<25) else None,'Humidity: >60% or average <25% (prototype average window: 1 hour)',point=p,state='normal' if mean is not None else 'insufficient_data',evidence={'value_percent':p.value,'hour_mean_percent':mean,'assumption':'Workbook average duration unspecified; 1-hour prototype window'})
     p=f.point('noise_level',900)
     if p:
-        sleeping=p.context.get('sleep_period')
-        if sleeping is None:
-            period=f.point('crew_sleep_period',900)
-            if period is None:
-                f.decide('noise',state='insufficient_data',missing=['explicit work/sleep exposure period'],point=p)
-                sleeping=None
-            else:sleeping=period.value if type(period.value) is bool else None
-        mean=f.mean('noise_level',8*3600 if sleeping else 16*3600,logarithmic=True) if sleeping is not None else None
-        f.decide('noise',('advisory' if mean>50 else None) if sleeping and mean is not None else ('caution' if mean>=72 else 'advisory' if mean>60 else None) if mean is not None else None,
-                 'Energy-averaged cabin noise for sleep/work period',point=p,state='normal' if mean is not None else 'insufficient_data',missing=[] if mean is not None else ['complete 8h sleep or 16h work noise coverage'],evidence={'leq_dba':mean,'period':'sleep' if sleeping else 'work'})
+        exposures=[]
+        for sleeping,duration in ((True,8*3600),(False,16*3600)):
+            samples=f.history('noise_level',duration+900)
+            qualified=[]
+            for sample in samples:
+                tags=dict(sample.context)
+                # A sample exactly at the end covers zero exposure duration and
+                # may legitimately mark the start of the next work/sleep period.
+                if sample.at<f.anchor and tags.get('sleep_period') is not sleeping:
+                    tags['signal_quality']='invalid'
+                qualified.append(Point(sample.value,sample.at,sample.event_id,tags))
+            mean=average(qualified,f.anchor-timedelta(seconds=duration),f.anchor,logarithmic=True)
+            if mean is not None:
+                level=('advisory' if mean>50 else None) if sleeping else ('caution' if mean>=72 else 'advisory' if mean>60 else None)
+                exposures.append((level,mean,sleeping))
+        if exposures:
+            ranks={None:0,'advisory':1,'caution':2}
+            level,mean,sleeping=max(exposures,key=lambda e:ranks[e[0]])
+            f.decide('noise',level,'Energy-averaged qualified work/sleep exposure',point=p,
+                     evidence={'leq_dba':mean,'period':'sleep' if sleeping else 'work'})
+        else:
+            f.decide('noise',point=p,state='insufficient_data',
+                     missing=['complete consistently tagged 8h sleep or 16h work exposure'])
     p=f.point('dust_concentration',900)
     if p and f.environment in ('rover','surface_base'):
         body=p.context.get('surface_body')
@@ -263,6 +321,19 @@ def evaluate(frame):
 
 def evaluate_additional(f):
     """Optional workbook observations arrive as typed context.rule_inputs entries."""
+    p=f.point('diastolic_blood_pressure',3600)
+    reference=f.inflight.get('diastolic_blood_pressure')
+    drift=f.point('diastolic_drift_from_baseline',DAY)
+    if drift and drift.value is True:
+        f.decide('bp_diastolic','advisory','Source-reported diastolic drift',point=drift)
+    elif p and reference and p.context.get('activity') in ('resting','sleeping','working'):
+        outside=p.value<reference['min']-5 or p.value>reference['max']+5
+        f.decide('bp_diastolic','advisory' if outside else None,'Diastolic comparison with in-flight band (±5 mmHg prototype tolerance)',
+                 point=p,evidence={'value':p.value,'reference':reference,'tolerance_mmhg':5})
+    elif drift and drift.value is False:
+        f.decide('bp_diastolic',point=drift)
+    else:
+        f.decide('bp_diastolic',state='insufficient_data',missing=['recent non-exertion diastolic reading and in-flight reference'])
     ranges={'serum_calcium':(2,2.6,'caution'),'sodium':(135,145,'advisory'),'potassium':(3.5,5,'advisory'),
             'platelets':(150,400,'advisory'),'etco2':(35,45,'caution')}
     for code,(lo,hi,tier) in ranges.items():
@@ -304,8 +375,11 @@ def evaluate_additional(f):
         if code=='vision_change':
             if not f.mission_start or (f.anchor-f.mission_start).total_seconds()<=30*DAY:continue
             tier='caution'
-        if code=='ars_symptoms' and not f.flag('after_solar_storm'):continue
-        if code=='dust_symptoms' and not f.flag('within_24h_suit_removal'):continue
+        if code in ('ars_symptoms','dust_symptoms'):
+            gate=f.point('after_solar_storm' if code=='ars_symptoms' else 'within_24h_suit_removal',DAY)
+            combination(f,code,conjunction(truth(p),truth(gate)),tier,
+                        f'{code}: reported observation and exposure context',[p,gate])
+            continue
         if code=='flank_pain' and (f.flag('fever') or f.flag('cannot_urinate')):tier='warning'
         f.decide(code,tier if p.value else None,f'{code}: reported observation',point=p)
     headache=f.point('headache',DAY)
@@ -314,8 +388,8 @@ def evaluate_additional(f):
         f.decide('headache',tier,'Headache: review cabin context and associated symptoms',point=headache)
     pain=f.point('pain_injury',DAY)
     if pain and type(pain.value) in (int,float):f.decide('pain_injury','warning' if pain.value and f.flag('within_24h_eva') and (f.flag('tingling') or f.flag('skin_change')) else 'caution' if pain.value>=7 or f.flag('limiting_work') else 'advisory' if pain.value>0 else None,'Pain / injury report',point=pain)
-    for flag in ('chest_pain','collapse','breathlessness_at_rest','new_confusion','neurological_signs'):
-        if f.flag(flag):f.decide('acute_symptoms','emergency',f'Reported {flag.replace("_"," ")}',point=f.point(flag),evidence={'symptom':flag})
+    acute = ('chest_pain','collapse','breathlessness_at_rest','new_confusion','neurological_signs')
+    boolean_combination(f, 'acute_symptoms', acute, 'emergency', 'Explicit acute symptom review')
     signal_rules={
       'ecg_flag': [('ecg_alarm','caution'),('ecg_alarm_with_symptoms','warning'),('ecg_alarm_with_chest_pain_or_collapse','emergency')],
       'urinary_retention':[('painful_urination_with_fever','caution'),('cannot_urinate','warning')],
@@ -334,8 +408,17 @@ def evaluate_additional(f):
         present=[(name,tier,f.point(name,DAY)) for name,tier in signals if f.point(name,DAY) is not None]
         if not present:continue
         triggered=[(name,tier,p) for name,tier,p in present if p.value is True]
-        picked=triggered[-1] if triggered else present[-1]
-        f.decide(rule,picked[1] if triggered else None,f'{rule}: explicit observed signal {picked[0]}',point=picked[2])
+        if rule=='ecg_flag':
+            alarm=f.point('ecg_alarm',DAY)
+            if alarm and alarm.value is True:
+                tier='emergency' if f.flag('chest_pain') or f.flag('collapse') else 'warning' if any(
+                    f.flag(name) for name in ('symptoms_present','breathlessness','breathlessness_at_rest','lightheadedness','fainting','new_confusion')) else 'caution'
+                triggered.append(('ecg_alarm',tier,alarm))
+                triggered.sort(key=lambda item:{'caution':1,'warning':2,'emergency':3}[item[1]])
+        picked=triggered[-1] if triggered else min(present,key=lambda item:item[2].at)
+        f.decide(rule,picked[1] if triggered else None,f'{rule}: explicit observed signal {picked[0]}',point=picked[2],
+                 state='normal' if triggered or len(present)==len(signals) else 'insufficient_data',
+                 missing=[name for name,_ in signals if f.point(name,DAY) is None])
     # Non-numeric prose ("sustained", "falling", etc.) is never given an invented cutoff.
     explicit={
       'hrv':'sustained_hrv_drop','sphb':'sustained_sphb_shift_ge2','hemoglobin':'hemoglobin_below_sex_reference',
@@ -354,8 +437,7 @@ def evaluate_additional(f):
         if rule in ('spco','spmet') and f.flag('cabin_event_last24h'):tier='warning'
         if rule=='urinary_calcium' and f.flag('flank_pain'):tier='caution'
         f.decide(rule,tier if p.value else None,'Source-supplied reviewed trend flag; no undocumented numerical cutoff inferred',point=p,evidence={'signal':signal})
-    for rule,signal,tier in [('bp_diastolic','diastolic_drift_from_baseline','advisory'),
-                             ('wbc','wbc_outside_reference','advisory'),
+    for rule,signal,tier in [('wbc','wbc_outside_reference','advisory'),
                              ('wbc_infection','wbc_abnormal_with_infection','caution'),
                              ('wbc_radiation','lymphocytes_falling_after_large_dose','warning')]:
         p=f.point(signal,DAY)
@@ -367,36 +449,79 @@ def evaluate_additional(f):
     f.decide('perfusion_index',state='quality_gate',point=perfusion,missing=[] if perfusion else ['perfusion_index'],message='Signal-quality gate only; not a standalone medical alert')
 
 
+def truth(point, predicate=lambda v: v is True):
+    return None if point is None else bool(predicate(point.value))
+
+
+def conjunction(*values):
+    return False if False in values else None if None in values else True
+
+
+def disjunction(*values):
+    return True if True in values else None if None in values else False
+
+
+def combination(f, code, condition, tier, message, points):
+    """Three-valued logic: missing evidence never counts as a normal observation.
+
+    Recovery uses the oldest participating observation, so unrelated ticks cannot
+    count the same negative findings again. Triggers use the newest evidence.
+    """
+    known=[p for p in points if p is not None]
+    point=(max if condition else min)(known,key=lambda p:p.at) if known else None
+    return f.decide(code, tier if condition is True else None, message, point=point,
+                    state='insufficient_data' if condition is None else 'normal',
+                    missing=['explicit fresh observations for combination'] if condition is None else [],
+                    evidence={'event_ids':sorted({p.event_id for p in known})})
+
+
+def boolean_combination(f, code, names, tier, message):
+    points=[f.point(name,DAY) for name in names]
+    return combination(f,code,disjunction(*(truth(p) for p in points)),tier,message,points)
+
+
 def patterns(person,cabin=None):
     p=person;c=cabin
     if c:
         co2=c.mean('co2_partial_pressure',7*DAY)
         headache=p.point('headache',DAY);sleep=p.point('sleep_duration',2*DAY)
-        if co2 is not None and co2>=2.5 and ((headache and type(headache.value) in (int,float) and headache.value>=1) or (sleep and sleep.value<6)):
-            c.decide('pattern_cabin_first','advisory','Review habitat conditions before personal interpretation',point=c.point('co2_partial_pressure'),evidence={'seven_day_co2_mmhg':co2})
+        condition=conjunction(None if co2 is None else co2>=2.5,
+            disjunction(truth(headache,lambda v:v>=1),truth(sleep,lambda v:v<6)))
+        combination(p,'pattern_cabin_first',condition,'advisory',
+            'Review habitat conditions before personal interpretation',
+            [c.point('co2_partial_pressure',900),headache,sleep])
     sleep=p.daily('sleep_duration',3);reaction=p.point('reaction_ms',5*DAY);base=p.baselines.get('reaction_ms')
-    slow=bool(reaction and base and reaction.value>base['mean']) or p.flag('reaction_slower_two_tests')
-    if sleep is not None and slow:
-        p.decide('pattern_fatigue','caution' if all(v<6 for v in sleep) else None,'Short sleep plus slower reaction; higher explicit Parameters tier takes precedence',point=p.point('sleep_duration'))
-    fluids=p.daily('fluid_intake',1,total=True);urine=p.point('urine_volume',DAY);colour=p.point('urine_colour',DAY);calcium=p.point('urinary_calcium',35*DAY)
-    if fluids is not None or urine:
-        low=(fluids is not None and fluids[-1]<2) or bool(urine and urine.value<2.5)
-        contributor=bool(colour and colour.value=='dark') or bool(calcium and calcium.value>300) or p.flag('urinary_calcium_rising')
-        if contributor:p.decide('pattern_stone_risk','caution' if low and p.flag('flank_pain') else 'advisory' if low else None,'Hydration / urinary observation combination',point=p.point('fluid_intake') or urine)
-    if p.mission_start and (p.anchor-p.mission_start).total_seconds()>30*DAY:
-        point=p.point('vision_change',DAY) or p.point('amsler_acuity',DAY)
-        if point:p.decide('pattern_eye_change','caution' if point.value is True else None,'Visual change after flight day 30',point=point)
-    if p.flag('cabin_event_last24h'):
-        for key in ('spco_rise_after_cabin_event','spmet_rise_after_cabin_event'):
-            point=p.point(key,DAY)
-            if point:p.decide('pattern_smoke_toxic','warning' if point.value is True else None,'Reported blood-gas change after cabin event',point=point)
-    if p.flag('within_24h_eva',DAY):
-        severe=any(p.flag(key) for key in ('numbness','weakness','new_confusion','breathing_trouble'))
-        mild=any(p.flag(key) for key in ('joint_pain','tingling','skin_change'))
-        if severe or mild:p.decide('pattern_after_eva','emergency' if severe else 'warning','Post-EVA symptoms require the matching approved checklist',point=p.point('within_24h_eva'))
-    noaa=p.point('noaa_s_level',3600);projected=p.point('projected_event_dose_msv',3600)
-    if noaa and noaa.value>=1 and p.flag('dose_rate_rising'):
-        p.decide('pattern_solar_storm','warning' if projected and projected.value>=200 else 'caution','Rising dose rate and explicit NOAA space-weather alert',point=projected or noaa)
-    fitness=p.point('fitness',35*DAY)
-    if fitness and fitness.context.get('quantity')=='percent_of_preflight' and p.point('exercise_below_plan_7days',DAY):
-        p.decide('pattern_deconditioning','caution' if fitness.value<80 and p.flag('exercise_below_plan_7days') else None,'Exercise plan adherence combined with fitness reference',point=fitness)
+    reviewed=p.point('reaction_slower_two_tests',DAY)
+    slow=truth(reviewed) if reviewed is not None else truth(reaction,lambda v:v>base['mean']) if base else None
+    combination(p,'pattern_fatigue',conjunction(None if sleep is None else all(v<6 for v in sleep),slow),
+        'caution','Short sleep plus slower reaction', [p.point('sleep_duration',2*DAY),reviewed,reaction])
+    fluids=p.daily('fluid_intake',1,total=True);urine=p.point('urine_volume',DAY);colour=p.point('urine_colour',DAY)
+    calcium=p.point('urinary_calcium',35*DAY);rising=p.point('urinary_calcium_rising',DAY);pain=p.point('flank_pain',DAY)
+    low=disjunction(None if fluids is None else fluids[-1]<2,truth(urine,lambda v:v<2.5))
+    high_calcium=truth(calcium,lambda v:v>300) if calcium is not None else truth(rising)
+    contributor=disjunction(truth(colour,lambda v:v=='dark'),high_calcium)
+    combination(p,'pattern_stone_risk',conjunction(low,contributor),
+        'caution' if truth(pain) else 'advisory','Hydration / urinary observation combination',
+        [p.point('fluid_intake',DAY),urine,colour,calcium,rising,pain])
+    vision=p.point('vision_change',DAY);amsler=p.point('amsler_acuity',DAY)
+    after30=None if p.mission_start is None else (p.anchor-p.mission_start).total_seconds()>30*DAY
+    combination(p,'pattern_eye_change',conjunction(after30,disjunction(truth(vision),truth(amsler))),
+        'caution','Visual change after flight day 30',[vision,amsler])
+    event=p.point('cabin_event_last24h',DAY)
+    gases=[p.point(key,DAY) for key in ('spco_rise_after_cabin_event','spmet_rise_after_cabin_event')]
+    combination(p,'pattern_smoke_toxic',conjunction(truth(event),disjunction(*(truth(g) for g in gases))),
+        'warning','Reported blood-gas change after cabin event',[event,*gases])
+    eva=p.point('within_24h_eva',DAY)
+    severe=[p.point(key,DAY) for key in ('numbness','weakness','new_confusion','breathing_trouble')]
+    mild=[p.point(key,DAY) for key in ('joint_pain','tingling','skin_change')]
+    combination(p,'pattern_after_eva',conjunction(truth(eva),disjunction(*(truth(v) for v in severe+mild))),
+        'emergency' if any(truth(v) for v in severe) else 'warning',
+        'Post-EVA symptom review',[eva,*severe,*mild])
+    noaa=p.point('noaa_s_level',3600);projected=p.point('projected_event_dose_msv',3600);rising=p.point('dose_rate_rising',3600)
+    combination(p,'pattern_solar_storm',conjunction(truth(noaa,lambda v:v>=1),truth(rising)),
+        'warning' if projected and projected.value>=200 else 'caution',
+        'Rising dose rate and explicit NOAA space-weather alert',[noaa,projected,rising])
+    fitness=p.point('fitness',35*DAY);exercise=p.point('exercise_below_plan_7days',DAY)
+    fit=truth(fitness,lambda v:v<80) if fitness and fitness.context.get('quantity')=='percent_of_preflight' else None
+    combination(p,'pattern_deconditioning',conjunction(fit,truth(exercise)),
+        'caution','Exercise plan adherence combined with fitness reference',[fitness,exercise])

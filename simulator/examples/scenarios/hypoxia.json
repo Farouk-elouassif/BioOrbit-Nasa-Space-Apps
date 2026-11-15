@@ -1,0 +1,10 @@
+{
+  "name": "symptomatic_hypoxia",
+  "duration": 300,
+  "astronaut_id": "AST_001",
+  "measurements": {"spo2": 90},
+  "context": {
+    "activity": "resting",
+    "rule_inputs": {"breathlessness": {"value": true}}
+  }
+}

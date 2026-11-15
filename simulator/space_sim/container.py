@@ -34,10 +34,17 @@ def prepare(store, env, stopping=lambda: False):
             speed=number(env, 'SIM_SPEED', 1),
             preflight_days=int(env.get('SIM_PREFLIGHT_DAYS', '14')),
             run_id=env.get('SIM_RUN_ID', 'demo-001'),
+            surface_body=env.get('SIM_SURFACE_BODY', 'mars'),
+            error_level=number(env, 'SIM_ERROR_LEVEL', 0, allow_zero=True),
         )
         store.initialize(config)
         log.info('Created mission %s with %d astronauts', config.mission_id, config.astronauts)
     engine = store.load()
+    if 'SIM_ERROR_LEVEL' in env:
+        level=number(env, 'SIM_ERROR_LEVEL', 0, allow_zero=True)
+        if level!=engine.config.error_level:
+            store.control('error-level', value=level)
+            engine=store.load()
     target = min(days, engine.config.duration_days) * DAY
     log.info('Resuming day %.6f; startup history target day %.6f', engine.state['seconds']/DAY, target/DAY)
     ticks = 0

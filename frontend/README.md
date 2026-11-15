@@ -27,7 +27,7 @@ BIOORBIT_BACKEND_URL=http://127.0.0.1:8080 npm run dev
 ## Connected views
 
 - `GET /api/v1/dashboard` refreshes every five seconds. The roster, actual participant count, activity, locations, latest readings, source timestamps, preflight baselines, heart-rate mini charts, habitat values, mission day, and simulated clock come from the selected database run.
-- `GET /api/v1/trends` supplies recorded 24-hour, seven-day, or thirty-day charts, refreshed every fifteen seconds. These currently query PostgreSQL journal history; Gold/DuckDB analytics are not yet integrated.
+- `GET /api/v1/trends` supplies recorded 24-hour, seven-day, or thirty-day charts, refreshed every fifteen seconds. These query the PostgreSQL event journal, the sole application history store.
 - Select an explicit run or use the newest available run automatically. Habitat selection and selected-crew habitat changes scope the shared cabin view.
 - The twelve-region interactive 3D suit model, hover cards, floating cabin points, and crew comparison use the connected measurements. Changing astronauts resets orientation; rotating the person does not rotate cabin markers.
 - White/gray light mode and navy dark mode remain available. Only the theme preference persists in local storage.
@@ -38,9 +38,9 @@ No fixed four-person mock roster remains. Default simulation settings create thr
 
 No placeholder readings, fabricated historical points, fixed medical incidents, fake deck locations, or numerical forecasts are substituted when data is missing. Unknown values display `—`; empty history stays empty. On connection loss the last snapshot can remain visible alongside an explicit connection-error message. Requests time out and retry; changing run/person cancels obsolete requests.
 
-Freshness is assessed relative to the run's latest simulated observation time, so accelerated/future-dated simulations are not compared incorrectly with wall-clock time. Overdue data is a collection status, not a clinical alert. Clinical alert rules and forecasts are not connected yet.
+Freshness is assessed relative to the run's latest simulated observation time, so accelerated/future-dated simulations are not compared incorrectly with wall-clock time. Overdue data is a collection status, not a clinical alert. Clinical alert rules are connected; forecasts remain unimplemented.
 
-Session check-in notes are still local to the current browser tab, explicitly labeled, and clear on refresh. They do not overwrite backend telemetry. A persistent check-in API is future work. Offline/PWA caching is not implemented.
+Authenticated crew check-ins persist in the backend and feed alert evaluation. Manual measurements enter the recorded journal; symptoms and notes retain author and mission time. Offline/PWA caching is not implemented.
 
 ## Validation
 
@@ -59,3 +59,38 @@ npm run preview
 Preview uses the same API proxy. Browser interaction and real PostgreSQL round-trip verification must be performed against the services you run; no Docker containers or dev server were started by the assistant.
 
 The Alerts navigation item displays persisted workbook alerts, evidence, guidance, recheck times and acknowledgment. Crew cards, body regions and cabin pins reflect the highest applicable severity. Missing inputs and collection tasks are shown separately. This is a workbook-based prototype; session notes remain local and do not supply clinical rule inputs.
+
+Crew check-ins now save to the backend and feed the rule engine. The form accepts
+manual core indicators, consciousness, oxygen treatment, headache, red flags and
+ECG findings. Blank fields remain unknown. Sign in with a Django account granted
+`core.add_crewcheckin` (or a superuser); the form prompts for login when needed.
+The Crew check-ins view reloads saved reports after refresh. Backend migration
+`0006_crewcheckin` must be applied before using this feature. Findings are stored
+in simulated mission time; reports remain in history after their alert-input
+freshness expires.
+
+## Recorded decisions and history
+
+Alert details show recorded findings, the workbook condition for the displayed tier,
+mission observation/recheck times and readable guidance. Raw evidence and provenance
+remain available in an expandable panel. Reference conditions do not replace the
+engine's recorded evaluation, including held alert tiers.
+
+History charts include UTC axes, focusable/tappable exact aggregate values, expandable
+value tables, personal preflight reference bands where available, and separate systolic
+and diastolic blood-pressure series. Missing hourly/daily buckets break the lines.
+Habitat and cabin-zone selectors scope readings, history and displayed crew locations.
+
+API connectivity is separate from telemetry receipt age. The dashboard supplies
+`run.telemetry_received_at`, excluding manual crew check-ins. A feed with no receipt
+for over 30 wall-clock seconds is labeled inactive; this is independent of mission-time
+measurement freshness. The receipt clock continues updating during a connection loss.
+
+The Three.js body view loads on demand and pauses its animation loop while the page
+is hidden. Run `npm test` for mapping, presentation and recorded-history regressions.
+
+Habitat metric cards use the same interactive history panels as crew indicators:
+24-hour, seven-day and thirty-day windows, UTC axes, exact aggregate inspection,
+recorded-value tables and gaps for missing buckets. Each panel queries the selected
+run, habitat and cabin zone. Personal preflight reference labels apply only to crew
+charts; habitat charts show recorded environmental measurements.

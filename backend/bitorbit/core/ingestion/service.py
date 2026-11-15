@@ -1,4 +1,6 @@
 """Atomic event journal + preflight projection + timestamp-ordered live projection."""
+from itertools import groupby
+
 from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
@@ -129,44 +131,67 @@ def ingest(items):
 
     latest_rows = list(LatestMeasurement.objects.filter(run_id__in=runs))
     latest = {latest_key(row.run_id, row.domain, row.astronaut_id, row.habitat_id, row.zone_id, row.metric_id): row for row in latest_rows}
-    original_ids = {row.pk for row in latest_rows}
-    changed = {}
-    for item in new:
-        data = item.payload
-        if data['kind'] != 'measurement' or data['phase'] != 'inflight':
-            continue
-        astronaut = astronauts.get(data['astronaut_id'])
-        habitat = habitats[(data['mission_id'], data['habitat_id'])]
-        key = latest_key(data['run_id'], data['domain'], astronaut.pk if astronaut else None, habitat.pk, data['zone_id'], data['metric'])
-        current = latest.get(key)
-        if current is not None and not supersedes(item, current):
-            continue
-        if current is None:
-            current = LatestMeasurement(run=runs[data['run_id']], domain=data['domain'], astronaut=astronaut, metric=metrics[data['metric']])
-        value = data['value']
-        current.habitat = habitat
-        current.zone_id = data['zone_id']
-        current.numeric_value = None if type(value) is bool else value
-        current.boolean_value = value if type(value) is bool else None
-        current.context = data['context']
-        current.measured_at = item.measured_at
-        current.source_event_id = item.event_id
-        current.updated_at = timezone.now()
-        latest[key] = current
-        changed[key] = current
-    creates = [row for row in changed.values() if row.pk is None]
-    updates = [row for row in changed.values() if row.pk in original_ids]
-    LatestMeasurement.objects.bulk_create(creates)
-    if updates:
-        LatestMeasurement.objects.bulk_update(updates, ['habitat', 'zone_id', 'numeric_value', 'boolean_value',
-                                                        'context', 'measured_at', 'source_event', 'updated_at'])
-    for run_id, run in runs.items():
-        newest = max((i for i in new if i.payload['run_id'] == run_id), key=lambda i: (i.measured_at, i.event_id.int), default=None)
-        if newest is not None and (run_id not in previous_times or newest.measured_at >= previous_times[run_id]):
-            if run.environment != newest.payload['environment']:
-                run.environment = newest.payload['environment']
-                run.save(update_fields=['environment'])
-    from core.alerts.service import evaluate_run
-    for run in runs.values():
-        evaluate_run(run)
+    from core.alerts.service import evaluate_run, project_rule_inputs
+    journal_by_id = {event.event_id: event for event in journal}
+    evaluated = set()
+    # Publish each mission-time instant before evaluating it. Simultaneous vital
+    # readings and supplemental facts must be visible together, while later
+    # readings in this batch must not hide an intermediate trigger or recovery.
+    ordered = sorted(new, key=lambda item: (item.measured_at, item.event_id.int))
+    for at, observations in groupby(ordered, key=lambda item: item.measured_at):
+        observations = list(observations)
+        changed = {}
+        for item in observations:
+            data = item.payload
+            if data['kind'] != 'measurement' or data['phase'] != 'inflight':
+                continue
+            astronaut = astronauts.get(data['astronaut_id'])
+            habitat = habitats[(data['mission_id'], data['habitat_id'])]
+            key = latest_key(data['run_id'], data['domain'], astronaut.pk if astronaut else None, habitat.pk, data['zone_id'], data['metric'])
+            current = latest.get(key)
+            if current is not None and not supersedes(item, current):
+                continue
+            if current is None:
+                current = LatestMeasurement(run=runs[data['run_id']], domain=data['domain'], astronaut=astronaut, metric=metrics[data['metric']])
+            value = data['value']
+            current.habitat = habitat
+            current.zone_id = data['zone_id']
+            current.numeric_value = None if type(value) is bool else value
+            current.boolean_value = value if type(value) is bool else None
+            current.context = data['context']
+            current.measured_at = item.measured_at
+            current.source_event_id = item.event_id
+            current.updated_at = timezone.now()
+            latest[key] = current
+            changed[key] = current
+        creates = [row for row in changed.values() if row.pk is None]
+        updates = [row for row in changed.values() if row.pk is not None]
+        LatestMeasurement.objects.bulk_create(creates)
+        if updates:
+            LatestMeasurement.objects.bulk_update(updates, ['habitat', 'zone_id', 'numeric_value', 'boolean_value',
+                                                            'context', 'measured_at', 'source_event', 'updated_at'])
+        # Keep environment and independent facts on the same timeline as values.
+        # Already-stored future values are never rewound for a late history batch.
+        group_runs = {}
+        inflight_runs = set()
+        for item in observations:
+            data = item.payload
+            group_runs[data['run_id']] = item
+            if data['kind'] == 'measurement' and data['phase'] == 'inflight':
+                inflight_runs.add(data['run_id'])
+        for run_id, item in group_runs.items():
+            run = runs[run_id]
+            if run_id not in previous_times or at >= previous_times[run_id]:
+                if run.environment != item.payload['environment']:
+                    run.environment = item.payload['environment']
+                    run.save(update_fields=['environment'])
+        project_rule_inputs([journal_by_id[item.event_id] for item in observations])
+        for run_id in sorted(inflight_runs):
+            if run_id not in previous_times or at >= previous_times[run_id]:
+                evaluate_run(runs[run_id])
+                evaluated.add(run_id)
+    # A late-only batch can complete historical coverage or add a preflight
+    # reference. Reassess the current state without replaying old transitions.
+    for run_id in sorted(set(runs) - evaluated):
+        evaluate_run(runs[run_id])
     return {'accepted_event_ids': [str(i.event_id) for i in items], 'created_count': len(new), 'duplicate_count': len(items)-len(new)}
